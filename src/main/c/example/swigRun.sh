@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # wrapper in java
-swig -java example.i
+swig -cpp -java example.i
 # compiling
 gcc -fPIC -c example_wrap.c -I/usr/lib/jvm/java-7-openjdk-amd64/include/ -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux/
 gcc -fPIC -c example.c
