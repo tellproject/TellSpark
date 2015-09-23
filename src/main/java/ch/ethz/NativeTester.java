@@ -2,7 +2,7 @@ package ch.ethz;
 
 public class NativeTester {
     static {
-        System.loadLibrary("customer");
+        System.loadLibrary("cimpl");
     }
 
     public native long createStruct();
