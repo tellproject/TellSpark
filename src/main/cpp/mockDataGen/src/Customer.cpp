@@ -44,16 +44,18 @@ long Customer::serializeCustomers(Customer *c, int n) {
 	offset += sizeof(int32_t);
 	memcpy(cont+offset, &c->wId, sizeof(c->wId));
 	// copy alphanumeric fields
-//	uint32_t sz1 = c->cFirst.size();
-
-//	memcpy(cont + nf*sizeof(c->cId), &sz1, sizeof(sz1));
-//	memcpy(cont + (nf+1)*sizeof(int32_t), c->cFirst.data(), sz1);
-
-//	int offset = (nf+1)*sizeof(int32_t) + sz1;
-//	uint32_t sz2 = c->cState.size();
-//	memcpy(cont + offset + sizeof(c->cId), &sz2, sizeof(sz2));
-//	offset += sizeof(c->cId);
-//	memcpy(cont + offset, c->cState.data(), sz2);
+	////first field
+	offset += sizeof(int32_t);
+	uint32_t sz1 = c->cFirst.size();
+	memcpy(cont + offset, &sz1, sizeof(sz1));
+	offset += sizeof(int32_t);
+	memcpy(cont + offset, c->cFirst.data(), sz1);
+	////second field
+	offset += sz1;
+	uint32_t sz2 = c->cState.size();
+	memcpy(cont + offset, &sz2, sizeof(sz2));
+	offset += sizeof(int32_t);
+	memcpy(cont + offset, c->cState.data(), sz2);
 
 //	std::string str("hell world!");
 //    int32_t i = 42;

@@ -29,13 +29,27 @@ public class Main {
         offset += 4;
         int wId = u.getInt(s + offset);
         System.out.printf("wId-> %d\n", wId);
-//        offset += 4;
-//        int sz = u.getInt(s + offset);
-//        byte[] str = new byte[sz];
-//        for (int i = 0; i < sz; ++i) {
-//            str[i] = u.getByte(s + 8 + i);
-//        }
-//        System.out.printf("String: %s\n", new String(str, "UTF-8"));
+        offset += 4;
+        int sz = u.getInt(s + offset);
+        System.out.printf("string1 size-> %d\n", sz);
+        offset += 4;
+        byte[] str = new byte[sz];
+        for (int i = 0; i < sz; ++i) {
+            str[i] = u.getByte(s + offset + i);
+        }
+        System.out.printf("String:--%s--\n", new String(str, "UTF-8"));
+        offset += sz;
+        int sz2 = u.getInt(s + offset);
+        System.out.printf("string2 size-> %d\n", sz2);
+        offset += 4;
+        System.out.printf("String:--%s--\n", readString(u, s +offset, sz2));
         tester.deleteStruct(s);
+    }
+    public static String readString(Unsafe u, long add, int length) throws UnsupportedEncodingException {
+        byte[] str = new byte[length];
+        for (int i = 0; i < length; ++i) {
+            str[i] = u.getByte(add + i);
+        }
+        return new String(str, "UTF-8");
     }
 }
