@@ -331,6 +331,7 @@ string DataSource::genAlphanumeric64(int minLength, int maxLength) {
 	int rLength=0;
 	randomUniformInt(minLength,maxLength,rLength);
 	int rPosition=0;
+
 	randomUniformInt(0,rLength-8,rPosition);
 	oss << genAlphanumeric64(rPosition);
 	oss << "ORIGINAL";

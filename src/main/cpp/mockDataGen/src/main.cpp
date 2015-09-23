@@ -10,11 +10,10 @@ int main ()
     int cId = 1;
     int dId = 2;
     int wId = 3;
-    Customer *c;
-    Customer::createCustomer(cId, dId, wId, c);
-
-        cout<<"Test \n";
-        //Customer::printCustomer(c);
-        cout << "Hell \n";
-        return 0;
+    Customer *c = Customer::createCustomer(cId, dId, wId);
+    cout<<"Test \n";
+    Customer::printCustomer(c);
+    cout << Customer::serializeCustomers(c, 1) << endl;
+    cout << "Hell \n";
+    return 0;
 }
