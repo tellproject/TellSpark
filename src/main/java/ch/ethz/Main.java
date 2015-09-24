@@ -13,6 +13,30 @@ public class Main {
         return (Unsafe) singleoneInstanceField.get(null);
     }
 
+    public static Customer getSingleCostumer() throws NoSuchFieldException, IllegalAccessException, UnsupportedEncodingException {
+        Unsafe u = getUnsafe();
+        NativeTester tester = new NativeTester();
+        long s = tester.createStruct();
+        int offset = 0;
+        // read a numbers from c++ memory
+        // TODO knowing the schema can improve this?
+        int cId = u.getInt(s);
+        offset += 4;
+        int dId = u.getInt(s + offset);
+        offset += 4;
+        int wId = u.getInt(s + offset);
+        offset += 4;
+        // read a string from the C++ heap
+        int sz = u.getInt(s + offset);
+        offset += 4;
+        String first = readString(u, s + offset, sz);
+        offset += sz;
+        int sz2 = u.getInt(s + offset);
+        offset += 4;
+        String last = readString(u, s + offset, sz2);
+        return new Customer(cId, dId, wId, first, last);
+    }
+
     public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException, UnsupportedEncodingException {
         Unsafe u = getUnsafe();
         NativeTester tester = new NativeTester();
@@ -33,18 +57,15 @@ public class Main {
         int sz = u.getInt(s + offset);
         System.out.printf("string1 size-> %d\n", sz);
         offset += 4;
-        byte[] str = new byte[sz];
-        for (int i = 0; i < sz; ++i) {
-            str[i] = u.getByte(s + offset + i);
-        }
-        System.out.printf("String:--%s--\n", new String(str, "UTF-8"));
+        System.out.printf("String:--%s--\n", readString(u, s + offset, sz));
         offset += sz;
         int sz2 = u.getInt(s + offset);
         System.out.printf("string2 size-> %d\n", sz2);
         offset += 4;
-        System.out.printf("String:--%s--\n", readString(u, s +offset, sz2));
+        System.out.printf("String:--%s--\n", readString(u, s + offset, sz2));
         tester.deleteStruct(s);
     }
+
     public static String readString(Unsafe u, long add, int length) throws UnsupportedEncodingException {
         byte[] str = new byte[length];
         for (int i = 0; i < length; ++i) {
