@@ -13,30 +13,6 @@ public class Main {
         return (Unsafe) singleoneInstanceField.get(null);
     }
 
-    public static Customer getSingleCostumer() throws NoSuchFieldException, IllegalAccessException, UnsupportedEncodingException {
-        Unsafe u = getUnsafe();
-        NativeTester tester = new NativeTester();
-        long s = tester.createStruct();
-        int offset = 0;
-        // read a numbers from c++ memory
-        // TODO knowing the schema can improve this?
-        int cId = u.getInt(s);
-        offset += 4;
-        int dId = u.getInt(s + offset);
-        offset += 4;
-        int wId = u.getInt(s + offset);
-        offset += 4;
-        // read a string from the C++ heap
-        int sz = u.getInt(s + offset);
-        offset += 4;
-        String first = readString(u, s + offset, sz);
-        offset += sz;
-        int sz2 = u.getInt(s + offset);
-        offset += 4;
-        String last = readString(u, s + offset, sz2);
-        return new Customer(cId, dId, wId, first, last);
-    }
-
     public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException, UnsupportedEncodingException {
         Unsafe u = getUnsafe();
         NativeTester tester = new NativeTester();
