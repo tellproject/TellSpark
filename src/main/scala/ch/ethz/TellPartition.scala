@@ -5,7 +5,7 @@ import org.apache.spark.Partition
 /**
  * Contains basic information about TellStore partition
  */
-class tellPartition[T] (val index: Int, val memAddr: Long) extends Partition {
+class TellPartition[T] (val index: Int, val memAddr: Long) extends Partition {
 
   override def toString = {
     val sb = new StringBuilder

@@ -12,16 +12,17 @@ object TellClient {
   // TODO we should get the number of partitions from tell
   // number of memory regions to be read
   val nPartitions: Int = 5
-  val array = new Array[Long](nPartitions)
+  var array = Array.empty[Long]
   // the transactions we need to pay attention to
   val trxId: Long = 0
 
 
   def getMemLocations() : Array[Long] = {
-    if (array.length == 0) {
+    if (array.isEmpty) {
+      array = new Array[Long](nPartitions)
       val u: Unsafe = getUnsafe()
       val tester: NativeTester = new NativeTester
-      (1 to nPartitions).map(n => {
+      (0 to nPartitions-1).map(n => {
         val memAddr: Long = tester.createStruct
         array(n) = memAddr
       })

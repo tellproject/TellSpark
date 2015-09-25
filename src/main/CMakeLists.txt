@@ -18,7 +18,7 @@ include(UseJava)
 
 set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.8" "-target" "1.8")
 set(CMAKE_JNI_TARGET TRUE)
-add_jar(testunsafe java/ch/ethz/Main.java java/ch/ethz/NativeTester.java VERSION 1.0)
+add_jar(testunsafe java/ch/ethz/Main.java java/ch/ethz/NativeTester.java java/ch/ethz/Customer.java VERSION 1.0)
 javah(testunsafe "ch.ethz.NativeTester")
 
 find_package(JNI REQUIRED)
