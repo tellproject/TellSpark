@@ -10,11 +10,14 @@ import static sun.misc.Unsafe.getUnsafe;
 /**
  */
 public class Customer {
-    private final int cId;
-    private final int dId;
-    private final int wId;
-    private final String cFirst;
-    private final String cLast;
+    private int cId;
+    private int dId;
+    private int wId;
+    private String cFirst;
+    private String cLast;
+
+    Customer () {
+    }
 
     Customer (int c, int d, int w, String first, String last) {
         cId = c;
@@ -22,6 +25,21 @@ public class Customer {
         wId = w;
         cFirst = first;
         cLast = last;
+    }
+
+    public void setField(int fPos, Object val) {
+        switch(fPos) {
+            case 0: this.cId = (int) val;
+                break;
+            case 1: this.dId = (int) val;
+                break;
+            case 2: this.wId = (int) val;
+                break;
+            case 3: this.cFirst = val.toString();
+                break;
+            case 4: this.cLast = val.toString();
+                break;
+        }
     }
 
     public static Customer deserialize(long memAddrs) throws UnsupportedEncodingException {
