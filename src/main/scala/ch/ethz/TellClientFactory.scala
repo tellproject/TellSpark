@@ -21,7 +21,7 @@ object TellClientFactory {
 
   def getConnection(): ClientManager = {
     if (clientManager == null) {
-      clientManager = new ClientManager(storageMng, commitMng, chNumber, chSize)
+      clientManager = new ClientManager(commitMng, storageMng, chNumber, chSize)
     }
     clientManager
   }

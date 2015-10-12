@@ -8,8 +8,10 @@ import org.apache.spark.rdd.RDD
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.reflect.ClassTag
+import java.lang.reflect.Field
 
-import ch.ethz.tell.{Unsafe, ScanQuery, Schema}
+
+import ch.ethz.tell.{ClientManager, Unsafe, ScanQuery, Schema}
 
 /**
  * RDD class for connecting to TellStore
@@ -114,14 +116,27 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
     getIterator(split.asInstanceOf[TellPartition[T]])
   }
 
+  def getUnsafe(): sun.misc.Unsafe = {
+    val singleoneInstanceField: Field = classOf[sun.misc.Unsafe].getDeclaredField("theUnsafe")
+    singleoneInstanceField.setAccessible(true)
+    singleoneInstanceField.get(null).asInstanceOf[sun.misc.Unsafe]
+  }
 
   override protected def getPartitions: Array[Partition] = {
     val array = new Array[Partition](TellClientFactory.chNumber)
+//    println("@@")
+//    val u = getUnsafe()
+    println("@@")
+    val clientManager = new ClientManager("192.168.0.11:7242", "192.168.0.11:7241", 4, 50000)
+    println("@@")
     TellClientFactory.startTransaction()
 
     (0 to TellClientFactory.chNumber -1).map(pos => {
       //TODO do range querying
-      array(pos) = new TellPartition(pos, TellClientFactory.trx.scan(tQuery, tTable, null))
+
+      println("=1=================================" + pos)
+      array(pos) = new TellPartition(pos, TellClientFactory.trx.scan(new ScanQuery, tTable, null))
+      println("=2=================================")
     })
     array
   }
