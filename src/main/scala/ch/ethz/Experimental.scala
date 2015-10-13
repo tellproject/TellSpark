@@ -19,8 +19,9 @@ object Experimental {
 
     // schema to be read
 //    val cm = new ClientManager(TellClientFactory.storageMng,TellClientFactory.commitMng, TellClientFactory.chNumber, TellClientFactory.chSize)
-//    val sch: Schema = new Schema()
-//    sch.addField(Schema.FieldType.INT, "number", true)
+    val sch: TellSchema = new TellSchema()
+
+    sch.addField(Schema.FieldType.INT, "number", true)
 //    sch.addField(Schema.FieldType.TEXT, "text1", true)
 //    sch.addField(Schema.FieldType.BIGINT, "largenumber", true)
 //    sch.addField(Schema.FieldType.TEXT, "text2", true)
