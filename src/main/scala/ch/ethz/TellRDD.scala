@@ -21,14 +21,14 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
   extends RDD[T](sc, deps) with Logging {
 
   // Tell schema
-  var tSchema: Schema = null
+  var tSchema: TellSchema = null
   // Tell table
   var tTable: String = ""
   // Tell query 
   var tQuery: ScanQuery = null
 
-  def this(sc: SparkContext, tbl: String, qry: ScanQuery, sch: Schema) = {
-    this(sc, null)
+  def this(@transient sc: SparkContext, tbl: String, qry: ScanQuery, sch: TellSchema) = {
+    this(sc, Nil)
     tSchema = sch
     tTable = tbl
     tQuery = qry
@@ -37,25 +37,78 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
   def getIterator(theSplit: TellPartition[T]): Iterator[T] = {
     val it = new Iterator[T] {
       // TODO a better way to map this?
-      var elems = mutable.Queue[T]()
-      var counter = 0
+      var offset = 0L
+      var cnt = 0
+      var keepGoing = theSplit.scanIt.next()
+      var len = theSplit.scanIt.length()
+      var addr = theSplit.scanIt.address()
 
       override def hasNext: Boolean = {
-        elems.isEmpty
+        println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4" + keepGoing)
+        keepGoing
       }
 
       override def next(): T = {
-        if (elems.front == null) {
-          if (theSplit.scanIt.next()) {
-            theSplit.scanIt.address()
-            theSplit.scanIt.length()
-            elems ++= getRecords(theSplit.scanIt.address(), theSplit.scanIt.length())
-          }
+        var tmpCustomer:Customer = null
+        if (offset == len) {
+          keepGoing = theSplit.scanIt.next()
+          len = theSplit.scanIt.length()
+          addr = theSplit.scanIt.address()
+          offset = 0
         }
-        elems.dequeue()
+        if (offset != len) {
+          tmpCustomer = new Customer
+          offset = len
+          cnt += 1
+        }
+        tmpCustomer.asInstanceOf[T]
       }
     }
+
     it
+  }
+
+  def getRecord(addr: Long, len: Long, offset: Long): (Long, T) = {
+    var fieldCnt = 0
+    val unsafe: sun.misc.Unsafe = Unsafe.getUnsafe()
+    var off = offset
+    off += 8
+    var tmpCustomer = new Customer
+    // fixed size fields
+    for (fieldType:Schema.FieldType <- tSchema.fixedSizeFields) {
+      fieldType match {
+        case FieldType.SMALLINT =>
+        case FieldType.INT =>
+        case FieldType.FLOAT =>
+          off += 2L
+          tmpCustomer.setField(fieldCnt, unsafe.getInt(addr + off))
+          fieldCnt += 1
+          off += 4
+        case FieldType.BIGINT =>
+        case FieldType.DOUBLE =>
+          off  += 6;
+          tmpCustomer.setField(fieldCnt, unsafe.getLong(addr + off))
+          fieldCnt += 1
+          off += 8;
+      }
+    }
+    fieldCnt += 1
+    // variable sized fields
+    for (fieldType:Schema.FieldType <- tSchema.varSizeFields) {
+      var ln = unsafe.getInt(addr + off);
+      off += 4;
+      var str = readString(unsafe, addr + off, ln);
+      if (str.length() != 94 && str.length() != 147)
+        throw new IllegalStateException("Error while reading expected record");
+      tmpCustomer.setField(fieldCnt, str)
+      fieldCnt += 1
+      if (off % 8 != 0) off += 8 - (off % 8)
+      off += ln;
+    }
+    println("/////////////////////////////////////")
+    println(tmpCustomer.toString)
+    println("/////////////////////////////////////")
+    (off, tmpCustomer.asInstanceOf[T])
   }
 
   def getRecords(addr: Long, len: Long): List[T] = {
@@ -86,7 +139,7 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
       }
       fieldCnt += 1
       // variable sized fields
-      for (fieldType:Schema.FieldType <- tSchema.variableSizedFields) {
+      for (fieldType:Schema.FieldType <- tSchema.varSizeFields) {
         var ln = unsafe.getInt(addr + offset);
         offset += 4;
         var str = readString(unsafe, addr + offset, ln);
@@ -96,6 +149,9 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
         fieldCnt += 1
         offset += ln;
       }
+      println("/////////////////////////////////////")
+      println(tmpCustomer.toString)
+      println("/////////////////////////////////////")
       recs += tmpCustomer
     }
     null
@@ -110,33 +166,38 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
     new String(str, "UTF-8")
   }
 
-  @DeveloperApi
-  override def compute(split: Partition, context: TaskContext): Iterator[T] = {
-    //TODO for each partition registered, get the customer values out
-    getIterator(split.asInstanceOf[TellPartition[T]])
+  /**
+   * Returns an array with all elements in this RDD
+   * @return
+   */
+  override def collect(): Array[T] = {
+    val results = sc.runJob(this, (iter: Iterator[T]) => iter.toArray)
+    TellClientFactory.trx.commit()
+    Array.concat(results: _*)
   }
 
-  def getUnsafe(): sun.misc.Unsafe = {
-    val singleoneInstanceField: Field = classOf[sun.misc.Unsafe].getDeclaredField("theUnsafe")
-    singleoneInstanceField.setAccessible(true)
-    singleoneInstanceField.get(null).asInstanceOf[sun.misc.Unsafe]
+  def compute(split: Partition, context: TaskContext): Iterator[T] = {
+    //TODO for each partition registered, get the customer values out
+    println("/////////////////////////////////////")
+    val it = getIterator(split.asInstanceOf[TellPartition[T]])
+    println("/////////////////////////////////////")
+    it
   }
+
+//  def getUnsafe(): sun.misc.Unsafe = {
+//    val singleoneInstanceField: Field = classOf[sun.misc.Unsafe].getDeclaredField("theUnsafe")
+//    singleoneInstanceField.setAccessible(true)
+//    singleoneInstanceField.get(null).asInstanceOf[sun.misc.Unsafe]
+//  }
 
   override protected def getPartitions: Array[Partition] = {
     val array = new Array[Partition](TellClientFactory.chNumber)
-//    println("@@")
-//    val u = getUnsafe()
-    println("@@")
-    val clientManager = new ClientManager("192.168.0.11:7242", "192.168.0.11:7241", 4, 50000)
-    println("@@")
+    val proj:Array[Short] = null
     TellClientFactory.startTransaction()
 
     (0 to TellClientFactory.chNumber -1).map(pos => {
       //TODO do range querying
-
-      println("=1=================================" + pos)
-      array(pos) = new TellPartition(pos, TellClientFactory.trx.scan(new ScanQuery, tTable, null))
-      println("=2=================================")
+      array(pos) = new TellPartition(pos, TellClientFactory.trx.scan(new ScanQuery, tTable, proj))
     })
     array
   }

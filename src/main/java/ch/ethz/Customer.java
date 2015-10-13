@@ -2,6 +2,7 @@ package ch.ethz;
 
 import sun.misc.Unsafe;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
 import static ch.ethz.Main.readString;
@@ -9,15 +10,17 @@ import static sun.misc.Unsafe.getUnsafe;
 
 /**
  */
-public class Customer {
+public class Customer implements Serializable {
+
+    private static final long serialVersionUID = 7526472295622770144L;
+
     private int cId;
     private int dId;
     private int wId;
     private String cFirst;
     private String cLast;
 
-    Customer () {
-    }
+    Customer () {}
 
     Customer (int c, int d, int w, String first, String last) {
         cId = c;

@@ -7,7 +7,7 @@ import ch.ethz.tell.{ClientManager, ScanQuery, Schema}
  */
 object Experimental {
 
-  val conf = new SparkConf().setMaster("local[*]").setAppName("Test")
+  val conf = new SparkConf()//.setMaster("local[2]").setAppName("Test")
   val sc = new SparkContext(conf)
 
   def main(args : Array[String]) {
@@ -22,16 +22,17 @@ object Experimental {
     val sch: TellSchema = new TellSchema()
 
     sch.addField(Schema.FieldType.INT, "number", true)
-//    sch.addField(Schema.FieldType.TEXT, "text1", true)
-//    sch.addField(Schema.FieldType.BIGINT, "largenumber", true)
-//    sch.addField(Schema.FieldType.TEXT, "text2", true)
+    sch.addField(Schema.FieldType.TEXT, "text1", true)
+    sch.addField(Schema.FieldType.BIGINT, "largenumber", true)
+    sch.addField(Schema.FieldType.TEXT, "text2", true)
 
     val tblName = "testTable"
     // rdd creation
-//    val tellRdd = new TellRDD[Customer](sc, tblName, new ScanQuery(), sch)
-    val tellRdd = new TellRDD[Customer](sc, tblName, new ScanQuery(), null)
-    println("=============")
+    val tellRdd = new TellRDD[Customer](sc, tblName, new ScanQuery(), sch)
+//    val tellRdd = new TellRDD[Customer](sc, tblName, new ScanQuery(), null)
+    println("=============MAPPING==============")
     tellRdd.map(println(_))
+    println("=============COLLECTING==============")
     tellRdd.collect()
   }
 }
