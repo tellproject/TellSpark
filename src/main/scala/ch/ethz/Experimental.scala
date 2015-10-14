@@ -42,7 +42,7 @@ object Experimental {
     val tblName = "testTable"
     // rdd creation
     val tellRdd = new TellRDD[Customer](sc, tblName, new ScanQuery(), sch)
-    tellRdd.map(p => if (p.getcId == 0) println(p.toString))
+    tellRdd.map(println(_))
     val result = tellRdd.collect()
     println("[TUPLES] %d".format(result.length))
   }

@@ -124,6 +124,7 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
   override def collect(): Array[T] = {
     val results = sc.runJob(this, (iter: Iterator[T]) => iter.toArray)
     TellClientFactory.trx.commit()
+    println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
     Array.concat(results: _*)
   }
 
