@@ -42,6 +42,7 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
       var keepGoing = theSplit.scanIt.next()
       var len = theSplit.scanIt.length()
       var addr = theSplit.scanIt.address()
+      val res:(Long, T) = null
 
       override def hasNext: Boolean = {
         println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4" + keepGoing)
@@ -57,36 +58,49 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
           offset = 0
         }
         if (offset != len) {
-          tmpCustomer = new Customer
-          offset = len
+          val res = getRecord(addr, offset)// new Customer
+//          tmpCustomer = res._2
+          offset = res._1
+
           cnt += 1
         }
-        tmpCustomer.asInstanceOf[T]
+//        tmpCustomer.asInstanceOf[T]
+        res._2
       }
     }
 
     it
   }
 
-  def getRecord(addr: Long, len: Long, offset: Long): (Long, T) = {
+  def getRecord(addr: Long, offset: Long): (Long, T) = {
     var fieldCnt = 0
     val unsafe: sun.misc.Unsafe = Unsafe.getUnsafe()
     var off = offset
     off += 8
-    var tmpCustomer = new Customer
+    val tmpCustomer = new Customer
     // fixed size fields
     for (fieldType:Schema.FieldType <- tSchema.fixedSizeFields) {
       fieldType match {
         case FieldType.SMALLINT =>
+          println("@@@@@@@@@@@@@@@@@@@@@@@")
+          println(unsafe.getShort(addr + off))
+          println("@@@@@@@@@@@@@@@@@@@@@@@")
+          tmpCustomer.setField(fieldCnt, unsafe.getShort(addr + off))
+          fieldCnt += 1
+          off += 2
         case FieldType.INT =>
         case FieldType.FLOAT =>
-          off += 2L
+          println("@@@@@@@@@@@@@@@@@@@@@@@")
+          println(unsafe.getInt(addr + off))
+          println("@@@@@@@@@@@@@@@@@@@@@@@")
           tmpCustomer.setField(fieldCnt, unsafe.getInt(addr + off))
           fieldCnt += 1
           off += 4
         case FieldType.BIGINT =>
         case FieldType.DOUBLE =>
-          off  += 6;
+          println("@@@@@@@@@@@@@@@@@@@@@@@")
+          println(unsafe.getLong(addr + off))
+          println("@@@@@@@@@@@@@@@@@@@@@@@")
           tmpCustomer.setField(fieldCnt, unsafe.getLong(addr + off))
           fieldCnt += 1
           off += 8;
@@ -97,64 +111,16 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
     for (fieldType:Schema.FieldType <- tSchema.varSizeFields) {
       var ln = unsafe.getInt(addr + off);
       off += 4;
-      var str = readString(unsafe, addr + off, ln);
-      if (str.length() != 94 && str.length() != 147)
-        throw new IllegalStateException("Error while reading expected record");
+      val str = readString(unsafe, addr + off, ln);
       tmpCustomer.setField(fieldCnt, str)
       fieldCnt += 1
       if (off % 8 != 0) off += 8 - (off % 8)
       off += ln;
     }
-    println("/////////////////////////////////////")
+    println("/////////////////////1////////////////")
     println(tmpCustomer.toString)
-    println("/////////////////////////////////////")
+    println("////////////////////2/////////////////")
     (off, tmpCustomer.asInstanceOf[T])
-  }
-
-  def getRecords(addr: Long, len: Long): List[T] = {
-    var offset = 0
-    val unsafe: sun.misc.Unsafe = Unsafe.getUnsafe()
-    var recs = ListBuffer[Customer]()
-
-    while (offset != len) {
-      var fieldCnt = 0
-      var tmpCustomer = new Customer
-      // fixed size fields
-      for (fieldType:Schema.FieldType <- tSchema.fixedSizeFields) {
-        fieldType match {
-          case FieldType.SMALLINT =>
-          case FieldType.INT =>
-          case FieldType.FLOAT =>
-            offset += 2
-            tmpCustomer.setField(fieldCnt, unsafe.getInt(addr + offset))
-            fieldCnt += 1
-            offset += 4
-          case FieldType.BIGINT =>
-          case FieldType.DOUBLE =>
-            offset += 6;
-            tmpCustomer.setField(fieldCnt, unsafe.getLong(addr + offset))
-            fieldCnt += 1
-            offset += 8;
-        }
-      }
-      fieldCnt += 1
-      // variable sized fields
-      for (fieldType:Schema.FieldType <- tSchema.varSizeFields) {
-        var ln = unsafe.getInt(addr + offset);
-        offset += 4;
-        var str = readString(unsafe, addr + offset, ln);
-        if (str.length() != 94 && str.length() != 147)
-          throw new IllegalStateException("Error while reading expected record");
-        tmpCustomer.setField(fieldCnt, str)
-        fieldCnt += 1
-        offset += ln;
-      }
-      println("/////////////////////////////////////")
-      println(tmpCustomer.toString)
-      println("/////////////////////////////////////")
-      recs += tmpCustomer
-    }
-    null
   }
 
   def readString(u: sun.misc.Unsafe, add: Long, length: Int): String = {
