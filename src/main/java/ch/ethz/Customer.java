@@ -1,14 +1,9 @@
 package ch.ethz;
 
-import sun.misc.Unsafe;
-
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-
-import static ch.ethz.Main.readString;
-import static sun.misc.Unsafe.getUnsafe;
 
 /**
+ * Sample Java Bean
  */
 public class Customer implements Serializable {
 
@@ -22,7 +17,7 @@ public class Customer implements Serializable {
 
     Customer () {}
 
-    Customer (int c, int d, int w, String first, String last) {
+    Customer (int c, long d, long w, String first, String last) {
         cId = c;
         dId = d;
         wId = w;
@@ -43,30 +38,6 @@ public class Customer implements Serializable {
             case 4: this.cLast = val.toString();
                 break;
         }
-    }
-
-    public static Customer deserialize(long memAddrs) throws UnsupportedEncodingException {
-        Unsafe u = getUnsafe();
-        NativeTester tester = new NativeTester();
-        long s = tester.createStruct();
-        int offset = 0;
-        // read a numbers from c++ memory
-        // TODO knowing the schema can improve this?
-        int cId = u.getInt(s);
-        offset += 4;
-        int dId = u.getInt(s + offset);
-        offset += 4;
-        int wId = u.getInt(s + offset);
-        offset += 4;
-        // read a string from the C++ heap
-        int sz = u.getInt(s + offset);
-        offset += 4;
-        String first = readString(u, s + offset, sz);
-        offset += sz;
-        int sz2 = u.getInt(s + offset);
-        offset += 4;
-        String last = readString(u, s + offset, sz2);
-        return new Customer(cId, dId, wId, first, last);
     }
 
     @Override

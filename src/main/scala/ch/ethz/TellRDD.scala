@@ -3,15 +3,10 @@ package ch.ethz;
 import ch.ethz.tell.Schema.FieldType
 import org.apache.spark._
 import org.apache.spark.SparkContext
-import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.rdd.RDD
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 import scala.reflect.ClassTag
-import java.lang.reflect.Field
 
-
-import ch.ethz.tell.{ClientManager, Unsafe, ScanQuery, Schema}
+import ch.ethz.tell.{Unsafe, ScanQuery, Schema}
 
 /**
  * RDD class for connecting to TellStore
@@ -136,12 +131,6 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
     //TODO for each partition registered, get the customer values out
     getIterator(split.asInstanceOf[TellPartition[T]])
   }
-
-//  def getUnsafe(): sun.misc.Unsafe = {
-//    val singleoneInstanceField: Field = classOf[sun.misc.Unsafe].getDeclaredField("theUnsafe")
-//    singleoneInstanceField.setAccessible(true)
-//    singleoneInstanceField.get(null).asInstanceOf[sun.misc.Unsafe]
-//  }
 
   override protected def getPartitions: Array[Partition] = {
     val array = new Array[Partition](TellClientFactory.chNumber)

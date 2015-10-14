@@ -1,6 +1,5 @@
 package ch.ethz
 
-import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 import ch.ethz.tell.{ScanQuery, Schema}
 
