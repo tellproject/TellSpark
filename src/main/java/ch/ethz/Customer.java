@@ -15,8 +15,8 @@ public class Customer implements Serializable {
     private static final long serialVersionUID = 7526472295622770144L;
 
     private int cId;
-    private int dId;
-    private int wId;
+    private long dId;
+    private long wId;
     private String cFirst;
     private String cLast;
 
@@ -34,9 +34,9 @@ public class Customer implements Serializable {
         switch(fPos) {
             case 0: this.cId = (int) val;
                 break;
-            case 1: this.dId = (int) val;
+            case 1: this.dId = (long) val;
                 break;
-            case 2: this.wId = (int) val;
+            case 2: this.wId = (long) val;
                 break;
             case 3: this.cFirst = val.toString();
                 break;
@@ -83,11 +83,11 @@ public class Customer implements Serializable {
         return cId;
     }
 
-    public int getdId() {
+    public long getdId() {
         return dId;
     }
 
-    public int getwId() {
+    public long getwId() {
         return wId;
     }
 

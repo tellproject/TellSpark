@@ -55,6 +55,14 @@ object TellClientFactory {
     array
   }
 
+  override def toString() : String = {
+    val sb = new StringBuilder
+    sb.append("{commitMng:").append(commitMng).append(",")
+    sb.append("storageMng:").append(storageMng).append(",")
+    sb.append("chNumber:").append(chNumber).append(",")
+    sb.append("chSize:").append(chSize).append("}")
+    sb.toString()
+  }
   def getUnsafe(): Unsafe = {
     val singleoneInstanceField: Field = classOf[Unsafe].getDeclaredField("theUnsafe")
     singleoneInstanceField.setAccessible(true)

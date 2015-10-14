@@ -39,18 +39,18 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
       // TODO a better way to map this?
       var offset = 0L
       var cnt = 0
+      var cnt1 = 0
       var keepGoing = theSplit.scanIt.next()
       var len = theSplit.scanIt.length()
       var addr = theSplit.scanIt.address()
-      val res:(Long, T) = null
+      var res:(Long, T) = null
 
       override def hasNext: Boolean = {
-        println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4" + keepGoing)
         keepGoing
       }
 
       override def next(): T = {
-        var tmpCustomer:Customer = null
+        var tmpCustomer:Customer = new Customer
         if (offset == len) {
           keepGoing = theSplit.scanIt.next()
           len = theSplit.scanIt.length()
@@ -58,13 +58,10 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
           offset = 0
         }
         if (offset != len) {
-          val res = getRecord(addr, offset)// new Customer
-//          tmpCustomer = res._2
+          res = getRecord(addr, offset)// new Customer
           offset = res._1
-
           cnt += 1
         }
-//        tmpCustomer.asInstanceOf[T]
         res._2
       }
     }
@@ -73,6 +70,7 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def getRecord(addr: Long, offset: Long): (Long, T) = {
+
     var fieldCnt = 0
     val unsafe: sun.misc.Unsafe = Unsafe.getUnsafe()
     var off = offset
@@ -80,27 +78,21 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
     val tmpCustomer = new Customer
     // fixed size fields
     for (fieldType:Schema.FieldType <- tSchema.fixedSizeFields) {
+
+
       fieldType match {
         case FieldType.SMALLINT =>
-          println("@@@@@@@@@@@@@@@@@@@@@@@")
-          println(unsafe.getShort(addr + off))
-          println("@@@@@@@@@@@@@@@@@@@@@@@")
+
           tmpCustomer.setField(fieldCnt, unsafe.getShort(addr + off))
           fieldCnt += 1
           off += 2
-        case FieldType.INT =>
-        case FieldType.FLOAT =>
-          println("@@@@@@@@@@@@@@@@@@@@@@@")
-          println(unsafe.getInt(addr + off))
-          println("@@@@@@@@@@@@@@@@@@@@@@@")
+        case FieldType.INT | FieldType.FLOAT =>
+
           tmpCustomer.setField(fieldCnt, unsafe.getInt(addr + off))
           fieldCnt += 1
           off += 4
-        case FieldType.BIGINT =>
-        case FieldType.DOUBLE =>
-          println("@@@@@@@@@@@@@@@@@@@@@@@")
-          println(unsafe.getLong(addr + off))
-          println("@@@@@@@@@@@@@@@@@@@@@@@")
+        case FieldType.BIGINT | FieldType.DOUBLE =>
+
           tmpCustomer.setField(fieldCnt, unsafe.getLong(addr + off))
           fieldCnt += 1
           off += 8;
@@ -114,19 +106,17 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
       val str = readString(unsafe, addr + off, ln);
       tmpCustomer.setField(fieldCnt, str)
       fieldCnt += 1
-      if (off % 8 != 0) off += 8 - (off % 8)
       off += ln;
     }
-    println("/////////////////////1////////////////")
-    println(tmpCustomer.toString)
-    println("////////////////////2/////////////////")
+    // aligning the next record
+    if (off % 8 != 0) off += 8 - (off % 8)
     (off, tmpCustomer.asInstanceOf[T])
   }
 
   def readString(u: sun.misc.Unsafe, add: Long, length: Int): String = {
     val str = new Array[Byte](length)
     var i = 0
-    for (i <- 1 to length){
+    for (i <- 0 to length-1){
       str(i) = u.getByte(add + i)
     }
     new String(str, "UTF-8")
@@ -144,10 +134,7 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
     //TODO for each partition registered, get the customer values out
-    println("/////////////////////////////////////")
-    val it = getIterator(split.asInstanceOf[TellPartition[T]])
-    println("/////////////////////////////////////")
-    it
+    getIterator(split.asInstanceOf[TellPartition[T]])
   }
 
 //  def getUnsafe(): sun.misc.Unsafe = {
