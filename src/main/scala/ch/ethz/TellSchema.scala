@@ -11,23 +11,18 @@ class TellSchema() extends Serializable {
   var fixedSizeFields = ArrayBuffer[FieldType]()
   var varSizeFields = ArrayBuffer[FieldType]()
   var fields = ArrayBuffer[TellField]()
-  var length: Int = 0
+  var cnt: Int = 0
 
   def addField(fType: FieldType, fName: String, fNull: Boolean) = {
     fType match {
-      case FieldType.NOTYPE =>
-      case FieldType.NULLTYPE =>
-      case FieldType.SMALLINT =>
-      case FieldType.INT =>
-      case FieldType.BIGINT =>
-      case FieldType.FLOAT =>
-      case FieldType.DOUBLE =>
+      case FieldType.NOTYPE | FieldType.NULLTYPE | FieldType.SMALLINT |
+      FieldType.INT | FieldType.BIGINT | FieldType.FLOAT | FieldType.DOUBLE =>
         fixedSizeFields += fType
-      case FieldType.TEXT =>
-      case FieldType.BLOB =>
+      case FieldType.TEXT | FieldType.BLOB =>
         varSizeFields += fType
     }
-    fields += new TellField(length, fType, fName, fNull)
+    fields += new TellField(cnt, fType, fName, fNull)
+    cnt += 1
   }
 
   class TellField(var index: Int, var fieldType: FieldType, var fieldName: String, var nullable: Boolean)
@@ -41,6 +36,12 @@ class TellSchema() extends Serializable {
       sb.append("null:").append(nullable).append("}")
       sb.toString()
     }
+  }
+
+  override def toString() : String = {
+    var sb = new StringBuilder
+    fields.map(f => sb.append(f.toString()).append("\n"))
+    sb.toString
   }
 
 }

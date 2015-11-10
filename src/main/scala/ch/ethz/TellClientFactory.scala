@@ -14,6 +14,7 @@ object TellClientFactory {
   var storageMng: String = ""
   var chNumber = 0
   var chSize = 0
+  // TODO we should use it properly
   var trx : Transaction = null
 
   //  val clientManager : ClientManager = new ClientManager(commitMng, tellStr, chunkCount, chunkSize);
@@ -34,27 +35,14 @@ object TellClientFactory {
     trx.commit()
   }
 
-  // TODO we should get the number of partitions from tell
-  // number of memory regions to be read
-  var array = Array.empty[Long]
-  // the transactions we need to pay attention to
-  val trxId: Long = 0
-
-
-  def getMemLocations(): Array[Long] = {
-    if (array.isEmpty) {
-      array = new Array[Long](chNumber)
-
-      val u: Unsafe = getUnsafe()
-      val tester: NativeTester = new NativeTester
-//      (0 to nPartitions - 1).map(n => {
-//        val memAddr: Long = tester.createStruct
-//        array(n) = memAddr
-//      })
-    }
-    array
+  override def toString() : String = {
+    val sb = new StringBuilder
+    sb.append("{commitMng:").append(commitMng).append(",")
+    sb.append("storageMng:").append(storageMng).append(",")
+    sb.append("chNumber:").append(chNumber).append(",")
+    sb.append("chSize:").append(chSize).append("}")
+    sb.toString()
   }
-
   def getUnsafe(): Unsafe = {
     val singleoneInstanceField: Field = classOf[Unsafe].getDeclaredField("theUnsafe")
     singleoneInstanceField.setAccessible(true)
