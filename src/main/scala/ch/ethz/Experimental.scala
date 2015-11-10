@@ -46,24 +46,25 @@ object Experimental {
 
     val tblName = "testTable"
     // rdd creation
-    val tellRdd = new TellRDD[Customer](sc, tblName, new ScanQuery(), sch)
+    val tellRdd = new TellRDD[TellRecord](sc, tblName, new ScanQuery(), sch)
 //    val tellRdd = new TellRDD[Customer](sc, tblName, new ScanQuery(), null)
+
     println("=============MAPPING==============")
-    val grouped = tellRdd.filter(record => record.getcFirst() > "2007")
-      .groupBy(record => record.getcId()).sortByKey().map( p => {
-      val idd = p._1
-      val it = p._2.iterator
-      var s1 = 0
-      var s2 = 0
-      var cnt = 0
-      while(it.hasNext) {
-       val cus = it.next()
-        s1 += cus.getdId()
-        s2 += cus.getwId()
-        cnt += 1
-      }
-      (idd, s1, s2, s1/cnt, s2/cnt)
-    })
+//    val grouped = tellRdd.filter(record => record.getField() > "2007")
+//      .groupBy(record => record.getcId()).sortByKey().map( p => {
+//      val idd = p._1
+//      val it = p._2.iterator
+//      var s1 = 0
+//      var s2 = 0
+//      var cnt = 0
+//      while(it.hasNext) {
+//       val cus = it.next()
+//        s1 += cus.getdId()
+//        s2 += cus.getwId()
+//        cnt += 1
+//      }
+//      (idd, s1, s2, s1/cnt, s2/cnt)
+//    })
 
     /*
     select   ol_number,
