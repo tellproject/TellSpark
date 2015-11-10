@@ -15,9 +15,9 @@ public class Customer implements Serializable {
     private String cFirst;
     private String cLast;
 
-    Customer () {}
+    public Customer () {}
 
-    Customer (int c, long d, long w, String first, String last) {
+    public Customer (int c, long d, long w, String first, String last) {
         cId = c;
         dId = d;
         wId = w;

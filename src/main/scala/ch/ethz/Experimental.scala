@@ -1,12 +1,12 @@
 package ch.ethz
 
+import ch.ethz.tell
 import org.apache.spark.{SparkConf, SparkContext}
-import ch.ethz.tell.{ClientManager, ScanQuery, Schema}
+import ch.ethz.tell._
 import org.apache.spark.sql.functions.count
 import org.apache.spark.sql.functions.sum
 import org.apache.spark.sql.functions.avg
 import org.apache.spark.sql.functions.udf
-import ch.ethz.tell.{ScanQuery, Schema}
 
 /**
  */
@@ -46,8 +46,8 @@ object Experimental {
 
     val tblName = "testTable"
     // rdd creation
-    val tellRdd = new TellRDD[TellRecord](sc, tblName, new ScanQuery(), sch)
-//    val tellRdd = new TellRDD[Customer](sc, tblName, new ScanQuery(), null)
+//    val tellRdd = new TellRDD[TellRecord](sc, tblName, new ScanQuery(), sch)
+    val tellRdd = new TellRDD[Customer](sc, tblName, new ScanQuery(), null)
 
     println("=============MAPPING==============")
 //    val grouped = tellRdd.filter(record => record.getField() > "2007")

@@ -1,8 +1,8 @@
-package ch.ethz
+package ch.ethz.tell
 
-import scala.collection.mutable.ArrayBuffer
 import ch.ethz.tell.Schema.FieldType
-import collection.mutable.HashMap
+
+import scala.collection.mutable.{ArrayBuffer, HashMap}
 
 /**
  * Wrapper around the native schema class used in TellStore
@@ -37,17 +37,17 @@ class TellSchema() extends Serializable {
     fields.map(f => sb.append(f.toString()).append("\n"))
     sb.toString
   }
-}
 
-class TellField(var index: Int, var fieldType: FieldType, var fieldName: String, var nullable: Boolean)
-  extends Serializable {
+  class TellField(var index: Int, var fieldType: FieldType, var fieldName: String, var nullable: Boolean)
+    extends Serializable {
 
-  override def toString(): String = {
-    var sb = new StringBuilder
-    sb.append("{index:").append(index).append(", ")
-    sb.append("type:").append(fieldType).append(", ")
-    sb.append("name:").append(fieldName).append(", ")
-    sb.append("null:").append(nullable).append("}")
-    sb.toString()
+    override def toString(): String = {
+      var sb = new StringBuilder
+      sb.append("{index:").append(index).append(", ")
+      sb.append("type:").append(fieldType).append(", ")
+      sb.append("name:").append(fieldName).append(", ")
+      sb.append("null:").append(nullable).append("}")
+      sb.toString()
+    }
   }
 }

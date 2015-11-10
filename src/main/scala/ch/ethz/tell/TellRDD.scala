@@ -1,19 +1,20 @@
-package ch.ethz;
+package ch.ethz.tell
 
+import ch.ethz.Customer
+import ch.ethz.TellClientFactory
 import ch.ethz.tell.Schema.FieldType
-import org.apache.spark._
-import org.apache.spark.SparkContext
+import ch.ethz.tell.TellSchema
+import org.apache.spark.{SparkContext, _}
 import org.apache.spark.rdd.RDD
-import scala.reflect.ClassTag
 
-import ch.ethz.tell.{Unsafe, ScanQuery, Schema}
+import scala.reflect.ClassTag
 
 /**
  * RDD class for connecting to TellStore
  */
 class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
                              @transient var deps: Seq[Dependency[_]])
-  extends RDD[T](sc, deps) with Logging {
+  extends RDD [T](sc, deps) with Logging {
 
   // Tell schema
   var tSchema: TellSchema = null
@@ -45,7 +46,6 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
       }
 
       override def next(): T = {
-        var tmpCustomer:Customer = new Customer
         if (offset == len) {
           keepGoing = theSplit.scanIt.next()
           len = theSplit.scanIt.length()
@@ -70,7 +70,7 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
     val unsafe: sun.misc.Unsafe = Unsafe.getUnsafe()
     var off = offset
     off += 8
-    val tmpCustomer = new Customer
+    val tmpCustomer = new Customer()
     // fixed size fields
     for (fieldType:Schema.FieldType <- tSchema.fixedSizeFields) {
 

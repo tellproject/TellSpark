@@ -1,6 +1,5 @@
-package ch.ethz
+package ch.ethz.tell
 
-import ch.ethz.tell.ScanIterator
 import org.apache.spark.Partition
 
 /**
