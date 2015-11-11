@@ -7,6 +7,7 @@ import ch.ethz.tell.TellSchema
 import org.apache.spark.{SparkContext, _}
 import org.apache.spark.rdd.RDD
 
+import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
 
 /**
@@ -28,6 +29,14 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
     tSchema = sch
     tTable = tbl
     tQuery = qry
+  }
+
+  def this(@transient scc: TSparkContext, tbl: String, query: ScanQuery, sch: TellSchema) = {
+    this(scc.sparkContext, tbl, query, sch)
+  }
+
+  def this(@transient oneParent: TellRDD[_]) = {
+    this(oneParent.context, List(new OneToOneDependency(oneParent)))
   }
 
   def getIterator(theSplit: TellPartition[T]): Iterator[T] = {
@@ -70,7 +79,7 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
     val unsafe: sun.misc.Unsafe = Unsafe.getUnsafe()
     var off = offset
     off += 8
-    val tmpCustomer = new Customer()
+    val tmpCustomer:TellRecord = new TellRecord(tSchema, new ArrayBuffer[Any]())
     // fixed size fields
     for (fieldType:Schema.FieldType <- tSchema.fixedSizeFields) {
 
@@ -95,7 +104,9 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
     }
     fieldCnt += 1
     // variable sized fields
+
     for (fieldType:Schema.FieldType <- tSchema.varSizeFields) {
+      if (off % 4 != 0) off += 4 - (off % 4)
       var ln = unsafe.getInt(addr + off);
       off += 4;
       val str = readString(unsafe, addr + off, ln);
@@ -140,7 +151,7 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
 
     (0 to TellClientFactory.chNumber -1).map(pos => {
       //TODO do range querying
-      array(pos) = new TellPartition(pos, TellClientFactory.trx.scan(new ScanQuery, tTable, proj))
+      array(pos) = new TellPartition(pos, TellClientFactory.trx.scan(new ScanQuery()., tTable, proj))
     })
     array
   }

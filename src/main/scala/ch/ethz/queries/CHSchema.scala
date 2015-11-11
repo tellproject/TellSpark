@@ -18,6 +18,7 @@ object CHSchema {
 			"	\"W_TAX\" DECIMAL(4,4) CS_FIXED,\n"
 			"	\"W_YTD\" DECIMAL(12,2) CS_FIXED,\n"
    */
+  //TODO order by size
   val warehouseSch: TellSchema = new TellSchema()
   warehouseSch.addField(Schema.FieldType.INT, "W_ID", false)
   warehouseSch.addField(Schema.FieldType.TEXT, "W_NAME", false)

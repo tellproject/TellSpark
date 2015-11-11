@@ -8,6 +8,7 @@ import scala.collection.mutable.ArrayBuffer
 class TellRecord (val fieldSchema: TellSchema, val values : ArrayBuffer[Any])
   extends Serializable {
 
+
   def getComplete() = {
     (fieldSchema.fields, values)
   }
@@ -17,6 +18,10 @@ class TellRecord (val fieldSchema: TellSchema, val values : ArrayBuffer[Any])
 
   def getField(fieldName : String) = {
     fieldSchema.strFields(fieldName)
+  }
+
+  def setField(idx: Int, value: Any) = {
+    values(idx) = value
   }
 
   def getValue(fieldName : String) = {

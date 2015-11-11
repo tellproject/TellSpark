@@ -1,7 +1,7 @@
 package ch.ethz.queries
 
 import ch.ethz.TellClientFactory
-import ch.ethz.tell.{TellRecord, TellRDD, ScanQuery}
+import ch.ethz.tell.{TSparkContext, TellRecord, TellRDD, ScanQuery}
 import org.apache.spark.{SparkContext, SparkConf}
 
 /**
@@ -22,25 +22,31 @@ object Q1 {
     var cm = "192.168.0.11:7242"
     var cn = 4
     var cs = 5120000
+    var masterUrl = "localhost[12]"
+    var appName = "ch_Qry1"
 
     // client properties
-    if (args.length == 4) {
+    if (args.length >= 4) {
       st = args(0)
       cm = args(1)
       cn = args(2).toInt
       cs = args(3).toInt
+      if (args.length == 6) {
+        masterUrl = args(4)
+        appName = args(5)
+      } else {
+        println("[TELL] Incorrect number of parameters")
+        println("[TELL] <strMng> <commitMng> <chunkNum> <chunkSz> <masterUrl> <appName>")
+        sys.exit()
+      }
     }
 
-    TellClientFactory.storageMng = st
-    TellClientFactory.commitMng = cm
-    TellClientFactory.chNumber = cn
-    TellClientFactory.chSize = cs
+    val scc = new TSparkContext(masterUrl, appName, st, cm, cn, cs)
     println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
-
     // rdd creation
-    val tellRdd = new TellRDD[TellRecord](sc, "order", new ScanQuery(), CHSchema.orderLineSch)
+    //val tellRdd = new TellRDD[TellRecord](sc, "order", new ScanQuery(), CHSchema.orderLineSch)
+    val tellRdd = new TellRDD[TellRecord](scc, "order", new ScanQuery(), CHSchema.orderLineSch)
 
-    println("=============MAPPING==============")
     val grouped = tellRdd.filter(record => record.getValue("OL_DELIVERY_D").asInstanceOf[String] > "2007")
       .groupBy(record => record.getValue("OL_NUMBER").asInstanceOf[Int]).sortByKey()
       .map( p => {
