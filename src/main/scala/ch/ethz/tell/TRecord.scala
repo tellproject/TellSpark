@@ -5,7 +5,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by marenato on 10.11.15.
  */
-class TellRecord (val fieldSchema: TellSchema, val values : ArrayBuffer[Any])
+class TRecord (val fieldSchema: TSchema, val values : ArrayBuffer[Any])
   extends Serializable {
 
 

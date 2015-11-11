@@ -3,7 +3,7 @@ package ch.ethz.tell
 import ch.ethz.Customer
 import ch.ethz.TellClientFactory
 import ch.ethz.tell.Schema.FieldType
-import ch.ethz.tell.TellSchema
+import ch.ethz.tell.TSchema
 import org.apache.spark.{SparkContext, _}
 import org.apache.spark.rdd.RDD
 
@@ -13,33 +13,33 @@ import scala.reflect.ClassTag
 /**
  * RDD class for connecting to TellStore
  */
-class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
+class TRDD [T: ClassTag]( @transient var sc: SparkContext,
                              @transient var deps: Seq[Dependency[_]])
   extends RDD [T](sc, deps) with Logging {
 
   // Tell schema
-  var tSchema: TellSchema = null
+  var tSchema: TSchema = null
   // Tell table
   var tTable: String = ""
   // Tell query 
   var tQuery: ScanQuery = null
 
-  def this(@transient sc: SparkContext, tbl: String, qry: ScanQuery, sch: TellSchema) = {
+  def this(@transient sc: SparkContext, tbl: String, qry: ScanQuery, sch: TSchema) = {
     this(sc, Nil)
     tSchema = sch
     tTable = tbl
     tQuery = qry
   }
 
-  def this(@transient scc: TSparkContext, tbl: String, query: ScanQuery, sch: TellSchema) = {
+  def this(@transient scc: TSparkContext, tbl: String, query: ScanQuery, sch: TSchema) = {
     this(scc.sparkContext, tbl, query, sch)
   }
 
-  def this(@transient oneParent: TellRDD[_]) = {
+  def this(@transient oneParent: TRDD[_]) = {
     this(oneParent.context, List(new OneToOneDependency(oneParent)))
   }
 
-  def getIterator(theSplit: TellPartition[T]): Iterator[T] = {
+  def getIterator(theSplit: TPartition[T]): Iterator[T] = {
     val it = new Iterator[T] {
       // TODO a better way to map this?
       var offset = 0L
@@ -79,25 +79,24 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
     val unsafe: sun.misc.Unsafe = Unsafe.getUnsafe()
     var off = offset
     off += 8
-    val tmpCustomer:TellRecord = new TellRecord(tSchema, new ArrayBuffer[Any]())
+    val rec:TRecord = new TRecord(tSchema, new ArrayBuffer[Any]())
+
     // fixed size fields
     for (fieldType:Schema.FieldType <- tSchema.fixedSizeFields) {
-
-
       fieldType match {
         case FieldType.SMALLINT =>
 
-          tmpCustomer.setField(fieldCnt, unsafe.getShort(addr + off))
+          rec.setField(fieldCnt, unsafe.getShort(addr + off))
           fieldCnt += 1
           off += 2
         case FieldType.INT | FieldType.FLOAT =>
 
-          tmpCustomer.setField(fieldCnt, unsafe.getInt(addr + off))
+          rec.setField(fieldCnt, unsafe.getInt(addr + off))
           fieldCnt += 1
           off += 4
         case FieldType.BIGINT | FieldType.DOUBLE =>
 
-          tmpCustomer.setField(fieldCnt, unsafe.getLong(addr + off))
+          rec.setField(fieldCnt, unsafe.getLong(addr + off))
           fieldCnt += 1
           off += 8;
       }
@@ -110,13 +109,13 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
       var ln = unsafe.getInt(addr + off);
       off += 4;
       val str = readString(unsafe, addr + off, ln);
-      tmpCustomer.setField(fieldCnt, str)
+      rec.setField(fieldCnt, str)
       fieldCnt += 1
       off += ln;
     }
     // aligning the next record
     if (off % 8 != 0) off += 8 - (off % 8)
-    (off, tmpCustomer.asInstanceOf[T])
+    (off, rec.asInstanceOf[T])
   }
 
   def readString(u: sun.misc.Unsafe, add: Long, length: Int): String = {
@@ -141,7 +140,7 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
     //TODO for each partition registered, get the customer values out
-    getIterator(split.asInstanceOf[TellPartition[T]])
+    getIterator(split.asInstanceOf[TPartition[T]])
   }
 
   override protected def getPartitions: Array[Partition] = {
@@ -151,7 +150,8 @@ class TellRDD [T: ClassTag]( @transient var sc: SparkContext,
 
     (0 to TellClientFactory.chNumber -1).map(pos => {
       //TODO do range querying
-      array(pos) = new TellPartition(pos, TellClientFactory.trx.scan(new ScanQuery()., tTable, proj))
+      //array(pos) = new TPartition(pos, TellClientFactory.trx.scan(new ScanQuery(), tTable, proj))
+      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(tQuery, tTable, proj))
     })
     array
   }

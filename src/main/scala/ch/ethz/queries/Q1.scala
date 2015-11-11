@@ -1,7 +1,7 @@
 package ch.ethz.queries
 
 import ch.ethz.TellClientFactory
-import ch.ethz.tell.{TSparkContext, TellRecord, TellRDD, ScanQuery}
+import ch.ethz.tell.{TSparkContext, TRecord, TRDD, ScanQuery}
 import org.apache.spark.{SparkContext, SparkConf}
 
 /**
@@ -13,16 +13,40 @@ import org.apache.spark.{SparkContext, SparkConf}
  */
 object Q1 {
 
-  //TODO move to sparkContext
-  val conf = new SparkConf()
-  val sc = new SparkContext(conf)
+//  val conf = new SparkConf()
+//  val sc = new SparkContext(conf)
+  def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, appName:String): Unit = {
+    val scc = new TSparkContext(mUrl, appName, st, cm, cn, cs)
+    println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
+    //val tellRdd = new TellRDD[TellRecord](sc, "order", new ScanQuery(), CHSchema.orderLineSch)
+    val orderRdd = new TRDD[TRecord](scc, "order", new ScanQuery(), CHSchema.orderLineSch)
+
+    val grouped = orderRdd.filter(record => record.getValue("OL_DELIVERY_D").asInstanceOf[String] > "2007")
+      .groupBy(record => record.getValue("OL_NUMBER").asInstanceOf[Int]).sortByKey()
+      .map( p => {
+      val olNumber = p._1
+      val it = p._2.iterator
+      var s1 = 0
+      var s2 = 0
+      var cnt = 0
+      while(it.hasNext) {
+        val record = it.next()
+        s1 += record.getValue("OL_QUANTITY").asInstanceOf[Int]
+        s2 += record.getValue("OL_AMOUNT").asInstanceOf[Int]
+        cnt += 1
+      }
+      (olNumber, s1, s2, s1/cnt, s2/cnt)
+    })
+    grouped.collect()
+    //    println("[TUPLES] %d".format(result.length))
+  }
 
   def main(args : Array[String]) {
     var st = "192.168.0.11:7241"
     var cm = "192.168.0.11:7242"
     var cn = 4
     var cs = 5120000
-    var masterUrl = "localhost[12]"
+    var masterUrl = "local[12]"
     var appName = "ch_Qry1"
 
     // client properties
@@ -40,33 +64,6 @@ object Q1 {
         sys.exit()
       }
     }
-
-    val scc = new TSparkContext(masterUrl, appName, st, cm, cn, cs)
-    println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
-    // rdd creation
-    //val tellRdd = new TellRDD[TellRecord](sc, "order", new ScanQuery(), CHSchema.orderLineSch)
-    val tellRdd = new TellRDD[TellRecord](scc, "order", new ScanQuery(), CHSchema.orderLineSch)
-
-    val grouped = tellRdd.filter(record => record.getValue("OL_DELIVERY_D").asInstanceOf[String] > "2007")
-      .groupBy(record => record.getValue("OL_NUMBER").asInstanceOf[Int]).sortByKey()
-      .map( p => {
-      val olNumber = p._1
-      val it = p._2.iterator
-      var s1 = 0
-      var s2 = 0
-      var cnt = 0
-      while(it.hasNext) {
-        val record = it.next()
-        s1 += record.getValue("OL_QUANTITY").asInstanceOf[Int]
-        s2 += record.getValue("OL_AMOUNT").asInstanceOf[Int]
-        cnt += 1
-      }
-      (olNumber, s1, s2, s1/cnt, s2/cnt)
-    })
-
-    println("=============COLLECTING==============")
-    grouped.collect()
-    //    println("[TUPLES] %d".format(result.length))
-
+    execute(st, cm, cn, cs, masterUrl, appName)
   }
 }

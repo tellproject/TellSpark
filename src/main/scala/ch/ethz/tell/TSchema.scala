@@ -7,7 +7,7 @@ import scala.collection.mutable.{ArrayBuffer, HashMap}
 /**
  * Wrapper around the native schema class used in TellStore
  */
-class TellSchema() extends Serializable {
+class TSchema() extends Serializable {
 
   var fixedSizeFields = ArrayBuffer[FieldType]()
   var varSizeFields = ArrayBuffer[FieldType]()
