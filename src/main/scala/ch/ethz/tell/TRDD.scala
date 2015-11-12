@@ -1,9 +1,7 @@
 package ch.ethz.tell
 
-import ch.ethz.Customer
 import ch.ethz.TellClientFactory
 import ch.ethz.tell.Schema.FieldType
-import ch.ethz.tell.TSchema
 import org.apache.spark.{SparkContext, _}
 import org.apache.spark.rdd.RDD
 

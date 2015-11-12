@@ -47,7 +47,7 @@ class Q3 extends ChQuery {
       val key = (r.getField("O_C_ID").asInstanceOf[Int], r.getField("O_W_ID").asInstanceOf[Int], r.getField("O_D_ID").asInstanceOf[Int])
       (key, r)
     })
-    val custJOrder = customerRdd.map(r => {
+    val cust_order = customerRdd.map(r => {
       val key = (r.getField("C_ID").asInstanceOf[Int], r.getField("C_W_ID").asInstanceOf[Int], r.getField("C_D_ID").asInstanceOf[Int])
       (key, r)
     }).join(order4cust).map(r => {
@@ -57,9 +57,9 @@ class Q3 extends ChQuery {
     })
 
     // no_w_id = o_w_id and no_d_id = o_d_id and no_o_id = o_id
-    val custJorderJnew = custJOrder.join(newOrderRdd).map(r => (r._1, r._2._1))
+    val cust_order_new = cust_order.join(newOrderRdd).map(r => (r._1, r._2._1))
     // ol_w_id = o_w_id and ol_d_id = o_d_id and ol_o_id = o_id
-    val custJorderJnewJolgr = custJorderJnew.join(orderlineRdd).map(r => {
+    val custJorderJnewJolgr = cust_order_new.join(orderlineRdd).map(r => {
       val k = (r._1._1, r._1._2, r._1._3, r._2._1.getField("O_ENTRY_D").asInstanceOf[Int])
       (k, r._2._2)
     }).groupBy(r => r._1)
