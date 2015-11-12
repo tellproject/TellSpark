@@ -5,7 +5,12 @@ import ch.ethz.tell.{TSchema, Schema}
 /**
  * Created by marenato on 10.11.15.
  */
-object CHSchema {
+abstract class ChQuery {
+  /**
+   *  implemented in children classes and hold the actual query
+   */
+  def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, appName:String): Unit
+
   /**
    * \"WAREHOUSE\" (\n"
 			"	\"W_ID\" INTEGER CS_INT,\n"

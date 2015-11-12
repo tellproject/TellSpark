@@ -14,27 +14,30 @@ import ch.ethz.tell.{ScanQuery, TRecord, TRDD, TSparkContext}
  * group by ol_o_id, ol_w_id, ol_d_id, o_entry_d
  * order by revenue desc, o_entry_d
  */
-object Q3 {
+class Q3 extends ChQuery {
 
-  def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, appName:String): Unit = {
+  /**
+   * implemented in children classes and hold the actual query
+   */
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, appName:String): Unit = {
     val scc = new TSparkContext(mUrl, appName, st, cm, cn, cs)
     println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
 
     //TODO push-downs
-    val customerRdd = new TRDD[TRecord](scc, "customer", new ScanQuery(), CHSchema.customerSch).filter(r => {
+    val customerRdd = new TRDD[TRecord](scc, "customer", new ScanQuery(), customerSch).filter(r => {
       r.getField("C_STATE").asInstanceOf[String].contains("A")
     })
     //TODO projections
-    val newOrderRdd = new TRDD[TRecord](scc, "new_order", new ScanQuery(), CHSchema.newOrderSch).map(r => {
+    val newOrderRdd = new TRDD[TRecord](scc, "new_order", new ScanQuery(), newOrderSch).map(r => {
       val key = (r.getField("NO_W_ID").asInstanceOf[Int], r.getField("NO_D_ID").asInstanceOf[Int], r.getField("NO_I_ID").asInstanceOf[Int])
       (key, r)
     })
     //TODO push-downs
-    val orderRdd = new TRDD[TRecord](scc, "orders", new ScanQuery(), CHSchema.orderSch).filter(r => {
+    val orderRdd = new TRDD[TRecord](scc, "orders", new ScanQuery(), orderSch).filter(r => {
       r.getField("O_ENTRY_D").asInstanceOf[Int] > 20070102
     })
     //TODO projections
-    val orderlineRdd = new TRDD[TRecord](scc, "order_line", new ScanQuery(), CHSchema.orderLineSch).map(r => {
+    val orderlineRdd = new TRDD[TRecord](scc, "order_line", new ScanQuery(), orderLineSch).map(r => {
       val key = (r.getField("OL_W_ID").asInstanceOf[Int], r.getField("OL_D_ID").asInstanceOf[Int], r.getField("OL_O_ID").asInstanceOf[Int])
       (key, r)
     })

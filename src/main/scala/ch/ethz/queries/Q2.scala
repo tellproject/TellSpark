@@ -16,9 +16,12 @@ import org.apache.spark.{SparkContext, SparkConf}
  * and s_quantity = m_s_quantity
  * order by n_name, su_name, i_id
  */
-object Q2 {
+class Q2 extends ChQuery {
 
-  def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, appName:String): Unit = {
+  /**
+   * implemented in children classes and hold the actual query
+   */
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, appName:String): Unit = {
     /**
      * (select s_i_id as m_i_id, min(s_quantity) as m_s_quantity
      * from stock, supplier, nation, region
@@ -29,10 +32,10 @@ object Q2 {
     val scc = new TSparkContext(mUrl, appName, st, cm, cn, cs)
     println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
 
-    val stockRdd = new TRDD[TRecord](scc, "stock", new ScanQuery(), CHSchema.stockSch)
-    val supplierRdd = new TRDD[TRecord](scc, "supplier", new ScanQuery(), CHSchema.supplierSch)
-    val nationRdd = new TRDD[TRecord](scc, "nation", new ScanQuery(), CHSchema.nationSch)
-    val regionRdd = new TRDD[TRecord](scc, "region", new ScanQuery(), CHSchema.regionSch)
+    val stockRdd = new TRDD[TRecord](scc, "stock", new ScanQuery(), stockSch)
+    val supplierRdd = new TRDD[TRecord](scc, "supplier", new ScanQuery(), supplierSch)
+    val nationRdd = new TRDD[TRecord](scc, "nation", new ScanQuery(), nationSch)
+    val regionRdd = new TRDD[TRecord](scc, "region", new ScanQuery(), regionSch)
 
     val suppMapped = supplierRdd.map( r => (r.getField("SU_SUPPKEY").asInstanceOf[Int], r))
     val stockMapped = stockRdd.map( r => {
