@@ -36,7 +36,7 @@ class Q1 extends ChQuery {
       )
     }).toDF()
 
-    //Do push downs
+    //ToDo push downs
     val res = orderline.filter($"OL_DELIVERY_D" > "2007-01-02")
       .groupBy($"OL_NUMBER")
       .agg(sum($"OL_AMOUNT"),
