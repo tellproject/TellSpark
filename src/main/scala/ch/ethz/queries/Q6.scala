@@ -12,17 +12,14 @@ import ch.ethz.tell.{TSparkContext, ScanQuery, TRecord, TRDD}
  */
 class Q6 extends ChQuery {
 
-  // convert an RDDs to a DataFrames
-
-  override def execute(): Unit = {}
-
-  def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, appName:String): Unit = {
-    val scc = new TSparkContext(mUrl, appName, st, cm, cn, cs)
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
+    val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
+    // convert an RDDs to a DataFrames
     val orderline = new TRDD[TRecord](scc, "orderline", new ScanQuery(), ChTSchema.orderLineSch).map(r => {
       OrderLine(r.getField("OL_O_ID").asInstanceOf[Int],
         r.getField("OL_D_ID").asInstanceOf[Short],
@@ -38,11 +35,10 @@ class Q6 extends ChQuery {
     }).toDF()
 
     //Do push downs
-      val res = orderline.filter($"OL_DELIVERY_D" >= "1998-09-02")
-        .filter($"OL_DELIVERY_D" >= "2020-01-01")
+      val res = orderline.filter($"OL_DELIVERY_D" >= "1999-01-01")
+        .filter($"OL_DELIVERY_D" < "2020-01-01")
         .filter($"OL_QUANTITY" >= "1").filter($"OL_QUANTITY" <= "10000")
         .agg(sum($"OL_AMOUNT"))
       //outputDF(res)
-
   }
 }

@@ -22,12 +22,12 @@ class Q4 extends ChQuery{
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, appName: String): Unit = {
-    val scc = new TSparkContext(mUrl, appName, st, cm, cn, cs)
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
+    val scc = new TSparkContext(mUrl, this.getClass.getSimpleName, st, cm, cn, cs)
     println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
     //val tellRdd = new TellRDD[TellRecord](sc, "order", new ScanQuery(), CHSchema.orderLineSch)
     //todo push down filter
-    val orderRdd = new TRDD[TRecord](scc, "order", new ScanQuery(), orderSch).filter(r => {
+    val orderRdd = new TRDD[TRecord](scc, "order", new ScanQuery(), ChTSchema.orderSch).filter(r => {
       val f1 = r.getField("O_ENTR_D").asInstanceOf[Long] >= 20070102
       val f2 = r.getField("O_ENTR_D").asInstanceOf[Long] < 20120102
       (f1&f2)
@@ -36,7 +36,7 @@ class Q4 extends ChQuery{
       (key, r)
     })
 
-    val orderLineRdd = new TRDD[TRecord](scc, "order_line", new ScanQuery(), orderLineSch).map(r => {
+    val orderLineRdd = new TRDD[TRecord](scc, "order_line", new ScanQuery(), ChTSchema.orderLineSch).map(r => {
       val key = (r.getField("OL_O_ID").asInstanceOf[Int], r.getField("OL_W_ID").asInstanceOf[Int], r.getField("OL_D_ID").asInstanceOf[Int])
       (key, key)
     })

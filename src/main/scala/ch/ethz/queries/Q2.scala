@@ -21,7 +21,8 @@ class Q2 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, appName:String): Unit = {
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
+    val scc = new TSparkContext(mUrl, this.getClass.getSimpleName, st, cm, cn, cs)
     /**
      * (select s_i_id as m_i_id, min(s_quantity) as m_s_quantity
      * from stock, supplier, nation, region
@@ -29,13 +30,12 @@ class Q2 extends ChQuery {
      * and n_regionkey=r_regionkey and r_name like 'Europ%' group by s_i_id) m
      */
     // rdd creation
-    val scc = new TSparkContext(mUrl, appName, st, cm, cn, cs)
     println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
 
-    val stockRdd = new TRDD[TRecord](scc, "stock", new ScanQuery(), stockSch)
-    val supplierRdd = new TRDD[TRecord](scc, "supplier", new ScanQuery(), supplierSch)
-    val nationRdd = new TRDD[TRecord](scc, "nation", new ScanQuery(), nationSch)
-    val regionRdd = new TRDD[TRecord](scc, "region", new ScanQuery(), regionSch)
+    val stockRdd = new TRDD[TRecord](scc, "stock", new ScanQuery(), ChTSchema.stockSch)
+    val supplierRdd = new TRDD[TRecord](scc, "supplier", new ScanQuery(), ChTSchema.supplierSch)
+    val nationRdd = new TRDD[TRecord](scc, "nation", new ScanQuery(), ChTSchema.nationSch)
+    val regionRdd = new TRDD[TRecord](scc, "region", new ScanQuery(), ChTSchema.regionSch)
 
     val suppMapped = supplierRdd.map( r => (r.getField("SU_SUPPKEY").asInstanceOf[Int], r))
     val stockMapped = stockRdd.map( r => {

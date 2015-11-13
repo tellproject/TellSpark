@@ -1,8 +1,6 @@
 package ch.ethz.queries
 
-import ch.ethz.TellClientFactory
 import ch.ethz.tell.{TSparkContext, TRecord, TRDD, ScanQuery}
-import org.apache.spark.{SparkContext, SparkConf}
 
 /**
  * Query1
@@ -13,35 +11,40 @@ import org.apache.spark.{SparkContext, SparkConf}
  */
 class Q1 extends ChQuery {
 
-//  val conf = new SparkConf()
-//  val sc = new SparkContext(conf)
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, appName:String): Unit = {
-    val scc = new TSparkContext(mUrl, appName, st, cm, cn, cs)
-    println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
-    //val tellRdd = new TellRDD[TellRecord](sc, "order", new ScanQuery(), CHSchema.orderLineSch)
-    val orderRdd = new TRDD[TRecord](scc, "order", new ScanQuery(), orderSch)
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
+    val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
-    val grouped = orderRdd.filter(record => record.getValue("OL_DELIVERY_D").asInstanceOf[String] > "2007")
-      .groupBy(record => record.getValue("OL_NUMBER").asInstanceOf[Int]).sortByKey()
-      .map( p => {
-      val olNumber = p._1
-      val it = p._2.iterator
-      var s1 = 0
-      var s2 = 0
-      var cnt = 0
-      while(it.hasNext) {
-        val record = it.next()
-        s1 += record.getValue("OL_QUANTITY").asInstanceOf[Int]
-        s2 += record.getValue("OL_AMOUNT").asInstanceOf[Int]
-        cnt += 1
-      }
-      (olNumber, s1, s2, s1/cnt, s2/cnt)
-    })
-    grouped.collect()
-    //    println("[TUPLES] %d".format(result.length))
+    val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
+    import org.apache.spark.sql.functions._
+    import sqlContext.implicits._
+
+    // convert an RDDs to a DataFrames
+    val orderline = new TRDD[TRecord](scc, "orderline", new ScanQuery(), ChTSchema.orderLineSch).map(r => {
+      OrderLine(r.getField("OL_O_ID").asInstanceOf[Int],
+        r.getField("OL_D_ID").asInstanceOf[Short],
+        r.getField("OL_W_ID").asInstanceOf[Int],
+        r.getField("OL_NUMBER").asInstanceOf[Short],
+        r.getField("OL_I_ID").asInstanceOf[Int],
+        r.getField("OL_SUPPLY_W_ID").asInstanceOf[Int],
+        r.getField("OL_DELIVERY_D").asInstanceOf[Long],
+        r.getField("OL_QUANTITY").asInstanceOf[Short],
+        r.getField("OL_AMOUNT").asInstanceOf[Double],
+        r.getField("OL_DIST_INFO").asInstanceOf[String]
+      )
+    }).toDF()
+
+    //Do push downs
+    val res = orderline.filter($"OL_DELIVERY_D" > "2007-01-02")
+      .groupBy($"OL_NUMBER")
+      .agg(sum($"OL_AMOUNT"),
+        sum($"OL_QUANTITY"),
+        avg($"OL_QUANTITY"),
+        avg($"OL_AMOUNT"),
+        count($"OL_NUMBER"))
+      .sort($"OL_NUMBER")
+    //outputDF(res)
   }
-
 }

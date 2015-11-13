@@ -35,11 +35,11 @@ class Q5 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, appName: String): Unit = {
-    val scc = new TSparkContext(mUrl, appName, st, cm, cn, cs)
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
+    val scc = new TSparkContext(mUrl, this.getClass.getSimpleName, st, cm, cn, cs)
     println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
     //todo push down filter
-    val orderRdd = new TRDD[TRecord](scc, "order", new ScanQuery(), orderSch).filter(r => {
+    val orderRdd = new TRDD[TRecord](scc, "order", new ScanQuery(), ChTSchema.orderSch).filter(r => {
       r.getField("O_ENTR_D").asInstanceOf[Long] >= 20070102
     }).map(r => {
       // key(o_c_id, o_w_id, o_d_id) val(o_id)
@@ -47,17 +47,17 @@ class Q5 extends ChQuery {
       (key, r.getField("O_ID").asInstanceOf[Int])
     })
 
-    val customerRdd = new TRDD[TRecord](scc, "customer", new ScanQuery(), customerSch).map(r => {
+    val customerRdd = new TRDD[TRecord](scc, "customer", new ScanQuery(), ChTSchema.customerSch).map(r => {
       // key(c_id, c_w_id, c_d_id) val(c_state)
       val key = (r.getField("C_ID").asInstanceOf[Int], r.getField("C_W_ID").asInstanceOf[Int], r.getField("C_D_ID").asInstanceOf[Int])
       (key, r.getField("C_STATE").asInstanceOf[String])
     })
 
-    val orderlineRdd = new TRDD[TRecord](scc, "order_line", new ScanQuery(), orderLineSch)
-    val stockRdd = new TRDD[TRecord](scc, "stock", new ScanQuery(), stockSch)
-    val supplierRdd = new TRDD[TRecord](scc, "supplier", new ScanQuery(), supplierSch)
-    val nationRdd = new TRDD[TRecord](scc, "nation", new ScanQuery(), nationSch)
-    val regionRdd = new TRDD[TRecord](scc, "region", new ScanQuery(), regionSch)
+    val orderlineRdd = new TRDD[TRecord](scc, "order_line", new ScanQuery(), ChTSchema.orderLineSch)
+    val stockRdd = new TRDD[TRecord](scc, "stock", new ScanQuery(), ChTSchema.stockSch)
+    val supplierRdd = new TRDD[TRecord](scc, "supplier", new ScanQuery(), ChTSchema.supplierSch)
+    val nationRdd = new TRDD[TRecord](scc, "nation", new ScanQuery(), ChTSchema.nationSch)
+    val regionRdd = new TRDD[TRecord](scc, "region", new ScanQuery(), ChTSchema.regionSch)
 
     val orderlineMapped = orderlineRdd.map(r => {
       //key(ol_o_id, ol_w_id, ol_d_id) val(orderline)

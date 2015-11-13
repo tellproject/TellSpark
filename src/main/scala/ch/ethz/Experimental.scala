@@ -1,6 +1,5 @@
 package ch.ethz
 
-import ch.ethz.tell
 import org.apache.spark.{SparkConf, SparkContext}
 import ch.ethz.tell._
 import org.apache.spark.sql.functions.count

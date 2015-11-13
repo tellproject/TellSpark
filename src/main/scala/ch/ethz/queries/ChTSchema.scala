@@ -7,11 +7,6 @@ import ch.ethz.tell.{TSchema, Schema}
  */
 object ChTSchema {
   /**
-   *  implemented in children classes and hold the actual query
-   */
-  //def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, appName:String): Unit
-
-  /**
    * \"WAREHOUSE\" (\n"
 			"	\"W_ID\" INTEGER CS_INT,\n"
 			"	\"W_NAME\" CHAR(10) CS_FIXEDSTRING,\n"
