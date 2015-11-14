@@ -11,7 +11,7 @@ import org.apache.spark.sql.functions.udf
  */
 object Experimental {
 
-  val conf = new SparkConf()
+  val conf = new SparkConf().setMaster("local[1]")
   val sc = new SparkContext(conf)
 
   def main(args : Array[String]) {
@@ -46,7 +46,7 @@ object Experimental {
     val tblName = "testTable"
     // rdd creation
 //    val tellRdd = new TellRDD[TellRecord](sc, tblName, new ScanQuery(), sch)
-    val tellRdd = new TellRDD[Customer](sc, tblName, new ScanQuery(), null)
+    val tellRdd = new TellRDD[Customer](sc, tblName, new ScanQuery(), sch)
 
     println("=============MAPPING==============")
 //    val grouped = tellRdd.filter(record => record.getField() > "2007")
@@ -67,8 +67,10 @@ object Experimental {
 
     println("=============COLLECTING==============")
     val result = tellRdd.collect()
+    println("=====================================")
     println("[TUPLES] %d".format(result.length))
-
+    println("======================================")
+    println("======================================")
   }
 
 }
