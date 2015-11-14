@@ -67,8 +67,10 @@ object Experimental {
 
     println("=============COLLECTING==============")
     val result = tellRdd.collect()
+    println("=====================================")
     println("[TUPLES] %d".format(result.length))
-
+    println("======================================")
+    println("======================================")
   }
 
 }
