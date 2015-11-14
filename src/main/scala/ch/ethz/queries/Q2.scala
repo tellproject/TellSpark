@@ -6,15 +6,6 @@ import org.apache.spark.{SparkContext, SparkConf}
 
 /**
  * Query2
- * select su_suppkey, su_name, n_name, i_id, i_name, su_address, su_phone, su_comment
- * from item, supplier, stock, nation, region,
- *     (select s_i_id as m_i_id, min(s_quantity) as m_s_quantity from stock, supplier, nation, region
- *     where mod((s_w_id*s_i_id),10000)=su_suppkey and su_nationkey=n_nationkey
- *     and n_regionkey=r_regionkey and r_name like 'Europ%' group by s_i_id) m
- * where i_id = s_i_id and mod((s_w_id * s_i_id), 10000) = su_suppkey and su_nationkey = n_nationkey
- * and n_regionkey = r_regionkey and i_data like '%b' and r_name like 'Europ%' and i_id=m_i_id
- * and s_quantity = m_s_quantity
- * order by n_name, su_name, i_id
  */
 class Q2 extends ChQuery {
 
@@ -112,6 +103,7 @@ class Q2 extends ChQuery {
       .filter(item("I_DATA").endsWith("b"))
       .filter(region("R_NAME").startsWith("Europ"))
       .join(minEuQty, (($"I_ID" === minEuQty("M_I_ID")) && ($"S_QUANTITY" === minEuQty("M_S_QUANTITY"))))
+      .orderBy(nation("N_NAME"), supplier("SU_NAME"), item("I_ID"))
     //outputDF(res)
   }
 }
