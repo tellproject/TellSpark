@@ -14,13 +14,14 @@ class Q6 extends ChQuery {
 
   override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
-
+    println("===========")
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
     // convert an RDDs to a DataFrames
-    val orderline = new TRDD[TRecord](scc, "orderline", new ScanQuery(), ChTSchema.orderLineSch).map(r => {
+    val oo = new TRDD[TRecord](scc, "order-line", new ScanQuery(), ChTSchema.orderLineSch)
+    val ol = oo.map(r => {
       OrderLine(r.getField("OL_O_ID").asInstanceOf[Int],
         r.getField("OL_D_ID").asInstanceOf[Short],
         r.getField("OL_W_ID").asInstanceOf[Int],
@@ -32,8 +33,15 @@ class Q6 extends ChQuery {
         r.getField("OL_AMOUNT").asInstanceOf[Double],
         r.getField("OL_DIST_INFO").asInstanceOf[String]
       )
-    }).toDF()
-
+    })
+    val orderline = ol.toDF()
+    println("%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^")
+    println("^^^^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%")
+    println("==============================" + oo.count)
+    ol.map(r => println(r.OL_I_ID))
+    ol.collect()
+    println("////////////////%%%%%%%%%%%%%%%%%%")
+    println("%%%%%%%%%%%%%%%%%%///////////////")
     //Do push downs
       val res = orderline.filter($"OL_DELIVERY_D" >= "1999-01-01")
         .filter($"OL_DELIVERY_D" < "2020-01-01")

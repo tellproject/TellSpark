@@ -38,6 +38,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def getIterator(theSplit: TPartition[T]): Iterator[T] = {
+    println(";;;;;;;;;;;;;;;;;;" + theSplit.toString)
     val it = new Iterator[T] {
       // TODO a better way to map this?
       var offset = 0L
@@ -47,8 +48,12 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       var len = theSplit.scanIt.length()
       var addr = theSplit.scanIt.address()
       var res:(Long, T) = null
-
+      
       override def hasNext: Boolean = {
+
+        println("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
+        println(keepGoing + ":" + len + ":" + addr)
+        println("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
         keepGoing
       }
 
@@ -131,8 +136,13 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
    */
   override def collect(): Array[T] = {
     val results = sc.runJob(this, (iter: Iterator[T]) => iter.toArray)
+    println("=============================") 
+    println("=============================") 
+    println("=============================") 
     TellClientFactory.trx.commit()
-    println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    println("=============================") 
+    println("=============================") 
+    println("=============================") 
     Array.concat(results: _*)
   }
 
@@ -145,11 +155,12 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     val array = new Array[Partition](TellClientFactory.chNumber)
     val proj:Array[Short] = null
     TellClientFactory.startTransaction()
-
+    
     (0 to TellClientFactory.chNumber -1).map(pos => {
       //TODO do range querying
       //array(pos) = new TPartition(pos, TellClientFactory.trx.scan(new ScanQuery(), tTable, proj))
       array(pos) = new TPartition(pos, TellClientFactory.trx.scan(tQuery, tTable, proj))
+      println("PARTITION>>>" + array(pos).toString)
     })
     array
   }
