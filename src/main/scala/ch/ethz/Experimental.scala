@@ -15,8 +15,8 @@ object Experimental {
   val sc = new SparkContext(conf)
 
   def main(args : Array[String]) {
-    var st = "192.168.0.11:7241"
-    var cm = "192.168.0.11:7242"
+    var st = "192.168.0.21:7241"
+    var cm = "192.168.0.21:7242"
     var cn = 4
     var cs = 5120000
 
@@ -65,20 +65,9 @@ object Experimental {
 //      (idd, s1, s2, s1/cnt, s2/cnt)
 //    })
 
-    /*
-    select   ol_number,
-	 sum(ol_quantity) as sum_qty,
-	 sum(ol_amount) as sum_amount,
-	 avg(ol_quantity) as avg_qty,
-	 avg(ol_amount) as avg_amount,
-	 count(*) as count_order
-from	 orderline
-where	 ol_delivery_d > '2007-01-02 00:00:00.000000'
-group by ol_number order by ol_number
-     */
     println("=============COLLECTING==============")
-    tellRdd.collect()
-//    println("[TUPLES] %d".format(result.length))
+    val result = tellRdd.collect()
+    println("[TUPLES] %d".format(result.length))
 
   }
 
