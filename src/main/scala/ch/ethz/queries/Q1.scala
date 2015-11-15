@@ -39,13 +39,9 @@ class Q1 extends ChQuery {
         r.getValue("OL_DIST_INFO").asInstanceOf[String]
       )
     })
-    println("======== Q1 ===============")
-//    val olc = oo.count()
-  //  println("======== Q1 ===============" + olc )
+
     val orderline = oo.toDF()
-    println("========xxxxxxxxxxx======= Q1 ===============" + orderline.printSchema)
-//    val oll = orderline.count()
-  //  println("====zzzzzzzzzzzzzz==== Q1 ===============" + oll)
+    logger.info("[Query %d] %s".format(1, orderline.printSchema))
 
     //ToDo push downs
     val res = orderline//.filter($"OL_DELIVERY_D" > "2007-01-02")

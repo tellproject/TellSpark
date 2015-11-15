@@ -24,6 +24,11 @@ class TSparkContext (val conf: SparkConf) {
     TellClientFactory.commitMng = cmMng
     TellClientFactory.chNumber = chNum
     TellClientFactory.chSize = chSz
+
+    println("==============PRE TRANSACTION =================")
+    println("==============POST TRANSACTION2=================")
+    val trxId = TellClientFactory.startTransaction()
+    println("==============POST TRANSACTION=================")
   }
 
   def setLocalProperty(key: String, value: String): Unit = {
