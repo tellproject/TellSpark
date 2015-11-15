@@ -1,7 +1,6 @@
 package ch.ethz.queries
 
-import ch.ethz.tell
-import ch.ethz.tell._
+import ch.ethz.tell.{TSparkContext, TRecord, TRDD, ScanQuery, CNFClause, PredicateType, Aggregation}
 
 import ch.ethz.tell.ScanQuery
 /**
@@ -57,21 +56,9 @@ class Q22 extends ChQuery {
     clause2.addPredicate(ScanQuery.CmpType.GREATER, balanceIndex, PredicateType.create(0.0))
     query.addSelection(clause2)
 
-    query.addProjection(3);
+    // add the two aggregations for getting the average
+    query.addAggregation(ScanQuery.AggrType.SUM, balanceIndex)
+    query.addAggregation(ScanQuery.AggrType.CNT, balanceIndex)
 
-    val customer = new TRDD[TRecord](scc, "customer", query, ChTSchema.customerSch).map(r => {
-      Customer(r.getField("C_ID").asInstanceOf[Int],0,0,"","","","","","","","","",0L,"",0.0,0.0,0.0,0.0,0,0,"",0)
-    }).toDF()
-
-    //ToDo push downs
-    val res = customer.filter($"OL_DELIVERY_D" > "2007-01-02")
-      .groupBy($"OL_NUMBER")
-      .agg(sum($"OL_AMOUNT"),
-        sum($"OL_QUANTITY"),
-        avg($"OL_QUANTITY"),
-        avg($"OL_AMOUNT"),
-        count($"OL_NUMBER"))
-      .sort($"OL_NUMBER")
-    //outputDF(res)
-  }
+    // TODO: continue here...
 }
