@@ -121,7 +121,8 @@ class Q5 extends ChQuery {
       (key, aggr)
     })
 
-    res.collect()
+    //res.collect()
+    //)
 
   }
 
