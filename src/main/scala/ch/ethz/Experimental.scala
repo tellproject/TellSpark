@@ -36,7 +36,7 @@ object Experimental {
     println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
 
     // schema to be read
-    val sch: TellSchema = new TellSchema()
+    val sch: TSchema = new TSchema()
 
     sch.addField(Schema.FieldType.INT, "number", true)
     sch.addField(Schema.FieldType.TEXT, "text1", true)

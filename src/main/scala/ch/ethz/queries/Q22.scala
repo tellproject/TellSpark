@@ -2,6 +2,7 @@ package ch.ethz.queries
 
 import ch.ethz.tell.{TSparkContext, TRecord, TRDD, ScanQuery, CNFClause, PredicateType, Aggregation}
 
+import ch.ethz.tell.ScanQuery
 /**
 Query22
 select	 substr(c_state,1,1) as country,
@@ -34,21 +35,24 @@ class Q22 extends ChQuery {
     import sqlContext.implicits._
 
     // assumption, columns start with 0 and have the order defined in CHQuery.scala. Not sure whether this assumption holds...
-    Short phoneIndex = 11
-    Short balanceIndex = 16;
+    val phoneIndex: Short = 11
+    val balanceIndex: Short = 16;
 
     // convert an RDDs to a DataFrames
 
     // first subquery
 
-    val clause1 = new CNFClause() // clause for substring matching
+    val query = new tell.ScanQuery()
+
+
+    val clause1 = new query.CNFCLause() // clause for substring matching
     // assuming that the shorts will be converted to prefix-strings once we will implement the LIKE predicates
-    for (i <- 1 to 7) {
+    for (i <- 1 to 7)
       clause1.addPredicate(ScanQuery.CmpType.LIKE, phoneIndex, PredicateType.create(String.valueOf(i)))
-    val query = new ScanQuery()
+
     query.addSelection(clause1)
 
-    val clause2 = new CNFClause() // clause for balance greater 0.0
+    val clause2 = new query.CNFCLause() // clause for balance greater 0.0
     clause2.addPredicate(ScanQuery.CmpType.GREATER, balanceIndex, PredicateType.create(0.0))
     query.addSelection(clause2)
 
