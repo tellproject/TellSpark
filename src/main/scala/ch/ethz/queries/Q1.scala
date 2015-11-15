@@ -1,6 +1,7 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{TSparkContext, TRecord, TRDD, ScanQuery}
+import ch.ethz.tell.PredicateType.FloatType
+import ch.ethz.tell._
 
 /**
  * Query1
@@ -21,8 +22,11 @@ class Q1 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
+    val sQry = new ScanQuery()
+    val cl1 = new sQry.CNFCLause
+    cl1.addPredicate(ScanQuery.CmpType.EQUAL, 1, FloatType)
     // convert an RDDs to a DataFrames
-    val orderline = new TRDD[TRecord](scc, "orderline", new ScanQuery(), ChTSchema.orderLineSch).map(r => {
+    val orderline = new TRDD[TRecord](scc, "orderline", sQry, ChTSchema.orderLineSch).map(r => {
       OrderLine(r.getField("OL_O_ID").asInstanceOf[Int],
         r.getField("OL_D_ID").asInstanceOf[Short],
         r.getField("OL_W_ID").asInstanceOf[Int],
@@ -35,6 +39,10 @@ class Q1 extends ChQuery {
         r.getField("OL_DIST_INFO").asInstanceOf[String]
       )
     }).toDF()
+
+    println("======== Q1 ===============")
+    orderline.count()
+    println("======== Q1 ===============")
 
     //ToDo push downs
     val res = orderline.filter($"OL_DELIVERY_D" > "2007-01-02")

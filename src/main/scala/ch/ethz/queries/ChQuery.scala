@@ -171,14 +171,12 @@ object ChQuery {
     val res = m.execute(st, cm, cn, cs, mUrl)
   }
 
-
-
   def main(args: Array[String]): Unit = {
     var st = "192.168.0.21:7241"
     var cm = "192.168.0.21:7242"
     var cn = 4
     var cs = 5120000
-    var masterUrl = "local[12]"
+    var masterUrl = "local[1]"
     var qryNum = 6
 
     // client properties

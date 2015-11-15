@@ -4,10 +4,7 @@ import ch.ethz.TellClientFactory
 import ch.ethz.tell.Schema.FieldType
 import org.apache.spark.{SparkContext, _}
 import org.apache.spark.rdd.RDD
-import ch.ethz.tell.ClientManager
-import ch.ethz.tell.Transaction
 
-import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
 
 /**
@@ -51,7 +48,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       var res:(Long, T) = null
       
       override def hasNext: Boolean = {
-	if (offset == len) {
+        if (offset == len) {
           keepGoing = theSplit.scanIt.next()
           len = theSplit.scanIt.length()
           addr = theSplit.scanIt.address()
@@ -61,17 +58,17 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       }
 
       override def next(): T = {
-       // if (offset == len) {
-      //    keepGoing = theSplit.scanIt.next()
-     //     len = theSplit.scanIt.length()
-     ///     addr = theSplit.scanIt.address()
-      //    offset = 0
-       // }
+//       if (offset == len) {
+//          keepGoing = theSplit.scanIt.next()
+//          len = theSplit.scanIt.length()
+//          addr = theSplit.scanIt.address()
+//          offset = 0
+//       }
         if (offset <= len) {
           res = getRecord(addr, offset)
           offset = res._1
           cnt += 1
-	  println(">>>>>>>>cnt:" + cnt + "<<<<<<" + ">>>>>>offset:" + offset + "<<<<<<len:" + len + ">>>>>>>")
+          //println(">>>>>>>>cnt:" + cnt + "<<<<<<" + ">>>>>>offset:" + offset + "<<<<<<len:" + len + ">>>>>>>")
         }
         res._2
       }
