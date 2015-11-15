@@ -22,16 +22,16 @@ class Q6 extends ChQuery {
     // convert an RDDs to a DataFrames
     val oo = new TRDD[TRecord](scc, "order-line", new ScanQuery(), ChTSchema.orderLineSch)
     val ol = oo.map(r => {
-      OrderLine(r.getField("OL_O_ID").asInstanceOf[Int],
-        r.getField("OL_D_ID").asInstanceOf[Short],
-        r.getField("OL_W_ID").asInstanceOf[Int],
-        r.getField("OL_NUMBER").asInstanceOf[Short],
-        r.getField("OL_I_ID").asInstanceOf[Int],
-        r.getField("OL_SUPPLY_W_ID").asInstanceOf[Int],
-        r.getField("OL_DELIVERY_D").asInstanceOf[Long],
-        r.getField("OL_QUANTITY").asInstanceOf[Short],
-        r.getField("OL_AMOUNT").asInstanceOf[Long],
-        r.getField("OL_DIST_INFO").asInstanceOf[String]
+      OrderLine(r.getValue("OL_O_ID").asInstanceOf[Int],
+        r.getValue("OL_D_ID").asInstanceOf[Short],
+        r.getValue("OL_W_ID").asInstanceOf[Int],
+        r.getValue("OL_NUMBER").asInstanceOf[Short],
+        r.getValue("OL_I_ID").asInstanceOf[Int],
+        r.getValue("OL_SUPPLY_W_ID").asInstanceOf[Int],
+        r.getValue("OL_DELIVERY_D").asInstanceOf[Long],
+        r.getValue("OL_QUANTITY").asInstanceOf[Short],
+        r.getValue("OL_AMOUNT").asInstanceOf[Long],
+        r.getValue("OL_DIST_INFO").asInstanceOf[String]
       )
     })
     val orderline = ol.toDF()
