@@ -46,9 +46,9 @@ object Experimental {
     val tblName = "testTable"
     // rdd creation
 //    val tellRdd = new TellRDD[TellRecord](sc, tblName, new ScanQuery(), sch)
+    readLine()
     val tellRdd = new TRDD[Customer](sc, tblName, new ScanQuery(), null)
 
-    println("=============MAPPING==============")
 //    val grouped = tellRdd.filter(record => record.getField() > "2007")
 //      .groupBy(record => record.getcId()).sortByKey().map( p => {
 //      val idd = p._1

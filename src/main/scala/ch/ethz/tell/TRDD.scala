@@ -38,7 +38,6 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def getIterator(theSplit: TPartition[T]): Iterator[T] = {
-    println(";;;;;;;;;;;;;;;;;;" + theSplit.toString)
     val it = new Iterator[T] {
       // TODO a better way to map this?
       var offset = 0L
@@ -58,6 +57,9 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       }
 
       override def next(): T = {
+        println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        println("<<<<<<<<<<<<<<<<<" + offset + "<<<<<<<<<<<" + len)
+        println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
         if (offset == len) {
           keepGoing = theSplit.scanIt.next()
           len = theSplit.scanIt.length()
@@ -158,8 +160,8 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     
     (0 to TellClientFactory.chNumber -1).map(pos => {
       //TODO do range querying
-      //array(pos) = new TPartition(pos, TellClientFactory.trx.scan(new ScanQuery(), tTable, proj))
-      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(tQuery, tTable, proj))
+      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(new ScanQuery(), tTable, proj))
+//      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(tQuery, tTable, proj))
       println("PARTITION>>>" + array(pos).toString)
     })
     array
