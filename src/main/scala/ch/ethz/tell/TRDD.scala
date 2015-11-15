@@ -155,12 +155,11 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
   override protected def getPartitions: Array[Partition] = {
     val array = new Array[Partition](TellClientFactory.chNumber)
-    val proj:Array[Short] = null
     TellClientFactory.startTransaction()
     
     (0 to TellClientFactory.chNumber -1).map(pos => {
       //TODO do range querying
-      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(new ScanQuery(), tTable, proj))
+      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(new ScanQuery(), tTable))
 //      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(tQuery, tTable, proj))
       println("PARTITION>>>" + array(pos).toString)
     })
