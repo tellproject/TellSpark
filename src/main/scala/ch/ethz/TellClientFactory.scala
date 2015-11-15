@@ -22,12 +22,18 @@ object TellClientFactory {
 
   def getConnection(): ClientManager = {
     if (clientManager == null) {
+      println("================= PRE CLIENT ==============")
+      println("=================" + toString + "==============")
       clientManager = new ClientManager(commitMng, storageMng, chNumber, chSize)
+      println("================= POST CLIENT ==============")
     }
     clientManager
   }
 
   def startTransaction() = {
+    clientManager = getConnection
+    println("=========== ClientManagerPointer ======= " + clientManager.getImplPtr)
+//    println("=========== ClientManagerPointer ======= " + clientManager.getScanMemoryManagerPtr)
     trx = Transaction.startTransaction(getConnection)
   }
 

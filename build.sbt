@@ -39,3 +39,4 @@ assemblyMergeStrategy in assembly := {
   case PathList("com", "esotericsoftware", xs@_ *) => MergeStrategy.last // For Log$Logger.class
   case x => MergeStrategy.first
 }
+

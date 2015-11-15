@@ -4,6 +4,8 @@ import ch.ethz.TellClientFactory
 import ch.ethz.tell.Schema.FieldType
 import org.apache.spark.{SparkContext, _}
 import org.apache.spark.rdd.RDD
+import ch.ethz.tell.ClientManager
+import ch.ethz.tell.Transaction
 
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
@@ -138,13 +140,8 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
    */
   override def collect(): Array[T] = {
     val results = sc.runJob(this, (iter: Iterator[T]) => iter.toArray)
-    println("=============================") 
-    println("=============================") 
-    println("=============================") 
     TellClientFactory.trx.commit()
-    println("=============================") 
-    println("=============================") 
-    println("=============================") 
+    println("============POST COMMIT=================") 
     Array.concat(results: _*)
   }
 
@@ -156,8 +153,10 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   override protected def getPartitions: Array[Partition] = {
     val array = new Array[Partition](TellClientFactory.chNumber)
     val proj:Array[Short] = null
+    println("==============PRE TRANSACTION =================")
+    println("==============POST TRANSACTION2=================")
     TellClientFactory.startTransaction()
-    
+    println("==============POST TRANSACTION=================")  
     (0 to TellClientFactory.chNumber -1).map(pos => {
       //TODO do range querying
       array(pos) = new TPartition(pos, TellClientFactory.trx.scan(new ScanQuery(), tTable, proj))
