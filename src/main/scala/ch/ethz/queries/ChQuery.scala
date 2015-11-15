@@ -151,10 +151,14 @@ abstract class ChQuery {
 
   def timeCollect(df: DataFrame, queryNo: Int): Unit = {
     val t0 = System.nanoTime()
-    //TODO do we need to get all the tuples? or just count them?
-    df.collect().foreach(println)
+    var cnt = 0
+    val ress = df.collect()
+    ress.foreach(r => {
+      println("[TTTTTTTTTTTTTTTT]" + r.toString())
+      cnt += 1
+    })
     val t1 = System.nanoTime()
-    logger.info("[Query %d] Elapsed time: %d msecs".format(queryNo, (t1-t0)/1000000))
+    logger.info("[Query %d] Elapsed time: %d msecs. map:%d ress:%d".format(queryNo, (t1-t0)/1000000, cnt, ress.length))
   }
 
 }

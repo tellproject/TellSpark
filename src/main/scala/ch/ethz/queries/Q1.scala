@@ -40,23 +40,23 @@ class Q1 extends ChQuery {
       )
     })
     println("======== Q1 ===============")
-    val olc = oo.count()
-    println("======== Q1 ===============" + olc )
+//    val olc = oo.count()
+  //  println("======== Q1 ===============" + olc )
     val orderline = oo.toDF()
-    println("======== Q1 ===============")
-    val oll = orderline.count()
-    println("======== Q1 ===============" + oll)
+    println("========xxxxxxxxxxx======= Q1 ===============" + orderline.printSchema)
+//    val oll = orderline.count()
+  //  println("====zzzzzzzzzzzzzz==== Q1 ===============" + oll)
 
     //ToDo push downs
- //   val res = orderline.filter($"OL_DELIVERY_D" > "2007-01-02")
-     // .groupBy($"OL_NUMBER")
-   //   .agg(sum($"OL_AMOUNT"),
-  //      sum($"OL_QUANTITY"),
-  //      avg($"OL_QUANTITY"),
-  //      avg($"OL_AMOUNT"),
-  //      count($"OL_NUMBER"))
-  //    .sort($"OL_NUMBER")
+    val res = orderline//.filter($"OL_DELIVERY_D" > "2007-01-02")
+      .groupBy($"OL_NUMBER")
+      .agg(sum($"OL_AMOUNT"),
+        sum($"OL_QUANTITY"),
+        avg($"OL_QUANTITY"),
+        avg($"OL_AMOUNT"),
+        count($"OL_NUMBER"))
+      .sort($"OL_NUMBER")
 
-    //timeCollect(res, 1)
+    timeCollect(res, 1)
   }
 }
