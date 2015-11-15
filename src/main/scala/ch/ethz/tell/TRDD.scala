@@ -51,27 +51,27 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       var res:(Long, T) = null
       
       override def hasNext: Boolean = {
-
-        println("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
-        println(keepGoing + ":" + len + ":" + addr)
-        println("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
-        keepGoing
-      }
-
-      override def next(): T = {
-        println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-        println("<<<<<<<<<<<<<<<<<" + offset + "<<<<<<<<<<<" + len)
-        println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-        if (offset == len) {
+	if (offset == len) {
           keepGoing = theSplit.scanIt.next()
           len = theSplit.scanIt.length()
           addr = theSplit.scanIt.address()
           offset = 0
         }
-        if (offset != len) {
-          res = getRecord(addr, offset)// new Customer
+        keepGoing
+      }
+
+      override def next(): T = {
+       // if (offset == len) {
+      //    keepGoing = theSplit.scanIt.next()
+     //     len = theSplit.scanIt.length()
+     ///     addr = theSplit.scanIt.address()
+      //    offset = 0
+       // }
+        if (offset <= len) {
+          res = getRecord(addr, offset)
           offset = res._1
           cnt += 1
+	  println(">>>>>>>>cnt:" + cnt + "<<<<<<" + ">>>>>>offset:" + offset + "<<<<<<len:" + len + ">>>>>>>")
         }
         res._2
       }
@@ -86,31 +86,28 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     val unsafe: sun.misc.Unsafe = Unsafe.getUnsafe()
     var off = offset
     off += 8
-    val rec:TRecord = new TRecord(tSchema, new ArrayBuffer[Any]())
-
+    val rec:TRecord = new TRecord(tSchema, new Array[Any](tSchema.cnt))
     // fixed size fields
     for (fieldType:Schema.FieldType <- tSchema.fixedSizeFields) {
       fieldType match {
         case FieldType.SMALLINT =>
-
+	  val vv = unsafe.getShort(addr + off)
           rec.setField(fieldCnt, unsafe.getShort(addr + off))
           fieldCnt += 1
           off += 2
         case FieldType.INT | FieldType.FLOAT =>
-
+	  val vv = unsafe.getInt(addr+off)
           rec.setField(fieldCnt, unsafe.getInt(addr + off))
           fieldCnt += 1
           off += 4
         case FieldType.BIGINT | FieldType.DOUBLE =>
-
+	  val vv = unsafe.getLong(addr + off)
           rec.setField(fieldCnt, unsafe.getLong(addr + off))
           fieldCnt += 1
           off += 8;
       }
     }
-    fieldCnt += 1
     // variable sized fields
-
     for (fieldType:Schema.FieldType <- tSchema.varSizeFields) {
       if (off % 4 != 0) off += 4 - (off % 4)
       var ln = unsafe.getInt(addr + off);

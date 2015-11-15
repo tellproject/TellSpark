@@ -5,9 +5,12 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * Created by marenato on 10.11.15.
  */
-class TRecord (val fieldSchema: TSchema, val values : ArrayBuffer[Any])
+class TRecord (var fieldSchema: TSchema, var values : Array[Any])
   extends Serializable {
 
+  def this(fSchema: TSchema, valSz: Int)= {
+    this(fSchema, new Array[Any](valSz))
+  }
 
   def getComplete() = {
     (fieldSchema.fields, values)
@@ -21,6 +24,7 @@ class TRecord (val fieldSchema: TSchema, val values : ArrayBuffer[Any])
   }
 
   def setField(idx: Int, value: Any) = {
+    if (values.size == 0) println("cacacacacacacaca")
     values(idx) = value
   }
 
