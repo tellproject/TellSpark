@@ -24,7 +24,6 @@ class TRecord (var fieldSchema: TSchema, var values : Array[Any])
   }
 
   def setField(idx: Int, value: Any) = {
-    if (values.size == 0) println("cacacacacacacaca")
     values(idx) = value
   }
 
@@ -32,5 +31,15 @@ class TRecord (var fieldSchema: TSchema, var values : Array[Any])
     val tellField = fieldSchema.strFields(fieldName)
     val idx = fieldSchema.fields.indexOf(tellField)
     values(idx)
+  }
+  override def toString():String = {
+    val sb = new StringBuilder
+    sb.append("{")
+    fieldSchema.strFields.map(entry => {
+      sb.append(entry._1).append(":")
+      sb.append(values(fieldSchema.fields.indexOf(entry._1)))
+    })
+    sb.append("}")
+    sb.toString()
   }
 }
