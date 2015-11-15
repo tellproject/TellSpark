@@ -4,6 +4,7 @@ import ch.ethz.tell.{ScanQuery, TRecord, TRDD}
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.functions.min
+import org.slf4j.{LoggerFactory, Logger}
 import scala.reflect.runtime.universe
 import org.apache.spark.sql.DataFrame
 import java.io.File
@@ -155,18 +156,22 @@ abstract class ChQuery {
 
 object ChQuery {
 
+  val logger = LoggerFactory.getLogger(ChQuery.getClass)
   /**
    * Execute query reflectively
    */
   def executeQuery(queryNo: Int, st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
     assert(queryNo >= 1 && queryNo <= 22, "Invalid query number")
     val m = Class.forName(f"ch.ethz.queries.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st:String, cm:String, cn:Int, cs:Int, mUrl:String)}]
+    val t0 = System.nanoTime()
     m.execute(st, cm, cn, cs, mUrl)
+    val t1 = System.nanoTime()
+    logger.info(String.format("[Query %d] Elapsed time: %d msecs", queryNo, (t1-t0)/1000000))
   }
 
   def main(args: Array[String]): Unit = {
-    var st = "192.168.0.11:7241"
-    var cm = "192.168.0.11:7242"
+    var st = "192.168.0.21:7241"
+    var cm = "192.168.0.21:7242"
     var cn = 4
     var cs = 5120000
     var masterUrl = "local[12]"
