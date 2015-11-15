@@ -24,7 +24,8 @@ class Q1 extends ChQuery {
 
     val sQry = new ScanQuery()
     val cl1 = new sQry.CNFCLause
-    cl1.addPredicate(ScanQuery.CmpType.EQUAL, 1, FloatType)
+    val ff = new PredicateType.FloatType(10)
+    cl1.addPredicate(ScanQuery.CmpType.EQUAL, 1, ff)
     // convert an RDDs to a DataFrames
     val orderline = new TRDD[TRecord](scc, "orderline", sQry, ChTSchema.orderLineSch).map(r => {
       OrderLine(r.getField("OL_O_ID").asInstanceOf[Int],
