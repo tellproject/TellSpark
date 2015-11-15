@@ -36,8 +36,7 @@ class Q1 extends ChQuery {
         r.getValue("OL_DELIVERY_D").asInstanceOf[Long],
         r.getValue("OL_QUANTITY").asInstanceOf[Short],
         r.getValue("OL_AMOUNT").asInstanceOf[Long],
-        r.getValue("OL_DIST_INFO").asInstanceOf[String]
-      )
+        r.getValue("OL_DIST_INFO").asInstanceOf[String])
     })
 
     val orderline = oo.toDF()

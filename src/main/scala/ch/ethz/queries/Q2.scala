@@ -22,8 +22,8 @@ class Q2 extends ChQuery {
     // convert an RDDs to a DataFrames
     val stock = new TRDD[TRecord](scc, "stock", new ScanQuery(), ChTSchema.stockSch).map(r => {
       Stock(r.getField("S_I_ID").asInstanceOf[Int],
-        r.getField("S_W_ID").asInstanceOf[Int],
-        r.getField("S_QUANTITY").asInstanceOf[Short],
+        r.getField("S_W_ID").asInstanceOf[Short],
+        r.getField("S_QUANTITY").asInstanceOf[Int],
         r.getField("S_DIST_01").asInstanceOf[String],
         r.getField("S_DIST_02").asInstanceOf[String],
         r.getField("S_DIST_03").asInstanceOf[String],
@@ -37,8 +37,9 @@ class Q2 extends ChQuery {
         r.getField("S_YTD").asInstanceOf[Int],
         r.getField("S_ORDER_CNT").asInstanceOf[Short],
         r.getField("S_REMOTE_CNT").asInstanceOf[Short],
-        r.getField("S_DATA").asInstanceOf[String],
-        r.getField("S_SU_SUPPKEY").asInstanceOf[Int])
+        r.getField("S_DATA").asInstanceOf[String]
+        //, r.getField("S_SU_SUPPKEY").asInstanceOf[Int]
+      )
     }).toDF()
 
     val supplier = new TRDD[TRecord](scc, "supplier", new ScanQuery(), ChTSchema.supplierSch).map(r => {

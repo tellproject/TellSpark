@@ -17,7 +17,7 @@ case class OrderLine(OL_O_ID: Int,
                      OL_SUPPLY_W_ID: Int,
                      OL_DELIVERY_D: Long,
                      OL_QUANTITY: Short,
-                     OL_AMOUNT: Double,
+                     OL_AMOUNT: Long,
                      OL_DIST_INFO: String)
 
 case class Warehouse(W_ID: Int,
@@ -105,8 +105,8 @@ case class Supplier(SU_SUPPKEY: Short,
                     SU_COMMENT: String)
 
 case class Stock(S_I_ID: Int,
-                 S_W_ID: Int,
-                 S_QUANTITY: Short,
+                 S_W_ID: Short,
+                 S_QUANTITY: Int,
                  S_DIST_01: String,
                  S_DIST_02: String,
                  S_DIST_03: String,
@@ -120,8 +120,31 @@ case class Stock(S_I_ID: Int,
                  S_YTD: Int,
                  S_ORDER_CNT: Short,
                  S_REMOTE_CNT: Short,
-                 S_DATA: String,
-                 S_SU_SUPPKEY: Int)
+                 S_DATA: String
+                 //, S_SU_SUPPKEY: Int
+                  ) {
+
+  def this(S_I_ID: Int,
+           S_W_ID: Short,
+           S_QUANTITY: Int,
+           S_DIST_01: String,
+           S_DIST_02: String,
+           S_DIST_03: String,
+           S_DIST_04: String,
+           S_DIST_05: String,
+           S_DIST_06: String,
+           S_DIST_07: String,
+           S_DIST_08: String,
+           S_DIST_09: String,
+           S_DIST_10: String,
+           S_YTD: Int,
+           S_ORDER_CNT: Short,
+           S_REMOTE_CNT: Short,
+           S_DATA: String) = {
+    this(S_I_ID, S_W_ID, S_QUANTITY,  S_DIST_01, S_DIST_02, S_DIST_03, S_DIST_04, S_DIST_05,
+      S_DIST_06, S_DIST_07, S_DIST_08, S_DIST_09, S_DIST_10, S_YTD, S_ORDER_CNT, S_REMOTE_CNT, S_DATA, 0)
+  }
+}
 
 case class Item(I_ID: Int,
                 I_IM_ID: Short,

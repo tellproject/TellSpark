@@ -250,13 +250,13 @@ object ChTSchema {
 			"	\"S_SU_SUPPKEY\" INTEGER CS_INT,\n"
    */
   val stockSch: TSchema = new TSchema()
-  stockSch.addField(Schema.FieldType.SMALLINT, "S_QUANTITY", false)
+  stockSch.addField(Schema.FieldType.SMALLINT, "S_W_ID", false)
   stockSch.addField(Schema.FieldType.SMALLINT, "S_ORDER_CNT", false)
   stockSch.addField(Schema.FieldType.SMALLINT, "S_REMOTE_CNT", false)
   stockSch.addField(Schema.FieldType.INT, "S_I_ID", false)
-  stockSch.addField(Schema.FieldType.INT, "S_W_ID", false)
   stockSch.addField(Schema.FieldType.INT, "S_YTD", false)
-  stockSch.addField(Schema.FieldType.INT, "S_SU_SUPPKEY", false)
+  stockSch.addField(Schema.FieldType.INT, "S_QUANTITY", false)
+//  stockSch.addField(Schema.FieldType.INT, "S_SU_SUPPKEY", false)
   stockSch.addField(Schema.FieldType.TEXT, "S_DIST_01", false)
   stockSch.addField(Schema.FieldType.TEXT, "S_DIST_02", false)
   stockSch.addField(Schema.FieldType.TEXT, "S_DIST_03", false)
