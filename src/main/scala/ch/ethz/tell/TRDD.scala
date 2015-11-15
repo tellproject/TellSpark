@@ -156,8 +156,8 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     println("==============POST TRANSACTION=================")  
     (0 to TellClientFactory.chNumber -1).map(pos => {
       //TODO do range querying
-      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(new ScanQuery(), tTable))
-//      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(tQuery, tTable, proj))
+      //array(pos) = new TPartition(pos, TellClientFactory.trx.scan(new ScanQuery(), tTable))
+      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(tQuery, tTable, null))
       println("PARTITION>>>" + array(pos).toString)
     })
     array
