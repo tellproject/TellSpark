@@ -21,7 +21,7 @@ class Q2 extends ChQuery {
 
     // convert an RDDs to a DataFrames
     val stt = new TRDD[TRecord](scc, "stock", new ScanQuery(), ChTSchema.stockSch).map(r => {
-      Stock(r.getField("S_I_ID").asInstanceOf[Int],
+      new Stock(r.getField("S_I_ID").asInstanceOf[Int],
         r.getField("S_W_ID").asInstanceOf[Short],
         r.getField("S_QUANTITY").asInstanceOf[Int],
         r.getField("S_DIST_01").asInstanceOf[String],

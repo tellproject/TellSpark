@@ -30,7 +30,7 @@ class Q6 extends ChQuery {
         r.getField("OL_SUPPLY_W_ID").asInstanceOf[Int],
         r.getField("OL_DELIVERY_D").asInstanceOf[Long],
         r.getField("OL_QUANTITY").asInstanceOf[Short],
-        r.getField("OL_AMOUNT").asInstanceOf[Double],
+        r.getField("OL_AMOUNT").asInstanceOf[Long],
         r.getField("OL_DIST_INFO").asInstanceOf[String]
       )
     })
@@ -38,7 +38,7 @@ class Q6 extends ChQuery {
     println("%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^")
     println("^^^^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%")
     println("==============================" + oo.count)
-    ol.map(r => println(r.OL_I_ID))
+    ol.map(r => println(r.toString))
     ol.collect()
     println("////////////////%%%%%%%%%%%%%%%%%%")
     println("%%%%%%%%%%%%%%%%%%///////////////")
