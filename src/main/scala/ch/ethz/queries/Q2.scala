@@ -20,7 +20,7 @@ class Q2 extends ChQuery {
     import sqlContext.implicits._
 
     // convert an RDDs to a DataFrames
-    val stock = new TRDD[TRecord](scc, "stock", new ScanQuery(), ChTSchema.stockSch).map(r => {
+    val stt = new TRDD[TRecord](scc, "stock", new ScanQuery(), ChTSchema.stockSch).map(r => {
       Stock(r.getField("S_I_ID").asInstanceOf[Int],
         r.getField("S_W_ID").asInstanceOf[Int],
         r.getField("S_QUANTITY").asInstanceOf[Short],
@@ -39,9 +39,12 @@ class Q2 extends ChQuery {
         r.getField("S_REMOTE_CNT").asInstanceOf[Short],
         r.getField("S_DATA").asInstanceOf[String],
         r.getField("S_SU_SUPPKEY").asInstanceOf[Int])
-    }).toDF()
+    })
+    var cnt = stt.count
+    println("=================== Q2 ===================stock:" + cnt )
+    val stock = stt.toDF()
 
-    val supplier = new TRDD[TRecord](scc, "supplier", new ScanQuery(), ChTSchema.supplierSch).map(r => {
+    val spp = new TRDD[TRecord](scc, "supplier", new ScanQuery(), ChTSchema.supplierSch).map(r => {
       Supplier(r.getField("SU_SUPPKEY").asInstanceOf[Short],
         r.getField("SU_NAME").asInstanceOf[String],
         r.getField("SU_ADDRESS").asInstanceOf[String],
@@ -49,20 +52,29 @@ class Q2 extends ChQuery {
         r.getField("SU_PHONE").asInstanceOf[String],
         r.getField("SU_ACCTBAL").asInstanceOf[Double],
         r.getField("SU_COMMENT").asInstanceOf[String])
-    }).toDF()
+    })
+    cnt = spp.count
+    println("=================== Q2 ===================supplier:" + cnt )
+    val supplier = spp.toDF()
 
-    val nation = new TRDD[TRecord](scc, "nation", new ScanQuery(), ChTSchema.nationSch).map(r => {
+    val nn = new TRDD[TRecord](scc, "nation", new ScanQuery(), ChTSchema.nationSch).map(r => {
       Nation(r.getField("N_NATIONKEY").asInstanceOf[Short],
         r.getField("N_NAME").asInstanceOf[String],
         r.getField("N_REGIONKEY").asInstanceOf[Short],
         r.getField("N_COMMENT").asInstanceOf[String])
-    }).toDF()
+    })
+    cnt = nn.count
+    println("=================== Q2 ===================nation:" + cnt) 
+   val nation = nn.toDF()
 
-    val region = new TRDD[TRecord](scc, "region", new ScanQuery(), ChTSchema.regionSch).map(r => {
+    val rrr = new TRDD[TRecord](scc, "region", new ScanQuery(), ChTSchema.regionSch).map(r => {
       Region(r.getField("R_REGIONKEY").asInstanceOf[Short],
         r.getField("R_NAME").asInstanceOf[String],
         r.getField("R_COMMENT").asInstanceOf[String])
-    }).toDF()
+    })
+    cnt = rrr.count
+    println("=================== Q2 ===================region:" + cnt )
+    val region = rrr.toDF()
 
     /**
      * Inner query
