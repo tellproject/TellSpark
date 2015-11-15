@@ -168,7 +168,9 @@ object ChQuery {
   def executeQuery(queryNo: Int, st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
     assert(queryNo >= 1 && queryNo <= 22, "Invalid query number")
     val m = Class.forName(f"ch.ethz.queries.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st:String, cm:String, cn:Int, cs:Int, mUrl:String)}]
+    println("=========== pre execute =============")
     val res = m.execute(st, cm, cn, cs, mUrl)
+    println("=========== post execute =============")
   }
 
   def main(args: Array[String]): Unit = {
@@ -194,6 +196,9 @@ object ChQuery {
         throw new RuntimeException("Invalid number of arguments")
       }
     }
+    println("***********************************************")
+    println("********************q:" + qryNum + "***st:" + st + "***cm:" + cm)
+    println("***********************************************")
     if (qryNum > 0) {
         executeQuery(qryNum, st, cm, cn, cs, masterUrl)
     } else {
