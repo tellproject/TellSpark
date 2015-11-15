@@ -166,7 +166,7 @@ object ChQuery {
     val t0 = System.nanoTime()
     m.execute(st, cm, cn, cs, mUrl)
     val t1 = System.nanoTime()
-    logger.info(String.format("[Query %d] Elapsed time: %d msecs", queryNo, (t1-t0)/1000000))
+    logger.info("[Query %d] Elapsed time: %d msecs".format(queryNo, (t1-t0)/1000000))
   }
 
   def main(args: Array[String]): Unit = {
