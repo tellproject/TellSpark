@@ -42,23 +42,24 @@ class Q22 extends ChQuery {
 
     // first subquery
 
-    val query = new tell.ScanQuery()
+    val query = new ScanQuery()
 
 
-    val clause1 = new query.CNFCLause() // clause for substring matching
+    val clause1 = new CNFClause() // clause for substring matching
     // assuming that the shorts will be converted to prefix-strings once we will implement the LIKE predicates
     for (i <- 1 to 7)
       clause1.addPredicate(ScanQuery.CmpType.LIKE, phoneIndex, PredicateType.create(String.valueOf(i)))
 
     query.addSelection(clause1)
 
-    val clause2 = new query.CNFCLause() // clause for balance greater 0.0
+    val clause2 = new CNFClause() // clause for balance greater 0.0
     clause2.addPredicate(ScanQuery.CmpType.GREATER, balanceIndex, PredicateType.create(0.0))
     query.addSelection(clause2)
 
     // add the two aggregations for getting the average
-    query.addAggregation(ScanQuery.AggrType.SUM, balanceIndex)
-    query.addAggregation(ScanQuery.AggrType.CNT, balanceIndex)
+    //query.addAggregation(ScanQuery.AggrType.SUM, balanceIndex)
+    //    query.addAggregation(ScanQuery.AggrType.CNT, balanceIndex)
 
     // TODO: continue here...
+  }
 }
