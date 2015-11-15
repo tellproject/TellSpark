@@ -45,6 +45,7 @@ class Q1 extends ChQuery {
         avg($"OL_AMOUNT"),
         count($"OL_NUMBER"))
       .sort($"OL_NUMBER")
-    //outputDF(res)
+
+    timeCollect(res, 1)
   }
 }

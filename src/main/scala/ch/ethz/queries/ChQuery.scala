@@ -134,6 +134,7 @@ abstract class ChQuery {
   // get the name of the class excluding dollar signs and package
   val className = this.getClass.getName.split("\\.").last.replaceAll("\\$", "")
 
+  val logger = LoggerFactory.getLogger(ChQuery.getClass)
   // create spark context and set class name as the app name
 //  val sc = new SparkContext(new SparkConf().setAppName("Query: " + className))
 //
@@ -148,26 +149,29 @@ abstract class ChQuery {
    */
   def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit
 
-  def timeCollect(df: DataFrame): Unit = {
-    //TODO time collection
+  def timeCollect(df: DataFrame, queryNo: Int): Unit = {
+    val t0 = System.nanoTime()
+    //TODO do we need to get all the tuples? or just count them?
     df.collect().foreach(println)
+    val t1 = System.nanoTime()
+    logger.info("[Query %d] Elapsed time: %d msecs".format(queryNo, (t1-t0)/1000000))
   }
+
 }
 
 object ChQuery {
 
-  val logger = LoggerFactory.getLogger(ChQuery.getClass)
+
   /**
    * Execute query reflectively
    */
   def executeQuery(queryNo: Int, st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
     assert(queryNo >= 1 && queryNo <= 22, "Invalid query number")
     val m = Class.forName(f"ch.ethz.queries.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st:String, cm:String, cn:Int, cs:Int, mUrl:String)}]
-    val t0 = System.nanoTime()
-    m.execute(st, cm, cn, cs, mUrl)
-    val t1 = System.nanoTime()
-    logger.info("[Query %d] Elapsed time: %d msecs".format(queryNo, (t1-t0)/1000000))
+    val res = m.execute(st, cm, cn, cs, mUrl)
   }
+
+
 
   def main(args: Array[String]): Unit = {
     var st = "192.168.0.21:7241"

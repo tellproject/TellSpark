@@ -2,12 +2,9 @@ package ch.ethz
 
 import org.apache.spark.{SparkConf, SparkContext}
 import ch.ethz.tell._
-import org.apache.spark.sql.functions.count
-import org.apache.spark.sql.functions.sum
-import org.apache.spark.sql.functions.avg
-import org.apache.spark.sql.functions.udf
 
 /**
+ * Sanity checking class
  */
 object Experimental {
 
@@ -45,8 +42,7 @@ object Experimental {
 
     val tblName = "testTable"
     // rdd creation
-//    val tellRdd = new TellRDD[TellRecord](sc, tblName, new ScanQuery(), sch)
-//    readLine()
+    // readLine()
     val tellRdd = new TRDD[TRecord](sc, tblName, new ScanQuery(), sch)
 
 //    val grouped = tellRdd.filter(record => record.getField() > "2007")
