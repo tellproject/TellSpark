@@ -35,7 +35,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     this(oneParent.context, List(new OneToOneDependency(oneParent)))
   }
 
-  def getIterator(theSplit: TPartition[T]): Iterator[T] = {
+  def getIterator(scanIt: ScanIterator): Iterator[T] = {
     println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>theSplit")
     //println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>theSplit" + theSplit.toString)
     val it = new Iterator[T] {
@@ -43,16 +43,16 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       var offset = 0L
       var cnt = 0
       var cnt1 = 0
-      var keepGoing = theSplit.scanIt.next()
-      var len = theSplit.scanIt.length()
-      var addr = theSplit.scanIt.address()
+      var keepGoing = scanIt.next()
+      var len = scanIt.length()
+      var addr = scanIt.address()
       var res:(Long, T) = null
       
       override def hasNext: Boolean = {
         if (offset == len) {
-          keepGoing = theSplit.scanIt.next()
-          len = theSplit.scanIt.length()
-          addr = theSplit.scanIt.address()
+          keepGoing = scanIt.next()
+          len = scanIt.length()
+          addr = scanIt.address()
           offset = 0
         }
         keepGoing
@@ -151,8 +151,10 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     println("=================== COMPUTE :trxId: ========= " + tContext.broadcastTc.value)
     val trxId = tContext.broadcastTc.value
     TellClientFactory.startTransaction(trxId)
+    val theSplit = split.asInstanceOf[TPartition[T]]
+    val scanIt = TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, theSplit.index, tQuery), tTable)
     println("+++++++++++++++++++++++++++++++++++++")
-    getIterator(split.asInstanceOf[TPartition[T]])
+    getIterator(scanIt)
   }
 
   override protected def getPartitions: Array[Partition] = {
@@ -168,10 +170,9 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     val trxId = tContext.broadcastTc.value
 
     println("=================== GET_PARTITION :trxId: ========= " + trxId)
-
+    //TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
     (0 to TellClientFactory.chNumber -1).map(pos => {
-      array(pos) = new TPartition(pos,
-        TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
+      array(pos) = new TPartition(pos, tQuery, tTable)
       println("PARTITION>>>" + array(pos).toString)
     })
     array
