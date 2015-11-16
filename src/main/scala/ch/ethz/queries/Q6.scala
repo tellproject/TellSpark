@@ -14,39 +14,20 @@ class Q6 extends ChQuery {
 
   override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
-    println("===========")
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
     // convert an RDDs to a DataFrames
-    val oo = new TRDD[TRecord](scc, "order-line", new ScanQuery(), ChTSchema.orderLineSch)
-    val ol = oo.map(r => {
-      OrderLine(r.getValue("OL_O_ID").asInstanceOf[Int],
-        r.getValue("OL_D_ID").asInstanceOf[Short],
-        r.getValue("OL_W_ID").asInstanceOf[Int],
-        r.getValue("OL_NUMBER").asInstanceOf[Short],
-        r.getValue("OL_I_ID").asInstanceOf[Int],
-        r.getValue("OL_SUPPLY_W_ID").asInstanceOf[Int],
-        r.getValue("OL_DELIVERY_D").asInstanceOf[Long],
-        r.getValue("OL_QUANTITY").asInstanceOf[Short],
-        r.getValue("OL_AMOUNT").asInstanceOf[Long],
-        r.getValue("OL_DIST_INFO").asInstanceOf[String]
-      )
-    })
+//    val oo = new TRDD[TRecord](scc, "order-line", new ScanQuery(), ChTSchema.orderLineSch)
+    val ol = orderLineRdd(scc, new ScanQuery())
     val orderline = ol.toDF()
-    println("%%%%%%%%%%%%%%%%%%^^^^^^^^^^^^^^^^^^")
-    println("^^^^^^^^^^^^^^^^^^%%%%%%%%%%%%%%%%%%")
-    println("==============================" + oo.count)
-    ol.map(r => println(r.toString))
-    ol.collect()
-    println("////////////////%%%%%%%%%%%%%%%%%%")
-    println("%%%%%%%%%%%%%%%%%%///////////////")
     //Do push downs
-      val res = orderline.filter($"OL_DELIVERY_D" >= "1999-01-01")
-        .filter($"OL_DELIVERY_D" < "2020-01-01")
-        .filter($"OL_QUANTITY" >= "1").filter($"OL_QUANTITY" <= "10000")
-        .agg(sum($"OL_AMOUNT"))
-      //outputDF(res)
+      val res = orderline.filter($"ol_delivery_d" >= 19990101)
+        .filter($"ol_delivery_d" < 20200101)
+        .filter($"ol_quantity" >= 1).filter($"ol_quantity" <= 10000)
+        .agg(sum($"ol_amount"))
+
+    timeCollect(res, 6)
   }
 }

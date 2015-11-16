@@ -82,28 +82,28 @@ object ChTSchema {
 			"	\"C_N_NATIONKEY\" INTEGER CS_INT,\n"
    */
   val customerSch: TSchema = new TSchema()
-  customerSch.addField(Schema.FieldType.SMALLINT, "C_ID", false)
-  customerSch.addField(Schema.FieldType.SMALLINT, "C_D_ID", false)
-  customerSch.addField(Schema.FieldType.SMALLINT, "C_PAYMENT_CNT", false)
-  customerSch.addField(Schema.FieldType.SMALLINT, "C_DELIVERY_CNT", false)
-  customerSch.addField(Schema.FieldType.INT, "C_N_NATIONKEY", false)
-  customerSch.addField(Schema.FieldType.INT, "C_W_ID", false)
-  customerSch.addField(Schema.FieldType.BIGINT, "C_SINCE", false)
-  customerSch.addField(Schema.FieldType.DOUBLE, "C_CREDIT_LIM", false)
-  customerSch.addField(Schema.FieldType.DOUBLE, "C_DISCOUNT", false)
-  customerSch.addField(Schema.FieldType.DOUBLE, "C_BALANCE", false)
-  customerSch.addField(Schema.FieldType.DOUBLE, "C_YTD_PAYMENT", false)
-  customerSch.addField(Schema.FieldType.TEXT, "C_FIRST", false)
-  customerSch.addField(Schema.FieldType.TEXT, "C_MIDDLE", false)
-  customerSch.addField(Schema.FieldType.TEXT, "C_LAST", false)
-  customerSch.addField(Schema.FieldType.TEXT, "C_STREET_1", false)
-  customerSch.addField(Schema.FieldType.TEXT, "C_STREET_2", false)
-  customerSch.addField(Schema.FieldType.TEXT, "C_CITY", false)
-  customerSch.addField(Schema.FieldType.TEXT, "C_STATE", false)
-  customerSch.addField(Schema.FieldType.TEXT, "C_ZIP", false)
-  customerSch.addField(Schema.FieldType.TEXT, "C_PHONE", false)
-  customerSch.addField(Schema.FieldType.TEXT, "C_CREDIT", false)
-  customerSch.addField(Schema.FieldType.TEXT, "C_DATA", false)
+  customerSch.addField(Schema.FieldType.SMALLINT, "c_id", false)
+  customerSch.addField(Schema.FieldType.SMALLINT, "c_d_id", false)
+  customerSch.addField(Schema.FieldType.SMALLINT, "c_payment_cnt", false)
+  customerSch.addField(Schema.FieldType.SMALLINT, "c_delivery_cnt", false)
+  customerSch.addField(Schema.FieldType.INT, "c_n_nationkey", false)
+  customerSch.addField(Schema.FieldType.INT, "c_w_id", false)
+  customerSch.addField(Schema.FieldType.BIGINT, "c_since", false)
+  customerSch.addField(Schema.FieldType.DOUBLE, "c_credit_lim", false)
+  customerSch.addField(Schema.FieldType.DOUBLE, "c_discount", false)
+  customerSch.addField(Schema.FieldType.DOUBLE, "c_balance", false)
+  customerSch.addField(Schema.FieldType.DOUBLE, "c_ytd_payment", false)
+  customerSch.addField(Schema.FieldType.TEXT, "c_first", false)
+  customerSch.addField(Schema.FieldType.TEXT, "c_middle", false)
+  customerSch.addField(Schema.FieldType.TEXT, "c_last", false)
+  customerSch.addField(Schema.FieldType.TEXT, "c_street_1", false)
+  customerSch.addField(Schema.FieldType.TEXT, "c_street_2", false)
+  customerSch.addField(Schema.FieldType.TEXT, "c_city", false)
+  customerSch.addField(Schema.FieldType.TEXT, "c_state", false)
+  customerSch.addField(Schema.FieldType.TEXT, "c_zip", false)
+  customerSch.addField(Schema.FieldType.TEXT, "c_phone", false)
+  customerSch.addField(Schema.FieldType.TEXT, "c_credit", false)
+  customerSch.addField(Schema.FieldType.TEXT, "c_data", false)
 
 
   /**
@@ -134,9 +134,9 @@ object ChTSchema {
 			"	\"NO_W_ID\" INTEGER CS_INT,\n"
    */
   val newOrderSch: TSchema = new TSchema()
-  newOrderSch.addField(Schema.FieldType.SMALLINT, "NO_D_ID", false)
-  newOrderSch.addField(Schema.FieldType.INT, "NO_O_ID", false)
-  newOrderSch.addField(Schema.FieldType.INT, "NO_W_ID", false)
+  newOrderSch.addField(Schema.FieldType.SMALLINT, "no_d_id", false)
+  newOrderSch.addField(Schema.FieldType.INT, "no_o_id", false)
+  newOrderSch.addField(Schema.FieldType.INT, "no_w_id", false)
 
   /**
    * "ORDER\" (\n"
@@ -150,14 +150,14 @@ object ChTSchema {
 			"	\"O_ALL_LOCAL\" TINYINT CS_INT,\n"
    */
   val orderSch: TSchema = new TSchema()
-  orderSch.addField(Schema.FieldType.SMALLINT, "O_D_ID", false)
-  orderSch.addField(Schema.FieldType.SMALLINT, "O_C_ID", false)
-  orderSch.addField(Schema.FieldType.SMALLINT, "O_CARRIER_ID", false)
-  orderSch.addField(Schema.FieldType.SMALLINT, "O_OL_CNT", false)
-  orderSch.addField(Schema.FieldType.SMALLINT, "O_ALL_LOCAL", false)
-  orderSch.addField(Schema.FieldType.INT, "O_ID", false)
-  orderSch.addField(Schema.FieldType.INT, "O_W_ID", false)
-  orderSch.addField(Schema.FieldType.BIGINT, "O_ENTRY_D", false)
+  orderSch.addField(Schema.FieldType.SMALLINT, "o_d_id", false)
+  orderSch.addField(Schema.FieldType.SMALLINT, "o_c_id", false)
+  orderSch.addField(Schema.FieldType.SMALLINT, "o_carrier_id", false)
+  orderSch.addField(Schema.FieldType.SMALLINT, "o_ol_cnt", false)
+  orderSch.addField(Schema.FieldType.SMALLINT, "o_all_local", false)
+  orderSch.addField(Schema.FieldType.INT, "o_id", false)
+  orderSch.addField(Schema.FieldType.INT, "o_w_id", false)
+  orderSch.addField(Schema.FieldType.BIGINT, "o_entry_d", false)
 
 
   /**
@@ -194,10 +194,10 @@ object ChTSchema {
 			"	\"N_COMMENT\" CHAR(152) CS_FIXEDSTRING NOT NULL,\n"
    */
   val nationSch: TSchema = new TSchema()
-  nationSch.addField(Schema.FieldType.SMALLINT, "N_NATIONKEY", false)
-  nationSch.addField(Schema.FieldType.SMALLINT, "N_REGIONKEY", false)
-  nationSch.addField(Schema.FieldType.TEXT, "N_NAME", false)
-  nationSch.addField(Schema.FieldType.TEXT, "N_COMMENT", false)
+  nationSch.addField(Schema.FieldType.SMALLINT, "n_nationkey", false)
+  nationSch.addField(Schema.FieldType.SMALLINT, "n_regionkey", false)
+  nationSch.addField(Schema.FieldType.TEXT, "n_name", false)
+  nationSch.addField(Schema.FieldType.TEXT, "n_comment", false)
 
   /**
    * \"REGION\" (\n"
@@ -206,9 +206,9 @@ object ChTSchema {
 			"	\"R_COMMENT\" CHAR(152) CS_FIXEDSTRING NOT NULL,\n"
    */
   val regionSch: TSchema = new TSchema()
-  regionSch.addField(Schema.FieldType.SMALLINT, "R_REGIONKEY", false)
-  regionSch.addField(Schema.FieldType.TEXT, "R_NAME", false)
-  regionSch.addField(Schema.FieldType.TEXT, "R_COMMENT", false)
+  regionSch.addField(Schema.FieldType.SMALLINT, "r_regionkey", false)
+  regionSch.addField(Schema.FieldType.TEXT, "r_name", false)
+  regionSch.addField(Schema.FieldType.TEXT, "r_comment", false)
 
   /** "SUPPLIER\" (\n"
 			"	\"SU_SUPPKEY\" SMALLINT CS_INT NOT NULL,\n"
@@ -220,13 +220,13 @@ object ChTSchema {
 			"	\"SU_COMMENT\" CHAR(101) CS_FIXEDSTRING NOT NULL,\n"
    */
   val supplierSch: TSchema = new TSchema()
-  supplierSch.addField(Schema.FieldType.SMALLINT, "SU_SUPPKEY", false)
-  supplierSch.addField(Schema.FieldType.SMALLINT, "SU_NATIONKEY", false)
-  supplierSch.addField(Schema.FieldType.DOUBLE, "SU_ACCTBAL", false)
-  supplierSch.addField(Schema.FieldType.TEXT, "SU_NAME", false)
-  supplierSch.addField(Schema.FieldType.TEXT, "SU_ADDRESS", false)
-  supplierSch.addField(Schema.FieldType.TEXT, "SU_PHONE", false)
-  supplierSch.addField(Schema.FieldType.TEXT, "SU_COMMENT", false)
+  supplierSch.addField(Schema.FieldType.SMALLINT, "su_suppkey", false)
+  supplierSch.addField(Schema.FieldType.SMALLINT, "su_nationkey", false)
+  supplierSch.addField(Schema.FieldType.DOUBLE, "su_acctbal", false)
+  supplierSch.addField(Schema.FieldType.TEXT, "su_name", false)
+  supplierSch.addField(Schema.FieldType.TEXT, "su_address", false)
+  supplierSch.addField(Schema.FieldType.TEXT, "su_phone", false)
+  supplierSch.addField(Schema.FieldType.TEXT, "su_comment", false)
 
   /**
    * \"STOCK\" (\n"
@@ -256,7 +256,7 @@ object ChTSchema {
   stockSch.addField(Schema.FieldType.INT, "S_I_ID", false)
   stockSch.addField(Schema.FieldType.INT, "S_YTD", false)
   stockSch.addField(Schema.FieldType.INT, "S_QUANTITY", false)
-//  stockSch.addField(Schema.FieldType.INT, "S_SU_SUPPKEY", false)
+  stockSch.addField(Schema.FieldType.INT, "S_SU_SUPPKEY", false)
   stockSch.addField(Schema.FieldType.TEXT, "S_DIST_01", false)
   stockSch.addField(Schema.FieldType.TEXT, "S_DIST_02", false)
   stockSch.addField(Schema.FieldType.TEXT, "S_DIST_03", false)
@@ -278,9 +278,9 @@ object ChTSchema {
 			"	\"I_DATA\" CHAR(50) CS_FIXEDSTRING,\n"
    */
   val itemSch: TSchema = new TSchema()
-  itemSch.addField(Schema.FieldType.SMALLINT, "I_IM_ID", false)
-  itemSch.addField(Schema.FieldType.INT, "I_ID", false)
-  itemSch.addField(Schema.FieldType.DOUBLE, "I_PRICE", false)
-  itemSch.addField(Schema.FieldType.TEXT, "I_NAME", false)
-  itemSch.addField(Schema.FieldType.TEXT, "I_DATA", false)
+  itemSch.addField(Schema.FieldType.SMALLINT, "i_im_id", false)
+  itemSch.addField(Schema.FieldType.INT, "i_id", false)
+  itemSch.addField(Schema.FieldType.DOUBLE, "i_price", false)
+  itemSch.addField(Schema.FieldType.TEXT, "i_name", false)
+  itemSch.addField(Schema.FieldType.TEXT, "i_data", false)
 }

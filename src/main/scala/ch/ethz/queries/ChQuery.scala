@@ -1,6 +1,6 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TRecord, TRDD}
+import ch.ethz.tell.{TSparkContext, ScanQuery, TRecord, TRDD}
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.functions.min
@@ -169,6 +169,136 @@ abstract class ChQuery {
     logger.info("[Query %d] Elapsed time: %d msecs. map:%d ress:%d".format(queryNo, (t1-t0)/1000000, cnt, ress.length))
   }
 
+  def orderRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
+    new TRDD[TRecord](scc, "orders", scanQuery, ChTSchema.orderSch).map(r => {
+      Order(r.getValue("o_id").asInstanceOf[Int],
+        r.getValue("o_d_id").asInstanceOf[Short],
+        r.getValue("o_w_id").asInstanceOf[Int],
+        r.getValue("o_c_id").asInstanceOf[Short],
+        r.getValue("o_entry_d").asInstanceOf[Long],
+        r.getValue("o_carrier_id").asInstanceOf[Short],
+        r.getValue("o_ol_cnt").asInstanceOf[Short],
+        r.getValue("o_all_local").asInstanceOf[Short]
+      )
+    })
+  }
+
+  def customerRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
+    new TRDD[TRecord](scc, "customer", scanQuery, ChTSchema.customerSch).map(r => {
+      Customer(r.getValue("C_ID").asInstanceOf[Int],
+        r.getValue("C_D_ID").asInstanceOf[Int],
+        r.getValue("C_W_ID").asInstanceOf[Int],
+        r.getValue("C_FIRST").asInstanceOf[String],
+        r.getValue("C_MIDDLE").asInstanceOf[String],
+        r.getValue("C_LAST").asInstanceOf[String],
+        r.getValue("C_STREET_1").asInstanceOf[String],
+        r.getValue("C_STREET_2").asInstanceOf[String],
+        r.getValue("C_CITY").asInstanceOf[String],
+        r.getValue("C_STATE").asInstanceOf[String],
+        r.getValue("C_ZIP").asInstanceOf[String],
+        r.getValue("C_PHONE").asInstanceOf[String],
+        r.getValue("C_SINCE").asInstanceOf[Long],
+        r.getValue("C_CREDIT").asInstanceOf[String],
+        r.getValue("C_CREDIT_LIM").asInstanceOf[Double],
+        r.getValue("C_DISCOUNT").asInstanceOf[Double],
+        r.getValue("C_BALANCE").asInstanceOf[Double],
+        r.getValue("C_YTD_PAYMENT").asInstanceOf[Double],
+        r.getValue("C_PAYMENT_CNT").asInstanceOf[Short],
+        r.getValue("C_DELIVERY_CNT").asInstanceOf[Short],
+        r.getValue("C_DATA").asInstanceOf[String],
+        r.getValue("C_N_NATIONKEY").asInstanceOf[Int]
+      )
+    })
+  }
+
+  def stockRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
+    new TRDD[TRecord](scc, "stock", scanQuery, ChTSchema.stockSch).map(r => {
+      new Stock(r.getValue("S_I_ID").asInstanceOf[Int],
+        r.getValue("S_W_ID").asInstanceOf[Short],
+        r.getValue("S_QUANTITY").asInstanceOf[Int],
+        r.getValue("S_DIST_01").asInstanceOf[String],
+        r.getValue("S_DIST_02").asInstanceOf[String],
+        r.getValue("S_DIST_03").asInstanceOf[String],
+        r.getValue("S_DIST_04").asInstanceOf[String],
+        r.getValue("S_DIST_05").asInstanceOf[String],
+        r.getValue("S_DIST_06").asInstanceOf[String],
+        r.getValue("S_DIST_07").asInstanceOf[String],
+        r.getValue("S_DIST_08").asInstanceOf[String],
+        r.getValue("S_DIST_09").asInstanceOf[String],
+        r.getValue("S_DIST_10").asInstanceOf[String],
+        r.getValue("S_YTD").asInstanceOf[Int],
+        r.getValue("S_ORDER_CNT").asInstanceOf[Short],
+        r.getValue("S_REMOTE_CNT").asInstanceOf[Short],
+        r.getValue("S_DATA").asInstanceOf[String]
+        , r.getValue("S_SU_SUPPKEY").asInstanceOf[Int]
+      )
+    })
+  }
+
+  def orderLineRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
+    new TRDD[TRecord](scc, "order-line", scanQuery, ChTSchema.orderLineSch).map(r => {
+      OrderLine(r.getValue("OL_O_ID").asInstanceOf[Int],
+        r.getValue("OL_D_ID").asInstanceOf[Short],
+        r.getValue("OL_W_ID").asInstanceOf[Int],
+        r.getValue("OL_NUMBER").asInstanceOf[Short],
+        r.getValue("OL_I_ID").asInstanceOf[Int],
+        r.getValue("OL_SUPPLY_W_ID").asInstanceOf[Int],
+        r.getValue("ol_delivery_d").asInstanceOf[Long],
+        r.getValue("OL_QUANTITY").asInstanceOf[Short],
+        r.getValue("OL_AMOUNT").asInstanceOf[Long],
+        r.getValue("OL_DIST_INFO").asInstanceOf[String])
+    })
+  }
+
+  def nationRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
+    new TRDD[TRecord](scc, "nation", scanQuery, ChTSchema.nationSch).map(r => {
+      Nation(r.getValue("N_NATIONKEY").asInstanceOf[Short],
+        r.getValue("N_NAME").asInstanceOf[String],
+        r.getValue("N_REGIONKEY").asInstanceOf[Short],
+        r.getValue("N_COMMENT").asInstanceOf[String])
+    })
+  }
+
+  def regionRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
+    new TRDD[TRecord](scc, "region", scanQuery, ChTSchema.regionSch).map(r => {
+      Region(r.getValue("R_REGIONKEY").asInstanceOf[Short],
+        r.getValue("R_NAME").asInstanceOf[String],
+        r.getValue("R_COMMENT").asInstanceOf[String])
+    })
+  }
+  def supplierRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
+    new TRDD[TRecord](scc, "supplier", scanQuery, ChTSchema.supplierSch).map(r => {
+      Supplier(r.getValue("SU_SUPPKEY").asInstanceOf[Short],
+        r.getValue("SU_NAME").asInstanceOf[String],
+        r.getValue("SU_ADDRESS").asInstanceOf[String],
+        r.getValue("SU_NATIONKEY").asInstanceOf[Short],
+        r.getValue("SU_PHONE").asInstanceOf[String],
+        r.getValue("SU_ACCTBAL").asInstanceOf[Double],
+        r.getValue("SU_COMMENT").asInstanceOf[String])
+    })
+  }
+  def ordersRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
+    new TRDD[TRecord](scc, "orders", scanQuery, ChTSchema.orderSch).map(r => {
+      Order(r.getValue("O_ID").asInstanceOf[Int],
+        r.getValue("O_D_ID").asInstanceOf[Short],
+        r.getValue("O_W_ID").asInstanceOf[Int],
+        r.getValue("O_C_ID").asInstanceOf[Short],
+        r.getValue("O_ENTRY_D").asInstanceOf[Long],
+        r.getValue("O_CARRIER_ID").asInstanceOf[Short],
+        r.getValue("O_OL_CNT").asInstanceOf[Short],
+        r.getValue("O_ALL_LOCAL").asInstanceOf[Short]
+      )
+    })
+  }
+  def itemRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
+    new TRDD[TRecord](scc, "item", scanQuery, ChTSchema.itemSch).map(r => {
+      Item(r.getValue("i_id").asInstanceOf[Int],
+        r.getValue("i_im_id").asInstanceOf[Short],
+        r.getValue("i_name").asInstanceOf[String],
+        r.getValue("i_price").asInstanceOf[Double],
+        r.getValue("i_data").asInstanceOf[String])
+    })
+  }
 }
 
 object ChQuery {

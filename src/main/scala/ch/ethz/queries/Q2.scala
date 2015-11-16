@@ -38,7 +38,7 @@ class Q2 extends ChQuery {
         r.getValue("S_ORDER_CNT").asInstanceOf[Short],
         r.getValue("S_REMOTE_CNT").asInstanceOf[Short],
         r.getValue("S_DATA").asInstanceOf[String]
-        //, r.getValue("S_SU_SUPPKEY").asInstanceOf[Int]
+        , r.getValue("S_SU_SUPPKEY").asInstanceOf[Int]
       )
     }).toDF()
     var cnt = stt.count
@@ -91,7 +91,7 @@ class Q2 extends ChQuery {
     .groupBy($"S_I_ID")
     .agg(min($"S_QUANTITY").as("M_S_QUANTITY")).select("S_I_ID as M_I_ID", "M_S_QUANTITY")
 
-    val item = new TRDD[TRecord](scc, "item", new ScanQuery(), ChTSchema.stockSch).map(r => {
+    val item = new TRDD[TRecord](scc, "item", new ScanQuery(), ChTSchema.itemSch).map(r => {
       Item(r.getValue("I_ID").asInstanceOf[Int],
         r.getValue("I_IM_ID").asInstanceOf[Short],
         r.getValue("I_NAME").asInstanceOf[String],
