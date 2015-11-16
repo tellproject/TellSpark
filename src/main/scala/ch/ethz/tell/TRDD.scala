@@ -142,8 +142,8 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
-    val tellClientBroad = context.asInstanceOf[TSparkContext].broadcastTc
-    tellClientBroad.value.startTransaction(tellClientBroad.value.trxId)
+    val trxId = context.asInstanceOf[TSparkContext].broadcastTc.value
+    TellClientFactory.startTransaction(trxId)
     println("+++++++++++++++++++++++++++++++++++++")
     println("++++++++++++++++COMPUTE with iterator+++++++++++++++++++++")
     println("+++++++++++++++++++++++++++++++++++++")
@@ -162,7 +162,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       println("=================== NULL: tellclientbroad")
     (0 to TellClientFactory.chNumber -1).map(pos => {
       array(pos) = new TPartition(pos,
-        tellClientBroad.value.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
+        TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
       println("PARTITION>>>" + array(pos).toString)
     })
     array
