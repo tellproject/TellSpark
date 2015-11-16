@@ -16,6 +16,7 @@ object TellClientFactory {
   var chSize = 0
   // TODO we should use it properly
   var trx : Transaction = null
+  var trxId : Long = 0L
 
   //  val clientManager : ClientManager = new ClientManager(commitMng, tellStr, chunkCount, chunkSize);
   var clientManager: ClientManager = null
@@ -31,10 +32,15 @@ object TellClientFactory {
   }
 
   def startTransaction() = {
-    clientManager = getConnection
-    println("=========== ClientManagerPointer ======= " + clientManager.getImplPtr)
-//    println("=========== ClientManagerPointer ======= " + clientManager.getScanMemoryManagerPtr)
     trx = Transaction.startTransaction(getConnection)
+    trxId = trx.getTransactionId
+    println("==========TRANSACTTION_ID ======" + trx.getTransactionId)
+  }
+
+  def startTransaction(trId: Long) = {
+    trx = Transaction.startTransaction(trxId, getConnection)
+    trxId = trx.getTransactionId
+    println("==========TRANSACTTION_ID ======" + trx.getTransactionId)
   }
 
   def commitTrx() = {

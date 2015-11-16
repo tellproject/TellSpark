@@ -37,6 +37,9 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def getIterator(theSplit: TPartition[T]): Iterator[T] = {
+    println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>theSplit" + theSplit.toString)
+    val cccc = TellClientFactory.getConnection()
+    println(">>>>>>>>>>>>>>>>>>>>AFTER ANOTHER CLIENT>>>>>>>>>>>>>>>>>>>>ClientManager:" + cccc)
     val it = new Iterator[T] {
       // TODO a better way to map this?
       var offset = 0L
@@ -140,7 +143,9 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
-    //TODO for each partition registered, get the customer values out
+    val tellClientBroad = context.asInstanceOf[TSparkContext].broadcastTc
+    
+    tellClientBroad.value.startTransaction(tellClientBroad.value.trxId)
     getIterator(split.asInstanceOf[TPartition[T]])
   }
 
@@ -151,9 +156,12 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 //    println("==============POST TRANSACTION2=================")
 //    TellClientFactory.startTransaction()
 //    println("==============POST TRANSACTION=================")
+    val tellClientBroad = context.asInstanceOf[TSparkContext].broadcastTc
+    if (tellClientBroad == null)
+      println("=================== NULL: tellclientbroad")
     (0 to TellClientFactory.chNumber -1).map(pos => {
-      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(
-        new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
+      array(pos) = new TPartition(pos,
+        tellClientBroad.value.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
       println("PARTITION>>>" + array(pos).toString)
     })
     array

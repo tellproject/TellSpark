@@ -1,6 +1,7 @@
 package ch.ethz.tell
 
 import ch.ethz.TellClientFactory
+import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
@@ -17,6 +18,7 @@ class TSparkContext (val conf: SparkConf) {
   var commitMng: String = ""
   var chNumber: Int = 0
   var chSize: Int = 0
+  var broadcastTc: Broadcast[TellClientFactory.type] = null
 
   def this(masterUrl: String, appName: String, strMng: String, cmMng: String, chNum: Int, chSz: Int) {
     this(new SparkConf().setMaster(masterUrl).setAppName(appName))
@@ -26,8 +28,11 @@ class TSparkContext (val conf: SparkConf) {
     TellClientFactory.chSize = chSz
 
     println("==============PRE TRANSACTION =================")
-    println("==============POST TRANSACTION2=================")
-    val trxId = TellClientFactory.startTransaction()
+    if (broadcastTc == null) {
+      broadcastTc = sparkContext.broadcast(TellClientFactory)
+      TellClientFactory.startTransaction()
+    }
+//    val trxId =
     println("==============POST TRANSACTION=================")
   }
 
