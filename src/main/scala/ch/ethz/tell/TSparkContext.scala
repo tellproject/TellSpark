@@ -28,6 +28,8 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
     chNumber = sparkContext.broadcast(chNum)
     chSize = sparkContext.broadcast(chSz)
 
+    TellClientFactory.setConf(strMng, cmMng, chNum,chSz)
+
     println("==============PRE TRANSACTION =================")
     if (broadcastTc == null) {
       TellClientFactory.startTransaction

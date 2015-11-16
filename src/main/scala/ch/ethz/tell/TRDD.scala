@@ -142,7 +142,11 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
     //TODO move the client creation somewhere else?
-    setClientParams
+    TellClientFactory.setConf(
+      tContext.storageMng.value,
+      tContext.commitMng.value,
+      tContext.chNumber.value,
+      tContext.chSize.value)
     val trxId = tContext.broadcastTc.value
     TellClientFactory.startTransaction(trxId)
     println("+++++++++++++++++++++++++++++++++++++")
@@ -155,7 +159,12 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     val array = new Array[Partition](TellClientFactory.chNumber)
 //    TellClientFactory.startTransaction()
     //TODO move the client creation somewhere else?
-    setClientParams
+    TellClientFactory.setConf(
+      tContext.storageMng.value,
+      tContext.commitMng.value,
+      tContext.chNumber.value,
+      tContext.chSize.value)
+
     val trxId = tContext.broadcastTc.value
 
     if (trxId < 0)
@@ -167,12 +176,5 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       println("PARTITION>>>" + array(pos).toString)
     })
     array
-  }
-
-  def setClientParams() = {
-    TellClientFactory.storageMng = tContext.storageMng.value
-    TellClientFactory.commitMng = tContext.commitMng.value
-    TellClientFactory.chNumber = tContext.chNumber.value
-    TellClientFactory.chSize = tContext.chSize.value
   }
 }

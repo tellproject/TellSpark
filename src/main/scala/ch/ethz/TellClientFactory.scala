@@ -10,6 +10,14 @@ import sun.misc.Unsafe
  * Object mocking the actual tell client
  */
 object TellClientFactory {
+
+  def setConf(strMng: String, cmMng: String, chNum: Int, chSz: Int) = {
+    storageMng = strMng
+    commitMng = cmMng
+    chNumber = chNum
+    chSize = chSz
+  }
+
   var commitMng: String = ""
   var storageMng: String = ""
   var chNumber = 0
