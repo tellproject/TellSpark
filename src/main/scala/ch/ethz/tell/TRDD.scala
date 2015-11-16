@@ -20,14 +20,8 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   var tTable: String = ""
   // Tell query 
   var tQuery: ScanQuery = null
+  // Tell context
   var tContext: TSparkContext = null
-
-//  def this(@transient sc: SparkContext, tbl: String, qry: ScanQuery, sch: TSchema) = {
-//    this(sc, Nil)
-//    tSchema = sch
-//    tTable = tbl
-//    tQuery = qry
-//  }
 
   def this(@transient scc: TSparkContext, tbl: String, qry: ScanQuery, sch: TSchema) = {
     this(scc.sparkContext, Nil)
@@ -147,6 +141,8 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
+    //TODO move the client creation somewhere else?
+    setClientParams
     val trxId = tContext.broadcastTc.value
     TellClientFactory.startTransaction(trxId)
     println("+++++++++++++++++++++++++++++++++++++")
@@ -157,19 +153,26 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
   override protected def getPartitions: Array[Partition] = {
     val array = new Array[Partition](TellClientFactory.chNumber)
-
-//    println("==============PRE TRANSACTION =================")
-//    println("==============POST TRANSACTION2=================")
 //    TellClientFactory.startTransaction()
-//    println("==============POST TRANSACTION=================")
+    //TODO move the client creation somewhere else?
+    setClientParams
     val trxId = tContext.broadcastTc.value
+
     if (trxId < 0)
       println("=================== trxId:" + trxId)
+
     (0 to TellClientFactory.chNumber -1).map(pos => {
       array(pos) = new TPartition(pos,
         TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
       println("PARTITION>>>" + array(pos).toString)
     })
     array
+  }
+
+  def setClientParams() = {
+    TellClientFactory.storageMng = tContext.storageMng.value
+    TellClientFactory.commitMng = tContext.commitMng.value
+    TellClientFactory.chNumber = tContext.chNumber.value
+    TellClientFactory.chSize = tContext.chSize.value
   }
 }

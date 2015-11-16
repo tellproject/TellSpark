@@ -22,6 +22,8 @@ object TellClientFactory {
   var clientManager: ClientManager = null
 
   def getConnection(): ClientManager = {
+    //TODO move the client creation somewhere else?
+
     if (clientManager == null) {
       println("================= PRE CLIENT ==============")
       println("=================" + toString + "==============")

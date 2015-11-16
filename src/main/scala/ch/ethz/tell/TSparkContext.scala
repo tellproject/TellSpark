@@ -14,18 +14,19 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
    */
   @transient val sparkContext = new SparkContext(conf)
 
-  var storageMng: String = ""
-  var commitMng: String = ""
-  var chNumber: Int = 0
-  var chSize: Int = 0
+  var storageMng: Broadcast[String] = null
+  var commitMng: Broadcast[String] = null
+  var chNumber: Broadcast[Int] = null
+  var chSize: Broadcast[Int] = null
   var broadcastTc: Broadcast[Long] = null
 
   def this(masterUrl: String, appName: String, strMng: String, cmMng: String, chNum: Int, chSz: Int) {
+
     this(new SparkConf().setMaster(masterUrl).setAppName(appName))
-    TellClientFactory.storageMng = strMng
-    TellClientFactory.commitMng = cmMng
-    TellClientFactory.chNumber = chNum
-    TellClientFactory.chSize = chSz
+    storageMng = sparkContext.broadcast(strMng)
+    commitMng = sparkContext.broadcast(cmMng)
+    chNumber = sparkContext.broadcast(chNum)
+    chSize = sparkContext.broadcast(chSz)
 
     println("==============PRE TRANSACTION =================")
     if (broadcastTc == null) {
