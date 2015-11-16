@@ -37,6 +37,8 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def getIterator(theSplit: TPartition[T]): Iterator[T] = {
+    println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>theSplit")
+    //println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>theSplit" + theSplit.toString)
     val it = new Iterator[T] {
       // TODO a better way to map this?
       var offset = 0L
@@ -141,6 +143,9 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
     //TODO for each partition registered, get the customer values out
+    println("+++++++++++++++++++++++++++++++++++++")
+    println("++++++++++++++++COMPUTE with iterator+++++++++++++++++++++")
+    println("+++++++++++++++++++++++++++++++++++++")
     getIterator(split.asInstanceOf[TPartition[T]])
   }
 
