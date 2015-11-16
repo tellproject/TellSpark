@@ -162,9 +162,9 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 //    println("==============POST TRANSACTION2=================")
 //    TellClientFactory.startTransaction()
 //    println("==============POST TRANSACTION=================")
-    val tellClientBroad = context.asInstanceOf[TSparkContext].broadcastTc
-    if (tellClientBroad == null)
-      println("=================== NULL: tellclientbroad")
+    val trxId = asInstanceOf[TSparkContext].broadcastTc.value
+    if (trxId < 0)
+      println("=================== trxId:" + trxId)
     (0 to TellClientFactory.chNumber -1).map(pos => {
       array(pos) = new TPartition(pos,
         TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
