@@ -44,13 +44,13 @@ object TellClientFactory {
   def startTransaction() = {
     trx = Transaction.startTransaction(getConnection)
     trxId = trx.getTransactionId
-    println("==========TRANSACTTION_ID ======" + trx.getTransactionId)
+    println("==========TRANSACTTION_ID.1. ======" + trx.getTransactionId)
   }
 
   def startTransaction(trId: Long) = {
     trx = Transaction.startTransaction(trxId, getConnection)
     trxId = trx.getTransactionId
-    println("==========TRANSACTTION_ID ======" + trx.getTransactionId)
+    println("==========TRANSACTTION_ID.2. ======" + trx.getTransactionId)
   }
 
   def commitTrx() = {

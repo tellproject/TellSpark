@@ -147,10 +147,10 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       tContext.commitMng.value,
       tContext.chNumber.value,
       tContext.chSize.value)
+    println("=================== COMPUTE :storageMng: ========= " + tContext.storageMng.value)
+    println("=================== COMPUTE :trxId: ========= " + tContext.broadcastTc.value)
     val trxId = tContext.broadcastTc.value
     TellClientFactory.startTransaction(trxId)
-    println("+++++++++++++++++++++++++++++++++++++")
-    println("++++++++++++++++COMPUTE with iterator+++++++++++++++++++++")
     println("+++++++++++++++++++++++++++++++++++++")
     getIterator(split.asInstanceOf[TPartition[T]])
   }
@@ -167,8 +167,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
     val trxId = tContext.broadcastTc.value
 
-    if (trxId < 0)
-      println("=================== trxId:" + trxId)
+    println("=================== GET_PARTITION :trxId: ========= " + trxId)
 
     (0 to TellClientFactory.chNumber -1).map(pos => {
       array(pos) = new TPartition(pos,

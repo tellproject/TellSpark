@@ -30,14 +30,12 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
 
     TellClientFactory.setConf(strMng, cmMng, chNum,chSz)
 
-    println("==============PRE TRANSACTION =================")
     if (broadcastTc == null) {
       TellClientFactory.startTransaction
       broadcastTc = sparkContext.broadcast(TellClientFactory.trx.getTransactionId)
       TellClientFactory.startTransaction(broadcastTc.value)
+      println("==============SPARK_CONTEXT:trxId:=================" + broadcastTc.value)
     }
-//    val trxId =
-    println("==============POST TRANSACTION=================")
   }
 
   def setLocalProperty(key: String, value: String): Unit = {
