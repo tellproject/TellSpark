@@ -18,7 +18,7 @@ class TSparkContext (val conf: SparkConf) {
   var commitMng: String = ""
   var chNumber: Int = 0
   var chSize: Int = 0
-  var broadcastTc: Broadcast[TellClientFactory.type] = null
+  var broadcastTc: Broadcast[Long] = null
 
   def this(masterUrl: String, appName: String, strMng: String, cmMng: String, chNum: Int, chSz: Int) {
     this(new SparkConf().setMaster(masterUrl).setAppName(appName))
@@ -29,8 +29,8 @@ class TSparkContext (val conf: SparkConf) {
 
     println("==============PRE TRANSACTION =================")
     if (broadcastTc == null) {
-      broadcastTc = sparkContext.broadcast(TellClientFactory)
-      TellClientFactory.startTransaction()
+      broadcastTc = sparkContext.broadcast(TellClientFactory.trx.getTransactionId)
+      TellClientFactory.startTransaction(broadcastTc.value)
     }
 //    val trxId =
     println("==============POST TRANSACTION=================")
