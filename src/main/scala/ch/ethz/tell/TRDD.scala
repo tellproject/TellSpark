@@ -20,16 +20,21 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   var tTable: String = ""
   // Tell query 
   var tQuery: ScanQuery = null
+  var tContext: TSparkContext = null
 
-  def this(@transient sc: SparkContext, tbl: String, qry: ScanQuery, sch: TSchema) = {
-    this(sc, Nil)
+//  def this(@transient sc: SparkContext, tbl: String, qry: ScanQuery, sch: TSchema) = {
+//    this(sc, Nil)
+//    tSchema = sch
+//    tTable = tbl
+//    tQuery = qry
+//  }
+
+  def this(@transient scc: TSparkContext, tbl: String, qry: ScanQuery, sch: TSchema) = {
+    this(scc.sparkContext, Nil)
     tSchema = sch
     tTable = tbl
     tQuery = qry
-  }
-
-  def this(@transient scc: TSparkContext, tbl: String, query: ScanQuery, sch: TSchema) = {
-    this(scc.sparkContext, tbl, query, sch)
+    tContext = scc
   }
 
   def this(@transient oneParent: TRDD[_]) = {
@@ -142,7 +147,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
-    val trxId = context.asInstanceOf[TSparkContext].broadcastTc.value
+    val trxId = asInstanceOf[TSparkContext].broadcastTc.value
     TellClientFactory.startTransaction(trxId)
     println("+++++++++++++++++++++++++++++++++++++")
     println("++++++++++++++++COMPUTE with iterator+++++++++++++++++++++")

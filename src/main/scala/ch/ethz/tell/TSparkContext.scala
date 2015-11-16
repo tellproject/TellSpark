@@ -29,6 +29,7 @@ class TSparkContext (val conf: SparkConf) {
 
     println("==============PRE TRANSACTION =================")
     if (broadcastTc == null) {
+      TellClientFactory.startTransaction()
       broadcastTc = sparkContext.broadcast(TellClientFactory.trx.getTransactionId)
       TellClientFactory.startTransaction(broadcastTc.value)
     }

@@ -43,7 +43,8 @@ object Experimental {
     val tblName = "testTable"
     // rdd creation
     // readLine()
-    val tellRdd = new TRDD[TRecord](sc, tblName, new ScanQuery(), sch)
+    val scc = new TSparkContext("local[1]", "Experimental", st, cm, cn, cs)
+    val tellRdd = new TRDD[TRecord](scc, tblName, new ScanQuery(), sch)
 
 //    val grouped = tellRdd.filter(record => record.getField() > "2007")
 //      .groupBy(record => record.getcId()).sortByKey().map( p => {
