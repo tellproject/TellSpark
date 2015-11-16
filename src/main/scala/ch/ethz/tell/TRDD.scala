@@ -147,7 +147,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
-    val trxId = asInstanceOf[TSparkContext].broadcastTc.value
+    val trxId = tContext.broadcastTc.value
     TellClientFactory.startTransaction(trxId)
     println("+++++++++++++++++++++++++++++++++++++")
     println("++++++++++++++++COMPUTE with iterator+++++++++++++++++++++")
@@ -162,7 +162,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 //    println("==============POST TRANSACTION2=================")
 //    TellClientFactory.startTransaction()
 //    println("==============POST TRANSACTION=================")
-    val trxId = asInstanceOf[TSparkContext].broadcastTc.value
+    val trxId = tContext.broadcastTc.value
     if (trxId < 0)
       println("=================== trxId:" + trxId)
     (0 to TellClientFactory.chNumber -1).map(pos => {
