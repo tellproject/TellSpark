@@ -7,12 +7,12 @@ import org.apache.spark.{SparkConf, SparkContext}
 /**
  * Created by marenato on 11.11.15.
  */
-class TSparkContext (val conf: SparkConf) {
+class TSparkContext (@transient val conf: SparkConf) extends Serializable{
 
   /**
    * SparkContext setup
    */
-  val sparkContext = new SparkContext(conf)
+  @transient val sparkContext = new SparkContext(conf)
 
   var storageMng: String = ""
   var commitMng: String = ""
