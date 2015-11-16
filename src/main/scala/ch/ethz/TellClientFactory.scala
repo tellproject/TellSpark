@@ -48,8 +48,9 @@ object TellClientFactory {
   }
 
   def startTransaction(trId: Long) = {
-    trx = Transaction.startTransaction(trxId, getConnection)
+    trx = Transaction.startTransaction(trId, getConnection)
     trxId = trx.getTransactionId
+    println("==========TRANSACTTION_ID.2.trId. ======" + trId)
     println("==========TRANSACTTION_ID.2. ======" + trx.getTransactionId)
   }
 
