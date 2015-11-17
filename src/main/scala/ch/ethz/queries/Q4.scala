@@ -48,29 +48,5 @@ class Q4 extends ChQuery {
       (orders("o_d_id") === $"ol_d_id")))
 
     timeCollect(res, 4)
-    //    //todo push down filter
-    //    val orderRdd = new TRDD[TRecord](scc, "order", new ScanQuery(), ChTSchema.orderSch).filter(r => {
-    //      val f1 = r.getValue("O_ENTR_D").asInstanceOf[Long] >= 20070102
-    //      val f2 = r.getValue("O_ENTR_D").asInstanceOf[Long] < 20120102
-    //      (f1&f2)
-    //    }).map(r => {
-    //      val key = (r.getValue("O_ID").asInstanceOf[Int], r.getValue("O_W_ID").asInstanceOf[Int], r.getValue("O_D_ID").asInstanceOf[Int])
-    //      (key, r)
-    //    })
-    //
-    //    val orderLineRdd = new TRDD[TRecord](scc, "order_line", new ScanQuery(), ChTSchema.orderLineSch).map(r => {
-    //      val key = (r.getValue("OL_O_ID").asInstanceOf[Int], r.getValue("OL_W_ID").asInstanceOf[Int], r.getValue("OL_D_ID").asInstanceOf[Int])
-    //      (key, key)
-    //    })
-    //    val o_ol = orderRdd.join(orderLineRdd)
-    //    val cntOrOrLi = o_ol.count()
-    //      if (cntOrOrLi > 0) {
-    //      //TODO check count function
-    //        val res = o_ol.map(r => (r._2._1.getValue("O_OL_CNT").asInstanceOf[Int], r._2._1.getValue("O_ID").asInstanceOf[Int]))
-    //        .groupBy(g => g._1)
-    //        .map(r => (r._1, r._2.count(_)))
-    //        //result
-    //        res.collect()
-    //    }
   }
 }
