@@ -20,40 +20,12 @@ class Q2 extends ChQuery {
     import sqlContext.implicits._
 
     // convert an RDDs to a DataFrames
-    val stt = new TRDD[TRecord](scc, "stock", new ScanQuery(), ChTSchema.stockSch).map(r => {
-      new Stock(r.getValue("S_I_ID").asInstanceOf[Int],
-        r.getValue("S_W_ID").asInstanceOf[Short],
-        r.getValue("S_QUANTITY").asInstanceOf[Int],
-        r.getValue("S_DIST_01").asInstanceOf[String],
-        r.getValue("S_DIST_02").asInstanceOf[String],
-        r.getValue("S_DIST_03").asInstanceOf[String],
-        r.getValue("S_DIST_04").asInstanceOf[String],
-        r.getValue("S_DIST_05").asInstanceOf[String],
-        r.getValue("S_DIST_06").asInstanceOf[String],
-        r.getValue("S_DIST_07").asInstanceOf[String],
-        r.getValue("S_DIST_08").asInstanceOf[String],
-        r.getValue("S_DIST_09").asInstanceOf[String],
-        r.getValue("S_DIST_10").asInstanceOf[String],
-        r.getValue("S_YTD").asInstanceOf[Int],
-        r.getValue("S_ORDER_CNT").asInstanceOf[Short],
-        r.getValue("S_REMOTE_CNT").asInstanceOf[Short],
-        r.getValue("S_DATA").asInstanceOf[String]
-        , r.getValue("S_SU_SUPPKEY").asInstanceOf[Int]
-      )
-    }).toDF()
-    var cnt = stt.count
+    val stk = stockRdd(scc, new ScanQuery)
+    var cnt = stk.count
     println("=================== Q2 ===================stock:" + cnt )
-    val stock = stt.toDF()
+    val stock = stk.toDF()
 
-    val spp = new TRDD[TRecord](scc, "supplier", new ScanQuery(), ChTSchema.supplierSch).map(r => {
-      Supplier(r.getValue("SU_SUPPKEY").asInstanceOf[Short],
-        r.getValue("SU_NAME").asInstanceOf[String],
-        r.getValue("SU_ADDRESS").asInstanceOf[String],
-        r.getValue("SU_NATIONKEY").asInstanceOf[Short],
-        r.getValue("SU_PHONE").asInstanceOf[String],
-        r.getValue("SU_ACCTBAL").asInstanceOf[Double],
-        r.getValue("SU_COMMENT").asInstanceOf[String])
-    })
+    val spp = supplierRdd(scc, new ScanQuery)
     cnt = spp.count
     println("=================== Q2 ===================supplier:" + cnt )
     val supplier = spp.toDF()

@@ -19,15 +19,15 @@ object ChTSchema {
 			"	\"W_YTD\" DECIMAL(12,2) CS_FIXED,\n"
    */
   val warehouseSch: TSchema = new TSchema()
-  warehouseSch.addField(Schema.FieldType.INT, "W_ID", false)
-  warehouseSch.addField(Schema.FieldType.DOUBLE, "W_TAX", false)
-  warehouseSch.addField(Schema.FieldType.DOUBLE, "W_YTD", false)
-  warehouseSch.addField(Schema.FieldType.TEXT, "W_NAME", false)
-  warehouseSch.addField(Schema.FieldType.TEXT, "W_STREET_1", false)
-  warehouseSch.addField(Schema.FieldType.TEXT, "W_STREET_2", false)
-  warehouseSch.addField(Schema.FieldType.TEXT, "W_CITY", false)
-  warehouseSch.addField(Schema.FieldType.TEXT, "W_STATE", false)
-  warehouseSch.addField(Schema.FieldType.TEXT, "W_ZIP", false)
+  warehouseSch.addField(Schema.FieldType.INT, "w_id", false)
+  warehouseSch.addField(Schema.FieldType.DOUBLE, "w_tax", false)
+  warehouseSch.addField(Schema.FieldType.DOUBLE, "w_ytd", false)
+  warehouseSch.addField(Schema.FieldType.TEXT, "w_name", false)
+  warehouseSch.addField(Schema.FieldType.TEXT, "w_street_1", false)
+  warehouseSch.addField(Schema.FieldType.TEXT, "w_street_2", false)
+  warehouseSch.addField(Schema.FieldType.TEXT, "w_city", false)
+  warehouseSch.addField(Schema.FieldType.TEXT, "w_state", false)
+  warehouseSch.addField(Schema.FieldType.TEXT, "w_zip", false)
 
   /**
    * \"DISTRICT\" (\n"
@@ -44,17 +44,17 @@ object ChTSchema {
 			"	\"D_NEXT_O_ID\" INTEGER CS_INT,\n"
    */
   val districtSch: TSchema = new TSchema()
-  districtSch.addField(Schema.FieldType.SMALLINT, "D_ID", false)
-  districtSch.addField(Schema.FieldType.INT, "D_W_ID", false)
-  districtSch.addField(Schema.FieldType.INT, "D_NEXT_O_ID", false)
-  districtSch.addField(Schema.FieldType.DOUBLE, "D_TAX", false)
-  districtSch.addField(Schema.FieldType.DOUBLE, "D_YTD", false)
-  districtSch.addField(Schema.FieldType.TEXT, "D_NAME", false)
-  districtSch.addField(Schema.FieldType.TEXT, "D_STREET_1", false)
-  districtSch.addField(Schema.FieldType.TEXT, "D_STREET_2", false)
-  districtSch.addField(Schema.FieldType.TEXT, "D_CITY", false)
-  districtSch.addField(Schema.FieldType.TEXT, "D_STATE", false)
-  districtSch.addField(Schema.FieldType.TEXT, "D_ZIP", false)
+  districtSch.addField(Schema.FieldType.SMALLINT, "d_id", false)
+  districtSch.addField(Schema.FieldType.INT, "d_w_id", false)
+  districtSch.addField(Schema.FieldType.INT, "d_next_o_id", false)
+  districtSch.addField(Schema.FieldType.DOUBLE, "d_tax", false)
+  districtSch.addField(Schema.FieldType.DOUBLE, "d_ytd", false)
+  districtSch.addField(Schema.FieldType.TEXT, "d_name", false)
+  districtSch.addField(Schema.FieldType.TEXT, "d_street_1", false)
+  districtSch.addField(Schema.FieldType.TEXT, "d_street_2", false)
+  districtSch.addField(Schema.FieldType.TEXT, "d_city", false)
+  districtSch.addField(Schema.FieldType.TEXT, "d_state", false)
+  districtSch.addField(Schema.FieldType.TEXT, "d_zip", false)
 
   /**
    * "CUSTOMER\" (\n"
@@ -118,14 +118,14 @@ object ChTSchema {
 			"	\"H_DATA\" CHAR(24) CS_FIXEDSTRING\n"
    */
   val historySch: TSchema = new TSchema()
-  historySch.addField(Schema.FieldType.SMALLINT, "H_C_ID", false)
-  historySch.addField(Schema.FieldType.SMALLINT, "H_C_D_ID", false)
-  historySch.addField(Schema.FieldType.SMALLINT, "H_D_ID", false)
-  historySch.addField(Schema.FieldType.INT, "H_W_ID", false)
-  historySch.addField(Schema.FieldType.INT, "H_C_W_ID", false)
-  historySch.addField(Schema.FieldType.BIGINT, "H_DATE", false)
-  historySch.addField(Schema.FieldType.DOUBLE, "H_AMOUNT", false)
-  historySch.addField(Schema.FieldType.TEXT, "H_DATA", false)
+  historySch.addField(Schema.FieldType.SMALLINT, "h_c_id", false)
+  historySch.addField(Schema.FieldType.SMALLINT, "h_c_d_id", false)
+  historySch.addField(Schema.FieldType.SMALLINT, "h_d_id", false)
+  historySch.addField(Schema.FieldType.INT, "h_w_id", false)
+  historySch.addField(Schema.FieldType.INT, "h_c_w_id", false)
+  historySch.addField(Schema.FieldType.BIGINT, "h_date", false)
+  historySch.addField(Schema.FieldType.DOUBLE, "h_amount", false)
+  historySch.addField(Schema.FieldType.TEXT, "h_data", false)
 
   /**
    * "NEWORDER\" (\n"
@@ -175,16 +175,16 @@ object ChTSchema {
    */
   val orderLineSch: TSchema = new TSchema()
 
-  orderLineSch.addField(Schema.FieldType.SMALLINT, "OL_D_ID", false)
-  orderLineSch.addField(Schema.FieldType.SMALLINT, "OL_NUMBER", false)
-  orderLineSch.addField(Schema.FieldType.SMALLINT, "OL_QUANTITY", true)
-  orderLineSch.addField(Schema.FieldType.INT, "OL_O_ID", false)
-  orderLineSch.addField(Schema.FieldType.INT, "OL_W_ID", false)
-  orderLineSch.addField(Schema.FieldType.INT, "OL_I_ID", true)
-  orderLineSch.addField(Schema.FieldType.INT, "OL_SUPPLY_W_ID", true)
-  orderLineSch.addField(Schema.FieldType.BIGINT, "OL_DELIVERY_D", true)
-  orderLineSch.addField(Schema.FieldType.DOUBLE, "OL_AMOUNT", true)
-  orderLineSch.addField(Schema.FieldType.TEXT, "OL_DIST_INFO", true)
+  orderLineSch.addField(Schema.FieldType.SMALLINT, "ol_d_id", false)
+  orderLineSch.addField(Schema.FieldType.SMALLINT, "ol_number", false)
+  orderLineSch.addField(Schema.FieldType.SMALLINT, "ol_quantity", true)
+  orderLineSch.addField(Schema.FieldType.INT, "ol_o_id", false)
+  orderLineSch.addField(Schema.FieldType.INT, "ol_w_id", false)
+  orderLineSch.addField(Schema.FieldType.INT, "ol_i_id", true)
+  orderLineSch.addField(Schema.FieldType.INT, "ol_supply_w_id", true)
+  orderLineSch.addField(Schema.FieldType.BIGINT, "ol_delivery_d", true)
+  orderLineSch.addField(Schema.FieldType.DOUBLE, "ol_amount", true)
+  orderLineSch.addField(Schema.FieldType.TEXT, "ol_dist_info", true)
 
   /**
    *\"NATION\" (\n"
@@ -250,24 +250,24 @@ object ChTSchema {
 			"	\"S_SU_SUPPKEY\" INTEGER CS_INT,\n"
    */
   val stockSch: TSchema = new TSchema()
-  stockSch.addField(Schema.FieldType.SMALLINT, "S_W_ID", false)
-  stockSch.addField(Schema.FieldType.SMALLINT, "S_ORDER_CNT", false)
-  stockSch.addField(Schema.FieldType.SMALLINT, "S_REMOTE_CNT", false)
-  stockSch.addField(Schema.FieldType.INT, "S_I_ID", false)
-  stockSch.addField(Schema.FieldType.INT, "S_YTD", false)
-  stockSch.addField(Schema.FieldType.INT, "S_QUANTITY", false)
-  stockSch.addField(Schema.FieldType.INT, "S_SU_SUPPKEY", false)
-  stockSch.addField(Schema.FieldType.TEXT, "S_DIST_01", false)
-  stockSch.addField(Schema.FieldType.TEXT, "S_DIST_02", false)
-  stockSch.addField(Schema.FieldType.TEXT, "S_DIST_03", false)
-  stockSch.addField(Schema.FieldType.TEXT, "S_DIST_04", false)
-  stockSch.addField(Schema.FieldType.TEXT, "S_DIST_05", false)
-  stockSch.addField(Schema.FieldType.TEXT, "S_DIST_06", false)
-  stockSch.addField(Schema.FieldType.TEXT, "S_DIST_07", false)
-  stockSch.addField(Schema.FieldType.TEXT, "S_DIST_08", false)
-  stockSch.addField(Schema.FieldType.TEXT, "S_DIST_09", false)
-  stockSch.addField(Schema.FieldType.TEXT, "S_DIST_10", false)
-  stockSch.addField(Schema.FieldType.TEXT, "S_DATA", false)
+  stockSch.addField(Schema.FieldType.SMALLINT, "s_w_id", false)
+  stockSch.addField(Schema.FieldType.SMALLINT, "s_order_cnt", false)
+  stockSch.addField(Schema.FieldType.SMALLINT, "s_remote_cnt", false)
+  stockSch.addField(Schema.FieldType.INT, "s_i_id", false)
+  stockSch.addField(Schema.FieldType.INT, "s_ytd", false)
+  stockSch.addField(Schema.FieldType.INT, "s_quantity", false)
+  stockSch.addField(Schema.FieldType.INT, "s_su_suppkey", false)
+  stockSch.addField(Schema.FieldType.TEXT, "s_dist_01", false)
+  stockSch.addField(Schema.FieldType.TEXT, "s_dist_02", false)
+  stockSch.addField(Schema.FieldType.TEXT, "s_dist_03", false)
+  stockSch.addField(Schema.FieldType.TEXT, "s_dist_04", false)
+  stockSch.addField(Schema.FieldType.TEXT, "s_dist_05", false)
+  stockSch.addField(Schema.FieldType.TEXT, "s_dist_06", false)
+  stockSch.addField(Schema.FieldType.TEXT, "s_dist_07", false)
+  stockSch.addField(Schema.FieldType.TEXT, "s_dist_08", false)
+  stockSch.addField(Schema.FieldType.TEXT, "s_dist_09", false)
+  stockSch.addField(Schema.FieldType.TEXT, "s_dist_10", false)
+  stockSch.addField(Schema.FieldType.TEXT, "s_data", false)
 
   /**
    * \"ITEM\" (\n"

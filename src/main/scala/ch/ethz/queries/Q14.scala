@@ -20,11 +20,15 @@ class Q14 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
-    var ol = orderLineRdd(scc, new ScanQuery())
-    var it = itemRdd(scc, new ScanQuery())
-    var forderline = ol.toDF().filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" < 20200102)
-    var item = it.toDF()
-    forderline.join(item, $"ol_i_id" === item("i_id"))
+    val promo = udf { (x: String, y: Double) => if (x.startsWith("PR")) y else 0 }
+
+    val ol = orderLineRdd(scc, new ScanQuery())
+    val it = itemRdd(scc, new ScanQuery())
+    val forderline = ol.toDF().filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" < 20200102)
+    val item = it.toDF()
+    val res = forderline.join(item, $"ol_i_id" === item("i_id"))
+      .agg(sum(promo($"i_data", $"ol_amount")) * 100 / (sum($"ol_amount").+(1))).as("promo_revenue")
+    timeCollect(res, 14)
   }
 
 }

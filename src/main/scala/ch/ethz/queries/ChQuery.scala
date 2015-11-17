@@ -169,6 +169,14 @@ abstract class ChQuery {
     logger.info("[Query %d] Elapsed time: %d msecs. map:%d ress:%d".format(queryNo, (t1-t0)/1000000, cnt, ress.length))
   }
 
+  def newOrderRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
+    new TRDD[TRecord](scc, "new_order", new ScanQuery(), ChTSchema.newOrderSch).map(r => {
+      NewOrder(r.getValue("no_o_id").asInstanceOf[Int],
+        r.getValue("no_d_id").asInstanceOf[Short],
+        r.getValue("no_w_id").asInstanceOf[Int]
+      )
+    })
+  }
   def orderRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
     new TRDD[TRecord](scc, "orders", scanQuery, ChTSchema.orderSch).map(r => {
       Order(r.getValue("o_id").asInstanceOf[Int],
@@ -185,52 +193,52 @@ abstract class ChQuery {
 
   def customerRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
     new TRDD[TRecord](scc, "customer", scanQuery, ChTSchema.customerSch).map(r => {
-      Customer(r.getValue("C_ID").asInstanceOf[Int],
-        r.getValue("C_D_ID").asInstanceOf[Int],
-        r.getValue("C_W_ID").asInstanceOf[Int],
-        r.getValue("C_FIRST").asInstanceOf[String],
-        r.getValue("C_MIDDLE").asInstanceOf[String],
-        r.getValue("C_LAST").asInstanceOf[String],
-        r.getValue("C_STREET_1").asInstanceOf[String],
-        r.getValue("C_STREET_2").asInstanceOf[String],
-        r.getValue("C_CITY").asInstanceOf[String],
-        r.getValue("C_STATE").asInstanceOf[String],
-        r.getValue("C_ZIP").asInstanceOf[String],
-        r.getValue("C_PHONE").asInstanceOf[String],
-        r.getValue("C_SINCE").asInstanceOf[Long],
-        r.getValue("C_CREDIT").asInstanceOf[String],
-        r.getValue("C_CREDIT_LIM").asInstanceOf[Double],
-        r.getValue("C_DISCOUNT").asInstanceOf[Double],
-        r.getValue("C_BALANCE").asInstanceOf[Double],
-        r.getValue("C_YTD_PAYMENT").asInstanceOf[Double],
-        r.getValue("C_PAYMENT_CNT").asInstanceOf[Short],
-        r.getValue("C_DELIVERY_CNT").asInstanceOf[Short],
-        r.getValue("C_DATA").asInstanceOf[String],
-        r.getValue("C_N_NATIONKEY").asInstanceOf[Int]
+      Customer(r.getValue("c_id").asInstanceOf[Int],
+        r.getValue("c_d_id").asInstanceOf[Int],
+        r.getValue("c_w_id").asInstanceOf[Int],
+        r.getValue("c_first").asInstanceOf[String],
+        r.getValue("c_middle").asInstanceOf[String],
+        r.getValue("c_last").asInstanceOf[String],
+        r.getValue("c_street_1").asInstanceOf[String],
+        r.getValue("c_street_2").asInstanceOf[String],
+        r.getValue("c_city").asInstanceOf[String],
+        r.getValue("c_state").asInstanceOf[String],
+        r.getValue("c_zip").asInstanceOf[String],
+        r.getValue("c_phone").asInstanceOf[String],
+        r.getValue("c_since").asInstanceOf[Long],
+        r.getValue("c_credit").asInstanceOf[String],
+        r.getValue("c_credit_lim").asInstanceOf[Double],
+        r.getValue("c_discount").asInstanceOf[Double],
+        r.getValue("c_balance").asInstanceOf[Double],
+        r.getValue("c_ytd_payment").asInstanceOf[Double],
+        r.getValue("c_payment_cnt").asInstanceOf[Short],
+        r.getValue("c_delivery_cnt").asInstanceOf[Short],
+        r.getValue("c_data").asInstanceOf[String],
+        r.getValue("c_n_nationkey").asInstanceOf[Int]
       )
     })
   }
 
   def stockRdd(scc: TSparkContext, scanQuery: ScanQuery) = {
     new TRDD[TRecord](scc, "stock", scanQuery, ChTSchema.stockSch).map(r => {
-      new Stock(r.getValue("S_I_ID").asInstanceOf[Int],
-        r.getValue("S_W_ID").asInstanceOf[Short],
-        r.getValue("S_QUANTITY").asInstanceOf[Int],
-        r.getValue("S_DIST_01").asInstanceOf[String],
-        r.getValue("S_DIST_02").asInstanceOf[String],
-        r.getValue("S_DIST_03").asInstanceOf[String],
-        r.getValue("S_DIST_04").asInstanceOf[String],
-        r.getValue("S_DIST_05").asInstanceOf[String],
-        r.getValue("S_DIST_06").asInstanceOf[String],
-        r.getValue("S_DIST_07").asInstanceOf[String],
-        r.getValue("S_DIST_08").asInstanceOf[String],
-        r.getValue("S_DIST_09").asInstanceOf[String],
-        r.getValue("S_DIST_10").asInstanceOf[String],
-        r.getValue("S_YTD").asInstanceOf[Int],
-        r.getValue("S_ORDER_CNT").asInstanceOf[Short],
-        r.getValue("S_REMOTE_CNT").asInstanceOf[Short],
-        r.getValue("S_DATA").asInstanceOf[String]
-        , r.getValue("S_SU_SUPPKEY").asInstanceOf[Int]
+      new Stock(r.getValue("s_i_id").asInstanceOf[Int],
+        r.getValue("s_w_id").asInstanceOf[Short],
+        r.getValue("s_quantity").asInstanceOf[Int],
+        r.getValue("s_dist_01").asInstanceOf[String],
+        r.getValue("s_dist_02").asInstanceOf[String],
+        r.getValue("s_dist_03").asInstanceOf[String],
+        r.getValue("s_dist_04").asInstanceOf[String],
+        r.getValue("s_dist_05").asInstanceOf[String],
+        r.getValue("s_dist_06").asInstanceOf[String],
+        r.getValue("s_dist_07").asInstanceOf[String],
+        r.getValue("s_dist_08").asInstanceOf[String],
+        r.getValue("s_dist_09").asInstanceOf[String],
+        r.getValue("s_dist_10").asInstanceOf[String],
+        r.getValue("s_ytd").asInstanceOf[Int],
+        r.getValue("s_order_cnt").asInstanceOf[Short],
+        r.getValue("s_remote_cnt").asInstanceOf[Short],
+        r.getValue("s_data").asInstanceOf[String]
+        , r.getValue("s_su_suppkey").asInstanceOf[Int]
       )
     })
   }

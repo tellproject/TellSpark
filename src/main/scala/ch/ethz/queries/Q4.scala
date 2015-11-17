@@ -1,7 +1,6 @@
 package ch.ethz.queries
 
-import ch.ethz.TellClientFactory
-import ch.ethz.tell.{ScanQuery, TRecord, TRDD, TSparkContext}
+import ch.ethz.tell.{ScanQuery, TSparkContext}
 
 /**
  * Query4
@@ -26,25 +25,12 @@ class Q4 extends ChQuery {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
-    import org.apache.spark.sql.functions._
     import sqlContext.implicits._
     //val tellRdd = new TellRDD[TellRecord](sc, "order", new ScanQuery(), CHSchema.orderLineSch)
 
     val orders = orderRdd(scc, new ScanQuery()).toDF()
 
-    val orderline = new TRDD[TRecord](scc, "orderline", new ScanQuery(), ChTSchema.orderLineSch).map(r => {
-      OrderLine(r.getValue("OL_O_ID").asInstanceOf[Int],
-        r.getValue("OL_D_ID").asInstanceOf[Short],
-        r.getValue("OL_W_ID").asInstanceOf[Int],
-        r.getValue("OL_NUMBER").asInstanceOf[Short],
-        r.getValue("OL_I_ID").asInstanceOf[Int],
-        r.getValue("OL_SUPPLY_W_ID").asInstanceOf[Int],
-        r.getValue("OL_DELIVERY_D").asInstanceOf[Long],
-        r.getValue("OL_QUANTITY").asInstanceOf[Short],
-        r.getValue("OL_AMOUNT").asInstanceOf[Long],
-        r.getValue("OL_DIST_INFO").asInstanceOf[String]
-      )
-    }).toDF()
+    val orderline = orderLineRdd(scc, new ScanQuery()).toDF()
     /**
      * select *
 		    from orderline
@@ -54,12 +40,12 @@ class Q4 extends ChQuery {
 		    and ol_delivery_d >= o_entry_d
      */
     val forderline = orderline
-      .filter(orderline("OL_DELIVERY_D").geq(orders("O_ENTRY_D")))
-      .select($"OL_O_ID", $"OL_W_ID", $"OL_D_ID").distinct
+      .filter(orderline("ol_delivery_d").geq(orders("o_entry_d")))
+      .select($"ol_o_id", $"ol_w_id", $"ol_d_id").distinct
 
-    val res = forderline.join(orders, ((orders("O_ID") === $"OL_O_ID") &&
-      (orders("O_W_ID") === $"OL_W_ID") &&
-      (orders("O_D_ID") === $"OL_D_ID")))
+    val res = forderline.join(orders, ((orders("o_id") === $"ol_o_id") &&
+      (orders("o_w_id") === $"ol_w_id") &&
+      (orders("o_d_id") === $"ol_d_id")))
 
     timeCollect(res, 4)
     //    //todo push down filter
