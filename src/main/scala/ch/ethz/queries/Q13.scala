@@ -16,17 +16,15 @@ order by custdist desc, c_count desc
  */
 class Q13 extends ChQuery {
 
-  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, chTSchema:ChTSchema): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
-    val cc = customerRdd(scc, new ScanQuery())
-    val oo = orderRdd(scc, new ScanQuery())
-    val customer = cc.toDF()
+    val customer = customerRdd(scc, new ScanQuery, chTSchema.customerSch).toDF()
 
-    val forders = oo.toDF().filter($"o_carrier_id" > 8)
+    val forders = orderRdd(scc, new ScanQuery, chTSchema.orderSch).toDF().filter($"o_carrier_id" > 8)
 
     val c_orders = customer.join(forders, $"c_w_id" === forders("o_w_id") &&
       $"c_d_id" === forders("o_d_id") &&

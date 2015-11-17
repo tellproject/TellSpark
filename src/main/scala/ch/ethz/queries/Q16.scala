@@ -22,21 +22,21 @@ class Q16  extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
-    val orders = orderRdd(scc, new ScanQuery()).toDF()
-    val fsupplier = supplierRdd(scc, new ScanQuery()).toDF()
+    val orders = orderRdd(scc, new ScanQuery, chTSchema.orderSch).toDF()
+    val fsupplier = supplierRdd(scc, new ScanQuery, chTSchema.supplierSch).toDF()
       .filter($"su_comment".like("%bad%"))
 //      .select($"su_suppkey")
 
-    val fitem = itemRdd(scc, new ScanQuery()).toDF()
+    val fitem = itemRdd(scc, new ScanQuery, chTSchema.itemSch).toDF()
     .filter(!$"i_data".like("zz%"))
 
-    val stock = stockRdd(scc, new ScanQuery()).toDF()
+    val stock = stockRdd(scc, new ScanQuery, chTSchema.stockSch).toDF()
     val res = stock.join(fsupplier, ( ($"s_w_id" * $"s_i_id")%10000 !== (fsupplier("su_suppkey")) ))
     .join(fitem, $"i_id" === $"s_i_id")
     .select($"i_name",

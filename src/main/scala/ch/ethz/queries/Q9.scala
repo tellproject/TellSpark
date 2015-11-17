@@ -37,17 +37,17 @@ class Q9 extends ChQuery {
   }
 
 
-  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, chTSchema:ChTSchema): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
-    val supplier = supplierRdd(scc, new ScanQuery).toDF()
-    val fitem = itemRdd(scc, new ScanQuery).toDF().filter($"i_data".like("%BB"))
-    val stock = stockRdd(scc, new ScanQuery).toDF()
-    val orderline = orderLineRdd(scc, new ScanQuery).toDF()
-    val orders = ordersRdd(scc, new ScanQuery).toDF()
-    val nation = nationRdd(scc, new ScanQuery).toDF()
+    val supplier = supplierRdd(scc, new ScanQuery, chTSchema.supplierSch).toDF()
+    val fitem = itemRdd(scc, new ScanQuery, chTSchema.itemSch).toDF().filter($"i_data".like("%BB"))
+    val stock = stockRdd(scc, new ScanQuery, chTSchema.stockSch).toDF()
+    val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
+    val orders = orderRdd(scc, new ScanQuery, chTSchema.orderSch).toDF()
+    val nation = nationRdd(scc, new ScanQuery, chTSchema.nationSch).toDF()
     val s_n = supplier.join(nation, nation("n_nationkey") === $"su_nationkey")
     val part_res = stock.join(s_n, $"s_w_id"*$"s_i_id"%10000 === s_n("su_suppkey"))
       //ol_i_id = s_i_id and ol_supply_w_id = s_w_id

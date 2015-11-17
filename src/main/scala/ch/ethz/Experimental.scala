@@ -32,15 +32,12 @@ object Experimental {
 
     println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
 
-    // schema to be read
-    val sch: TSchema = new TSchema()
-
-    sch.addField(Schema.FieldType.INT, "number", true)
-    sch.addField(Schema.FieldType.TEXT, "text1", true)
-    sch.addField(Schema.FieldType.BIGINT, "largenumber", true)
-    sch.addField(Schema.FieldType.TEXT, "text2", true)
-
     val tblName = "testTable"
+
+    // schema to be read
+    TellClientFactory.startTransaction()
+    val sch: TSchema = new TSchema(TellClientFactory.trx.schemaForTable(tblName))
+
     // rdd creation
     // readLine()
     val scc = new TSparkContext("local[1]", "Experimental", st, cm, cn, cs)

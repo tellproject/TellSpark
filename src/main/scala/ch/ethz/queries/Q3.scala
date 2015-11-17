@@ -10,7 +10,7 @@ class Q3 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, chTSchema:ChTSchema): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
@@ -18,10 +18,10 @@ class Q3 extends ChQuery {
     import sqlContext.implicits._
 
     // convert an RDDs to a DataFrames
-    val orderline = orderLineRdd(scc, new ScanQuery).toDF()
-    val orders = orderRdd(scc, new ScanQuery).toDF()
-    val new_order = newOrderRdd(scc, new ScanQuery).toDF()
-    val customer = customerRdd(scc, new ScanQuery).toDF()
+    val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
+    val orders = orderRdd(scc, new ScanQuery, chTSchema.orderSch).toDF()
+    val new_order = newOrderRdd(scc, new ScanQuery, chTSchema.newOrderSch).toDF()
+    val customer = customerRdd(scc, new ScanQuery, chTSchema.customerSch).toDF()
     /**
      *  * select ol_o_id, ol_w_id, ol_d_id, sum(ol_amount) as revenue, o_entry_d
      * from customer, neworder, orders, orderline
