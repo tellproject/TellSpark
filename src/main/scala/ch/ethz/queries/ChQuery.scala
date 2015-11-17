@@ -379,6 +379,7 @@ object ChQuery {
     }
 
     TellClientFactory.setConf(st, cm, cn, cs)
+    TellClientFactory.getConnection()
     TellClientFactory.startTransaction()
     val chtSchema = new ChTSchema(TellClientFactory.trx)
     TellClientFactory.commitTrx()

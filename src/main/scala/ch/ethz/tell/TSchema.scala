@@ -7,9 +7,16 @@ import scala.collection.mutable.{ArrayBuffer, HashMap}
 /**
  * Wrapper around the native schema class used in TellStore
  */
-class TSchema(tellSchema: Schema) extends Serializable {
+class TSchema extends Serializable {
 
-  {
+  var fixedSizeFields = ArrayBuffer[FieldType]()
+  var varSizeFields = ArrayBuffer[FieldType]()
+  var fields = HashMap[Short, Field]()
+  var strFields = HashMap[String, Field]()
+  val tellSchema: Schema = null
+
+  def this(tellSchema: Schema) {
+    this()
     val fieldNames = tellSchema.getFieldNames
     for (fieldName <- fieldNames) {
       val field = tellSchema.getFieldByName(fieldName)
@@ -25,11 +32,6 @@ class TSchema(tellSchema: Schema) extends Serializable {
       }
     }
   }
-
-  var fixedSizeFields = ArrayBuffer[FieldType]()
-  var varSizeFields = ArrayBuffer[FieldType]()
-  var fields = HashMap[Short, Field]()
-  var strFields = HashMap[String, Field]()
 
   def getField(fieldName : String) :Field = {
     strFields(fieldName)

@@ -26,12 +26,10 @@ object TellClientFactory {
   var trx : Transaction = null
   var trxId : Long = 0L
 
-  //  val clientManager : ClientManager = new ClientManager(commitMng, tellStr, chunkCount, chunkSize);
   var clientManager: ClientManager = null
 
   def getConnection(): ClientManager = {
     //TODO move the client creation somewhere else?
-
     if (clientManager == null) {
       println("================= PRE CLIENT ==============")
       println("=================" + toString + "==============")
