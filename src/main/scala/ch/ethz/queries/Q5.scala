@@ -1,7 +1,8 @@
 package ch.ethz.queries
 
 import ch.ethz.TellClientFactory
-import ch.ethz.tell.{TSparkContext, ScanQuery, TRecord, TRDD}
+import ch.ethz.tell.PredicateType.StringType
+import ch.ethz.tell._
 
 /**
  * Query5
@@ -42,12 +43,28 @@ class Q5 extends ChQuery {
     import sqlContext.implicits._
     println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
 
+    // prepare date selection
+    val oSchema = chTSchema.orderSch
+    val dateSelection = new CNFClause
+    dateSelection.addPredicate(
+      ScanQuery.CmpType.GREATER_EQUAL, oSchema.getField("o_entry_d").index, referenceDate2007)
+    val orderQuery = new ScanQuery
+    orderQuery.addSelection(dateSelection)
+
+    // prepare region selection (not sure whether that helps)
+    val rSchema = chTSchema.regionSch
+    val regionSelection = new CNFClause
+    regionSelection.addPredicate(
+      ScanQuery.CmpType.EQUAL, rSchema.getField("r_name").index, new StringType("Europe"))
+    val regionQuery = new ScanQuery
+    regionQuery.addSelection(regionSelection)
+
     //orderline
     val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
     //customer
     val customer = customerRdd(scc, new ScanQuery, chTSchema.customerSch).toDF()
     // orders
-    val orders = orderRdd(scc, new ScanQuery, chTSchema.orderSch).toDF()
+    val orders = orderRdd(scc, orderQuery, oSchema).toDF()
     // stock
     val stock = stockRdd(scc, new ScanQuery, chTSchema.stockSch).toDF()
     //supplier
@@ -55,7 +72,7 @@ class Q5 extends ChQuery {
     //nation
     val nation = nationRdd(scc, new ScanQuery, chTSchema.nationSch).toDF()
     //region
-    val region = regionRdd(scc, new ScanQuery, chTSchema.regionSch).toDF()
+    val region = regionRdd(scc, regionQuery, rSchema).toDF()
 
     val forder = orders.filter(orders("o_entry_d").geq(20070102))
     val fregion = region.filter(region("r_name").eqNullSafe("Europe"))

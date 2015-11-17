@@ -1,6 +1,7 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.PredicateType.StringType
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 
 /**
  * Query3
@@ -17,11 +18,28 @@ class Q3 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
+
+    // prepare date selection
+    val oSchema = chTSchema.orderSch
+    val dateSelection = new CNFClause
+    dateSelection.addPredicate(
+      ScanQuery.CmpType.GREATER, oSchema.getField("o_entry_d").index, referenceDate2007)
+    val orderQuery = new ScanQuery
+    orderQuery.addSelection(dateSelection)
+
+    // prepare c_state selection
+    val cSchema = chTSchema.customerSch
+    val stateSelection = new CNFClause
+    stateSelection.addPredicate(
+      ScanQuery.CmpType.LIKE, cSchema.getField("c_state").index, new StringType("A%"))
+    val customerQuery = new ScanQuery
+    customerQuery.addSelection(stateSelection)
+
     // convert an RDDs to a DataFrames
     val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
-    val orders = orderRdd(scc, new ScanQuery, chTSchema.orderSch).toDF()
+    val orders = orderRdd(scc, orderQuery, oSchema).toDF()
     val new_order = newOrderRdd(scc, new ScanQuery, chTSchema.newOrderSch).toDF()
-    val customer = customerRdd(scc, new ScanQuery, chTSchema.customerSch).toDF()
+    val customer = customerRdd(scc, customerQuery, cSchema).toDF()
     /**
      *  * select ol_o_id, ol_w_id, ol_d_id, sum(ol_amount) as revenue, o_entry_d
      * from customer, neworder, orders, orderline
@@ -32,7 +50,8 @@ class Q3 extends ChQuery {
      * group by ol_o_id, ol_w_id, ol_d_id, o_entry_d
      * order by revenue desc, o_entry_d
      */
-     customer.filter(customer("c_state").like("A%"))
+     customer
+//       .filter(customer("c_state").like("A%"))
        .join(orders, (($"c_id" === orders("o_c_id")) &&
        ($"c_w_id" === orders("o_w_id")) &&
        ($"c_d_id" === orders("o_d_id"))))
@@ -42,7 +61,7 @@ class Q3 extends ChQuery {
     .join(orderline, ($"o_w_id" === orderline("ol_w_id")) &&
        ($"o_d_id" === orderline("ol_d_id")) &&
        ($"o_id" === orderline("ol_o_id")))
-    .filter(orders("o_entry_d") > 20070102)
+//    .filter(orders("o_entry_d") > 20070102)
     .groupBy(orderline("ol_o_id"), orderline("ol_w_id"), orderline("ol_d_id"), orders("o_entry_d"))
     .agg(sum($"ol_amount").as("revenue"))
     .select(orderline("OL_O_ID"), orderline("ol_w_id"), orderline("ol_d_id"), orders("o_entry_d"))
