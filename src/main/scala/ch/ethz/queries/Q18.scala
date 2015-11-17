@@ -20,15 +20,15 @@ class Q18  extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
-    val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
-    val orders = orderRdd(scc, new ScanQuery, chTSchema.orderSch).toDF()
-    val customer = customerRdd(scc, new ScanQuery, chTSchema.customerSch).toDF()
+    val orderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
+    val orders = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
+    val customer = customerRdd(scc, new ScanQuery, ChTSchema.customerSch).toDF()
 
     val res = customer.join(orders, $"c_id" === orders("o_c_id") &&
       $"c_w_id" === orders("o_w_id") &&

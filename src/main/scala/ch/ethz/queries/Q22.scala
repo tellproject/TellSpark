@@ -27,7 +27,7 @@ class Q22 extends ChQuery {
   /**
     * implemented in children classes and hold the actual query
     */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
   //  val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
    // val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)

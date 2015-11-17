@@ -13,7 +13,7 @@ class Q14 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
@@ -22,9 +22,9 @@ class Q14 extends ChQuery {
 
     val promo = udf { (x: String, y: Double) => if (x.startsWith("PR")) y else 0 }
 
-    val forderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
+    val forderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
       .filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" < 20200102)
-    val item = itemRdd(scc, new ScanQuery, chTSchema.itemSch).toDF()
+    val item = itemRdd(scc, new ScanQuery, ChTSchema.itemSch).toDF()
     val res = forderline.join(item, $"ol_i_id" === item("i_id"))
       .agg(sum(promo($"i_data", $"ol_amount")) * 100 / (sum($"ol_amount").+(1))).as("promo_revenue")
     timeCollect(res, 14)

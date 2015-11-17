@@ -17,16 +17,16 @@ class Q17 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
-    val ol = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch)
+    val ol = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch)
     val orderline1 = ol.toDF()
     val orderline2 = ol.toDF()
-    val it = itemRdd(scc, new ScanQuery, chTSchema.itemSch)
+    val it = itemRdd(scc, new ScanQuery, ChTSchema.itemSch)
     val fitem = it.toDF().filter($"i_data".like("%d"))
     val t = fitem.join(orderline1, fitem("i_id") === orderline1("ol_i_id"))
       .select(fitem("i_id"))

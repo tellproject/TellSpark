@@ -21,14 +21,14 @@ class Q4 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import sqlContext.implicits._
 
     // prepare date selection
-    val oSchema = chTSchema.orderSch
+    val oSchema = ChTSchema.orderSch
     val orderQuery = new ScanQuery
     val oEntryIndex = oSchema.getField("o_entry_d").index
 
@@ -44,7 +44,7 @@ class Q4 extends ChQuery {
 
     val orders = orderRdd(scc, orderQuery, oSchema).toDF()
 
-    val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
+    val orderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
     /**
      * select *
 		    from orderline

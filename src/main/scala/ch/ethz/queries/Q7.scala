@@ -50,14 +50,14 @@ class Q7 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema) = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String) = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
     // prepare date selection
-    val oSchema = chTSchema.orderSch
+    val oSchema = ChTSchema.orderSch
     val orderlineQuery = new ScanQuery
     val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
     val oQuantityIndex = oSchema.getField("ol_quantity").index
@@ -75,12 +75,12 @@ class Q7 extends ChQuery {
     // supplier, stock, orderline, orders, customer, nation n1, nation n2
     val orderline = orderLineRdd(scc, orderlineQuery, oSchema).toDF()
     val forderline = orderline.filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" <= 20120102 )
-    val supplier = supplierRdd(scc, new ScanQuery, chTSchema.supplierSch).toDF()
-    val n1 = nationRdd(scc, new ScanQuery, chTSchema.nationSch).toDF()
-    val n2 = nationRdd(scc, new ScanQuery, chTSchema.nationSch).toDF()
-    val customer = customerRdd(scc, new ScanQuery, chTSchema.customerSch).toDF()
-    val order = orderRdd(scc, new ScanQuery, chTSchema.orderSch).toDF()
-    val stock = stockRdd(scc, new ScanQuery, chTSchema.stockSch).toDF()
+    val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
+    val n1 = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
+    val n2 = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
+    val customer = customerRdd(scc, new ScanQuery, ChTSchema.customerSch).toDF()
+    val order = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
+    val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
 
     val suppNation = supplier.join(n1, $"su_nationkey" === n1("n_nationkey"))
     .join(n2,

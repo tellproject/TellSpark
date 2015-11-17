@@ -17,7 +17,7 @@ order by o_ol_cnt
  */
 class Q12  extends ChQuery {
 
-  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, chTSchema:ChTSchema): Unit = {
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
@@ -26,8 +26,8 @@ class Q12  extends ChQuery {
     val high_line_count = udf { (x: Int) => if (x == 1 || x == 2) 1 else 0 }
     val low_line_count = udf { (x: Int) => if (x != 1 && x != 2) 1 else 0 }
 
-    val orders = orderRdd(scc, new ScanQuery, chTSchema.orderSch).toDF()
-    val forderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF().filter($"ol_delivery_d" < 20200101)
+    val orders = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
+    val forderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF().filter($"ol_delivery_d" < 20200101)
 
     val res = orders.join(forderline, ($"ol_w_id" === forderline("o_w_id")) &&
       ($"ol_d_id" === forderline("o_d_id")) &&

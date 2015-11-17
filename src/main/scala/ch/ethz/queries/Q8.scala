@@ -54,27 +54,27 @@ class Q8 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema) = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String) = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
     // supplier, stock, orderline, orders, customer, nation n1, nation n2
-    val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
+    val orderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
     val forderline = orderline.filter($"ol_i_id" < 1000)
-    val supplier = supplierRdd(scc, new ScanQuery, chTSchema.supplierSch).toDF()
-    val n1 = nationRdd(scc, new ScanQuery, chTSchema.nationSch).toDF()
-    val n2 = nationRdd(scc, new ScanQuery, chTSchema.nationSch).toDF()
-    val customer = customerRdd(scc, new ScanQuery, chTSchema.customerSch).toDF()
-    val region = regionRdd(scc, new ScanQuery, chTSchema.regionSch).toDF()
-    val forder = orderRdd(scc, new ScanQuery, chTSchema.orderSch).toDF()
+    val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
+    val n1 = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
+    val n2 = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
+    val customer = customerRdd(scc, new ScanQuery, ChTSchema.customerSch).toDF()
+    val region = regionRdd(scc, new ScanQuery, ChTSchema.regionSch).toDF()
+    val forder = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
     .filter($"o_entry_d".between(20070102, 20120102))
 
-    val stock = stockRdd(scc, new ScanQuery, chTSchema.stockSch).toDF()
-    val fregion = regionRdd(scc, new ScanQuery, chTSchema.regionSch).toDF().filter($"r_name" === "Europe")
+    val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
+    val fregion = regionRdd(scc, new ScanQuery, ChTSchema.regionSch).toDF().filter($"r_name" === "Europe")
 
-    val fitem = itemRdd(scc, new ScanQuery, chTSchema.itemSch).toDF().filter($"i_data".like("%b"))
+    val fitem = itemRdd(scc, new ScanQuery, ChTSchema.itemSch).toDF().filter($"i_data".like("%b"))
     val s_n2 = supplier.join(n2, $"su_nationkey" === n2("n_nationkey"))
     val r_n1 = region.join(n1, $"r_regionkey" === n1("n_regionkey"))
 

@@ -36,7 +36,7 @@ class Q5 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
@@ -44,7 +44,7 @@ class Q5 extends ChQuery {
     println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
 
     // prepare date selection
-    val oSchema = chTSchema.orderSch
+    val oSchema = ChTSchema.orderSch
     val dateSelection = new CNFClause
     dateSelection.addPredicate(
       ScanQuery.CmpType.GREATER_EQUAL, oSchema.getField("o_entry_d").index, referenceDate2007)
@@ -52,7 +52,7 @@ class Q5 extends ChQuery {
     orderQuery.addSelection(dateSelection)
 
     // prepare region selection (not sure whether that helps)
-    val rSchema = chTSchema.regionSch
+    val rSchema = ChTSchema.regionSch
     val regionSelection = new CNFClause
     regionSelection.addPredicate(
       ScanQuery.CmpType.EQUAL, rSchema.getField("r_name").index, new StringType("Europe"))
@@ -60,17 +60,17 @@ class Q5 extends ChQuery {
     regionQuery.addSelection(regionSelection)
 
     //orderline
-    val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
+    val orderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
     //customer
-    val customer = customerRdd(scc, new ScanQuery, chTSchema.customerSch).toDF()
+    val customer = customerRdd(scc, new ScanQuery, ChTSchema.customerSch).toDF()
     // orders
     val orders = orderRdd(scc, orderQuery, oSchema).toDF()
     // stock
-    val stock = stockRdd(scc, new ScanQuery, chTSchema.stockSch).toDF()
+    val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
     //supplier
-    val supplier = supplierRdd(scc, new ScanQuery, chTSchema.supplierSch).toDF()
+    val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
     //nation
-    val nation = nationRdd(scc, new ScanQuery, chTSchema.nationSch).toDF()
+    val nation = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
     //region
     val region = regionRdd(scc, regionQuery, rSchema).toDF()
 

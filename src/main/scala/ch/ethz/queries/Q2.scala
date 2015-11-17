@@ -12,7 +12,7 @@ class Q2 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
@@ -20,22 +20,22 @@ class Q2 extends ChQuery {
     import sqlContext.implicits._
 
     // convert an RDDs to a DataFrames
-    val stk = stockRdd(scc, new ScanQuery, chTSchema.stockSch)
+    val stk = stockRdd(scc, new ScanQuery, ChTSchema.stockSch)
     var cnt = stk.count
     println("=================== Q2 ===================stock:" + cnt )
     val stock = stk.toDF()
 
-    val spp = supplierRdd(scc, new ScanQuery, chTSchema.supplierSch)
+    val spp = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch)
     cnt = spp.count
     println("=================== Q2 ===================supplier:" + cnt )
     val supplier = spp.toDF()
 
-    val nn = nationRdd(scc, new ScanQuery, chTSchema.nationSch)
+    val nn = nationRdd(scc, new ScanQuery, ChTSchema.nationSch)
     cnt = nn.count
     println("=================== Q2 ===================nation:" + cnt) 
    val nation = nn.toDF()
 
-    val rrr = regionRdd(scc, new ScanQuery, chTSchema.regionSch)
+    val rrr = regionRdd(scc, new ScanQuery, ChTSchema.regionSch)
     cnt = rrr.count
     println("=================== Q2 ===================region:" + cnt )
     val region = rrr.toDF()
@@ -54,7 +54,7 @@ class Q2 extends ChQuery {
     .groupBy($"S_I_ID")
     .agg(min($"S_QUANTITY").as("M_S_QUANTITY")).select("S_I_ID as M_I_ID", "M_S_QUANTITY")
 
-    val item = itemRdd(scc, new ScanQuery, chTSchema.itemSch).toDF()
+    val item = itemRdd(scc, new ScanQuery, ChTSchema.itemSch).toDF()
 
     /**
      * select su_suppkey, su_name, n_name, i_id, i_name, su_address, su_phone, su_comment

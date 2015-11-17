@@ -11,7 +11,7 @@ class Q3 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, chTSchema:ChTSchema): Unit = {
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
@@ -20,7 +20,7 @@ class Q3 extends ChQuery {
 
 
     // prepare date selection
-    val oSchema = chTSchema.orderSch
+    val oSchema = ChTSchema.orderSch
     val dateSelection = new CNFClause
     dateSelection.addPredicate(
       ScanQuery.CmpType.GREATER, oSchema.getField("o_entry_d").index, referenceDate2007)
@@ -28,7 +28,7 @@ class Q3 extends ChQuery {
     orderQuery.addSelection(dateSelection)
 
     // prepare c_state selection
-    val cSchema = chTSchema.customerSch
+    val cSchema = ChTSchema.customerSch
     val stateSelection = new CNFClause
     stateSelection.addPredicate(
       ScanQuery.CmpType.LIKE, cSchema.getField("c_state").index, new StringType("A%"))
@@ -36,9 +36,9 @@ class Q3 extends ChQuery {
     customerQuery.addSelection(stateSelection)
 
     // convert an RDDs to a DataFrames
-    val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
+    val orderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
     val orders = orderRdd(scc, orderQuery, oSchema).toDF()
-    val new_order = newOrderRdd(scc, new ScanQuery, chTSchema.newOrderSch).toDF()
+    val new_order = newOrderRdd(scc, new ScanQuery, ChTSchema.newOrderSch).toDF()
     val customer = customerRdd(scc, customerQuery, cSchema).toDF()
     /**
      *  * select ol_o_id, ol_w_id, ol_d_id, sum(ol_amount) as revenue, o_entry_d

@@ -186,7 +186,7 @@ class ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema: ChTSchema): Unit = ???
+  def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = ???
 
   def timeCollect(df: DataFrame, queryNo: Int): Unit = {
     val t0 = System.nanoTime()
@@ -386,11 +386,11 @@ object ChQuery {
   /**
    * Execute query reflectively
    */
-  def executeQuery(queryNo: Int, st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema: ChTSchema): Unit = {
+  def executeQuery(queryNo: Int, st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
     assert(queryNo >= 1 && queryNo <= 22, "Invalid query number")
-    val m = Class.forName(f"ch.ethz.queries.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema: ChTSchema)}]
+    val m = Class.forName(f"ch.ethz.queries.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String)}]
     println("=========== pre execute =============")
-    val res = m.execute(st, cm, cn, cs, mUrl, chTSchema)
+    val res = m.execute(st, cm, cn, cs, mUrl)
     println("=========== post execute =============")
   }
 
@@ -421,16 +421,16 @@ object ChQuery {
     TellClientFactory.setConf(st, cm, cn, cs)
     TellClientFactory.getConnection()
     TellClientFactory.startTransaction()
-    val chtSchema = new ChTSchema(TellClientFactory.trx)
+    ChTSchema.init_schem(TellClientFactory.trx)
     TellClientFactory.commitTrx()
 
     println("***********************************************")
     println("********************q:" + qryNum + "***st:" + st + "***cm:" + cm)
     println("***********************************************")
     if (qryNum > 0) {
-      executeQuery(qryNum, st, cm, cn, cs, masterUrl, chtSchema)
+      executeQuery(qryNum, st, cm, cn, cs, masterUrl)
     } else {
-      (1 to 22).map(i => executeQuery(i, st, cm, cn, cs, masterUrl, chtSchema))
+      (1 to 22).map(i => executeQuery(i, st, cm, cn, cs, masterUrl))
     }
 
   }

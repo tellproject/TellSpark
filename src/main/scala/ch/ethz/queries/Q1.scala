@@ -14,14 +14,14 @@ class Q1 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
-    val oSchema = chTSchema.orderLineSch
+    val oSchema = ChTSchema.orderLineSch
 
     // prepare date selection
     val dateSelection = new CNFClause
@@ -30,7 +30,7 @@ class Q1 extends ChQuery {
     val orderLineQuery = new ScanQuery
     orderLineQuery.addSelection(dateSelection)
 
-    val orderline = orderLineRdd(scc, orderLineQuery, chTSchema.orderLineSch).toDF()
+    val orderline = orderLineRdd(scc, orderLineQuery, ChTSchema.orderLineSch).toDF()
     logger.info("[Query %d] %s".format(1, orderline.printSchema))
 
     //ToDo projection push downs

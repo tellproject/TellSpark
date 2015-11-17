@@ -33,7 +33,7 @@ class Q19 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
@@ -44,8 +44,8 @@ class Q19 extends ChQuery {
 //    val bb = udf { (x: String) => x.matches("b") }
 //    val cc = udf { (x: String) => x.matches("c") }
 
-    val ol = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch)
-    val it = itemRdd(scc, new ScanQuery, chTSchema.itemSch)
+    val ol = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch)
+    val it = itemRdd(scc, new ScanQuery, ChTSchema.itemSch)
     val forderline = ol.toDF().filter($"ol_quantity" >= 1 && $"ol_quantity" <= 10)
     val fitem = it.toDF().filter($"i_price" >= 1 && $"i_price" <= 40000)
     val res = forderline.join(fitem, $"ol_i_id" === $"i_id")

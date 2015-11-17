@@ -9,9 +9,22 @@ import ch.ethz.tell.{Transaction, TSchema}
  * Created by marenato on 10.11.15.
  * Rewritten by braunl on 17.11.15
  */
-class ChTSchema (transaction: Transaction) extends Serializable{
+object ChTSchema  extends Serializable{
 
-  {
+  var warehouseSch: TSchema = null
+  var districtSch: TSchema = null
+  var customerSch: TSchema = null
+  var historySch: TSchema = null
+  var newOrderSch: TSchema = null
+  var orderSch: TSchema = null
+  var orderLineSch: TSchema = null
+  var itemSch: TSchema = null
+  var stockSch: TSchema = null
+  var regionSch: TSchema = null
+  var nationSch: TSchema = null
+  var supplierSch: TSchema = null
+
+  def init_schem(transaction: Transaction) = {
     var tellSchema = transaction.schemaForTable("warehouse")
     warehouseSch = new TSchema(tellSchema)
 
@@ -50,16 +63,5 @@ class ChTSchema (transaction: Transaction) extends Serializable{
 
   }
 
-  var warehouseSch: TSchema = null
-  var districtSch: TSchema = null
-  var customerSch: TSchema = null
-  var historySch: TSchema = null
-  var newOrderSch: TSchema = null
-  var orderSch: TSchema = null
-  var orderLineSch: TSchema = null
-  var itemSch: TSchema = null
-  var stockSch: TSchema = null
-  var regionSch: TSchema = null
-  var nationSch: TSchema = null
-  var supplierSch: TSchema = null
+
 }
