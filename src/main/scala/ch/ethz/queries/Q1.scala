@@ -21,17 +21,20 @@ class Q1 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
-    val sQry = new ScanQuery()
-    val cl1 = new CNFClause
-    val ff = new PredicateType.FloatType(10)
-    cl1.addPredicate(ScanQuery.CmpType.EQUAL, 1, ff)
-    // convert an RDDs to a DataFrames
+    val oSchema = chTSchema.orderLineSch
 
-    val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
+    // prepare date selection
+    val dateSelection = new CNFClause
+    dateSelection.addPredicate(
+      ScanQuery.CmpType.GREATER, oSchema.getField("ol_delivery_d").index, referenceDate2007)
+    val orderLineQuery = new ScanQuery
+    orderLineQuery.addSelection(dateSelection)
+
+    val orderline = orderLineRdd(scc, orderLineQuery, chTSchema.orderLineSch).toDF()
     logger.info("[Query %d] %s".format(1, orderline.printSchema))
 
-    //ToDo push downs
-    val res = orderline//.filter($"OL_DELIVERY_D" > "2007-01-02")
+    //ToDo projection push downs
+    val res = orderline
       .groupBy($"OL_NUMBER")
       .agg(sum($"OL_AMOUNT"),
         sum($"OL_QUANTITY"),

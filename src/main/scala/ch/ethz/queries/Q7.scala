@@ -3,7 +3,7 @@ package ch.ethz.queries
 import java.text.SimpleDateFormat
 import java.util.{Date, GregorianCalendar}
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 import org.apache.spark.sql.functions.udf
 
 /**
@@ -56,8 +56,24 @@ class Q7 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
+    // prepare date selection
+    val oSchema = chTSchema.orderSch
+    val orderlineQuery = new ScanQuery
+    val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
+    val oQuantityIndex = oSchema.getField("ol_quantity").index
+
+    val dateSelectionLower = new CNFClause
+    dateSelectionLower.addPredicate(
+      ScanQuery.CmpType.GREATER_EQUAL, oDeliveryIndex, referenceDate2007)
+    orderlineQuery.addSelection(dateSelectionLower)
+
+    val dateSelectionUpper = new CNFClause
+    dateSelectionUpper.addPredicate(
+      ScanQuery.CmpType.LESS_EQUAL, oDeliveryIndex, referenceDate2012)
+    orderlineQuery.addSelection(dateSelectionUpper)
+
     // supplier, stock, orderline, orders, customer, nation n1, nation n2
-    val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
+    val orderline = orderLineRdd(scc, orderlineQuery, oSchema).toDF()
     val forderline = orderline.filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" <= 20120102 )
     val supplier = supplierRdd(scc, new ScanQuery, chTSchema.supplierSch).toDF()
     val n1 = nationRdd(scc, new ScanQuery, chTSchema.nationSch).toDF()
