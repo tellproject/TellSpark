@@ -1,5 +1,8 @@
 package ch.ethz.queries
 
+import java.text.SimpleDateFormat
+import java.util.{Date, GregorianCalendar}
+
 import ch.ethz.tell.{ScanQuery, TSparkContext}
 import org.apache.spark.sql.functions.udf
 
@@ -31,31 +34,18 @@ order by su_nationkey, cust_nation, l_year
  */
 class Q7 extends ChQuery {
 
-    val getYear = udf { (x: String) => x.substring(0, 4) }
+  //TODO double check
+  val sdf = new SimpleDateFormat("yyyy")
+  val cal = new GregorianCalendar()
 
-//    val fnation = nation.filter($"n_name" === "FRANCE" || $"n_name" === "GERMANY")
-//    val fline = lineitem.filter($"l_shipdate" >= "1995-01-01" && $"l_shipdate" <= "1996-12-31")
-//
-//    val supNation = fnation.join(supplier, $"n_nationkey" === supplier("s_nationkey"))
-//      .join(fline, $"s_suppkey" === fline("l_suppkey"))
-//      .select($"n_name".as("supp_nation"), $"l_orderkey", $"l_extendedprice", $"l_discount", $"l_shipdate")
-//
-//    val res = fnation.join(customer, $"n_nationkey" === customer("c_nationkey"))
-//      .join(order, $"c_custkey" === order("o_custkey"))
-//      .select($"n_name".as("cust_nation"), $"o_orderkey")
-//      .join(supNation, $"o_orderkey" === supNation("l_orderkey"))
-//      .filter($"supp_nation" === "FRANCE" && $"cust_nation" === "GERMANY"
-//      || $"supp_nation" === "GERMANY" && $"cust_nation" === "FRANCE")
-//      .select($"supp_nation", $"cust_nation",
-//        getYear($"l_shipdate").as("l_year"),
-//        decrease($"l_extendedprice", $"l_discount").as("volume"))
-//      .groupBy($"supp_nation", $"cust_nation", $"l_year")
-//      .agg(sum($"volume").as("revenue"))
-//      .sort($"supp_nation", $"cust_nation", $"l_year")
-//
-//    outputDF(res)
+  val getYear = udf { (x: Long) => timestampToString(x) }
 
-//  }
+  def timestampToString(input : Long): String = {
+    val dt = new Date(input)
+    sdf.setCalendar(cal)
+    cal.setTime(dt)
+    sdf.format(dt).substring(0, 4)
+  }
 
   /**
    * implemented in children classes and hold the actual query
@@ -78,14 +68,16 @@ class Q7 extends ChQuery {
     val supplier = supp.toDF()
     val n1 = nn1.toDF()
     val n2 = nn2.toDF()
-    val suppNation = supplier.join(n1, $"su_nationkey" === n1("n_nationkey"))
-    .join(n2,
-    (((n1("n_name") === "Germany") && (n2("n_name") === "Cambodia")) ||
-      ((n1("n_name") === "Cambodia") && (n2("n_name") === "Germany"))) )
     val customer = cc.toDF()
     val order = oo.toDF()
     val orderline = ol.toDF()
     val stock = stk.toDF()
+
+    val suppNation = supplier.join(n1, $"su_nationkey" === n1("n_nationkey"))
+    .join(n2,
+    (((n1("n_name") === "Germany") && (n2("n_name") === "Cambodia")) ||
+      ((n1("n_name") === "Cambodia") && (n2("n_name") === "Germany"))) )
+
     val part_res = customer.join(suppNation, n2("n_nationkey") === customer("c_state").substr(1,1))
     .join(order, (order("o_c_id") === customer("c_id")) &&
       (order("o_w_id") === customer("c_w_id")) &&

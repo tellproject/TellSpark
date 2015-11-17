@@ -30,21 +30,12 @@ class Q2 extends ChQuery {
     println("=================== Q2 ===================supplier:" + cnt )
     val supplier = spp.toDF()
 
-    val nn = new TRDD[TRecord](scc, "nation", new ScanQuery(), ChTSchema.nationSch).map(r => {
-      Nation(r.getValue("N_NATIONKEY").asInstanceOf[Short],
-        r.getValue("N_NAME").asInstanceOf[String],
-        r.getValue("N_REGIONKEY").asInstanceOf[Short],
-        r.getValue("N_COMMENT").asInstanceOf[String])
-    })
+    val nn = nationRdd(scc, new ScanQuery)
     cnt = nn.count
     println("=================== Q2 ===================nation:" + cnt) 
    val nation = nn.toDF()
 
-    val rrr = new TRDD[TRecord](scc, "region", new ScanQuery(), ChTSchema.regionSch).map(r => {
-      Region(r.getValue("R_REGIONKEY").asInstanceOf[Short],
-        r.getValue("R_NAME").asInstanceOf[String],
-        r.getValue("R_COMMENT").asInstanceOf[String])
-    })
+    val rrr = regionRdd(scc, new ScanQuery)
     cnt = rrr.count
     println("=================== Q2 ===================region:" + cnt )
     val region = rrr.toDF()
