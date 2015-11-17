@@ -7,7 +7,8 @@ import scala.collection.mutable.{ArrayBuffer, HashMap}
 /**
  * Wrapper around the native schema class used in TellStore
  */
-class TSchema(val tellSchema: Schema) extends Serializable {
+class TSchema() extends Serializable {
+//TODO: this is how this call should look like later!!!  class TSchema(val tellSchema: Schema) extends Serializable {
 
   var fixedSizeFields = ArrayBuffer[FieldType]()
   var varSizeFields = ArrayBuffer[FieldType]()
@@ -15,19 +16,20 @@ class TSchema(val tellSchema: Schema) extends Serializable {
   var strFields = HashMap[String, TellField]()
   var cnt: Int = 0
 
-//  def addField(fType: FieldType, fName: String, fNull: Boolean) = {
-//    fType match {
-//      case FieldType.NOTYPE | FieldType.NULLTYPE | FieldType.SMALLINT |
-//      FieldType.INT | FieldType.BIGINT | FieldType.FLOAT | FieldType.DOUBLE =>
-//        fixedSizeFields += fType
-//      case FieldType.TEXT | FieldType.BLOB =>
-//        varSizeFields += fType
-//    }
-//    val tf = new TellField(cnt, fType, fName, fNull)
-//    fields += tf
-//    strFields.put(fName, tf)
-//    cnt += 1
-//  }
+  //TODO: make this method private for being used by initialization
+  def addField(fType: FieldType, fName: String, fNull: Boolean) = {
+    fType match {
+      case FieldType.NOTYPE | FieldType.NULLTYPE | FieldType.SMALLINT |
+      FieldType.INT | FieldType.BIGINT | FieldType.FLOAT | FieldType.DOUBLE =>
+        fixedSizeFields += fType
+      case FieldType.TEXT | FieldType.BLOB =>
+        varSizeFields += fType
+    }
+    val tf = new TellField(cnt, fType, fName, fNull)
+    fields += tf
+    strFields.put(fName, tf)
+    cnt += 1
+  }
 
   def getField(fieldName : String) :TellField = {
     strFields(fieldName)
