@@ -1,7 +1,5 @@
 package ch.ethz.tell
 
-import scala.collection.mutable.ArrayBuffer
-
 /**
  * Created by marenato on 10.11.15.
  */

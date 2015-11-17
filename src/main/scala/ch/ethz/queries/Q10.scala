@@ -21,16 +21,16 @@ order by revenue desc
  */
 class Q10  extends ChQuery {
 
-  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
+  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String, chTSchema:ChTSchema): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
-    val cc = customerRdd(scc, new ScanQuery)
-    val oo = orderRdd(scc, new ScanQuery)
-    val ol = orderLineRdd(scc, new ScanQuery)
-    val nn = nationRdd(scc, new ScanQuery)
+    val cc = customerRdd(scc, new ScanQuery, chTSchema.customerSch)
+    val oo = orderRdd(scc, new ScanQuery, chTSchema.orderSch)
+    val ol = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch)
+    val nn = nationRdd(scc, new ScanQuery, chTSchema.nationSch)
 
     val forderline = oo.toDF().filter($"o_entry_d" >= 20070102)
     val customer = cc.toDF()

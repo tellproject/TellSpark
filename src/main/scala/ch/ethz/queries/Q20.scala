@@ -25,7 +25,7 @@ class Q20 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
@@ -33,11 +33,12 @@ class Q20 extends ChQuery {
     import sqlContext.implicits._
 
     //select i_id from item where i_data like 'co%'
-    val fitem = itemRdd(scc, new ScanQuery).toDF().filter($"i_data".like("co%")).select($"i_id")
-    val forderline = orderLineRdd(scc, new ScanQuery).toDF().filter($"ol_delivery_d" > 20100523)
-    val stock = stockRdd(scc, new ScanQuery).toDF()
-    val supplier = supplierRdd(scc, new ScanQuery).toDF()
-    val fnation = nationRdd(scc, new ScanQuery()).toDF().filter($"n_name" === "Germany")
+    val fitem = itemRdd(scc, new ScanQuery, chTSchema.itemSch).toDF()
+      .filter($"i_data".like("co%")).select($"i_id")
+    val forderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF().filter($"ol_delivery_d" > 20100523)
+    val stock = stockRdd(scc, new ScanQuery, chTSchema.stockSch).toDF()
+    val supplier = supplierRdd(scc, new ScanQuery, chTSchema.supplierSch).toDF()
+    val fnation = nationRdd(scc, new ScanQuery, chTSchema.nationSch).toDF().filter($"n_name" === "Germany")
 
     val inner_query = stock
       .join(forderline, (forderline("ol_i_id")===$"s_i_id") && ($"s_i_id".isin(fitem("i_id")) ))//TODO do with a join with item?

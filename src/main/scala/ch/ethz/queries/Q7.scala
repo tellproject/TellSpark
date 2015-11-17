@@ -50,28 +50,21 @@ class Q7 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String) = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema) = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
-    // supplier, stock, orderline, orders, customer, nation n1, nation n2
-    val supp = supplierRdd(scc, new ScanQuery())
-    val stk = stockRdd(scc, new ScanQuery())
-    val ol = orderLineRdd(scc, new ScanQuery())
-    val oo = ordersRdd(scc, new ScanQuery())
-    val cc = customerRdd(scc, new ScanQuery())
-    val nn1 = nationRdd(scc, new ScanQuery())
-    val nn2 = nationRdd(scc, new ScanQuery())
 
-    val forderline = ol.toDF().filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" <= 20120102 )
-    val supplier = supp.toDF()
-    val n1 = nn1.toDF()
-    val n2 = nn2.toDF()
-    val customer = cc.toDF()
-    val order = oo.toDF()
-    val orderline = ol.toDF()
-    val stock = stk.toDF()
+    // supplier, stock, orderline, orders, customer, nation n1, nation n2
+    val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
+    val forderline = orderline.filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" <= 20120102 )
+    val supplier = supplierRdd(scc, new ScanQuery, chTSchema.supplierSch).toDF()
+    val n1 = nationRdd(scc, new ScanQuery, chTSchema.nationSch).toDF()
+    val n2 = nationRdd(scc, new ScanQuery, chTSchema.nationSch).toDF()
+    val customer = customerRdd(scc, new ScanQuery, chTSchema.customerSch).toDF()
+    val order = orderRdd(scc, new ScanQuery, chTSchema.orderSch).toDF()
+    val stock = stockRdd(scc, new ScanQuery, chTSchema.stockSch).toDF()
 
     val suppNation = supplier.join(n1, $"su_nationkey" === n1("n_nationkey"))
     .join(n2,

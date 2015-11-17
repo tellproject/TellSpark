@@ -1,7 +1,7 @@
 package ch.ethz.tell
 
 import ch.ethz.TellClientFactory
-import ch.ethz.tell.Schema.FieldType
+import ch.ethz.tell.Field.FieldType
 import org.apache.spark.{SparkContext, _}
 import org.apache.spark.rdd.RDD
 
@@ -18,7 +18,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   var tSchema: TSchema = null
   // Tell table
   var tTable: String = ""
-  // Tell query 
+  // Tell query
   var tQuery: ScanQuery = null
   // Tell context
   var tContext: TSparkContext = null
@@ -47,7 +47,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       var len = scanIt.length()
       var addr = scanIt.address()
       var res:(Long, T) = null
-      
+
       override def hasNext: Boolean = {
         if (offset == len) {
           keepGoing = scanIt.next()
@@ -86,7 +86,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     off += 8
     val rec:TRecord = new TRecord(tSchema, new Array[Any](tSchema.cnt))
     // fixed size fields
-    for (fieldType:Schema.FieldType <- tSchema.fixedSizeFields) {
+    for (fieldType:Field.FieldType <- tSchema.fixedSizeFields) {
       fieldType match {
         case FieldType.SMALLINT =>
 	  val vv = unsafe.getShort(addr + off)
@@ -106,7 +106,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       }
     }
     // variable sized fields
-    for (fieldType:Schema.FieldType <- tSchema.varSizeFields) {
+    for (fieldType:Field.FieldType <- tSchema.varSizeFields) {
       if (off % 4 != 0) off += 4 - (off % 4)
       var ln = unsafe.getInt(addr + off);
       off += 4;
@@ -153,6 +153,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     TellClientFactory.startTransaction(trxId)
     val theSplit = split.asInstanceOf[TPartition[T]]
     val scanIt = TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, theSplit.index, tQuery), tTable)
+
     println("+++++++++++++++++++++++++++++++++++++")
     getIterator(scanIt)
   }

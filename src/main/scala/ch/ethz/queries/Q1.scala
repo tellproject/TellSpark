@@ -14,7 +14,7 @@ class Q1 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
@@ -26,20 +26,8 @@ class Q1 extends ChQuery {
     val ff = new PredicateType.FloatType(10)
     cl1.addPredicate(ScanQuery.CmpType.EQUAL, 1, ff)
     // convert an RDDs to a DataFrames
-    val oo = new TRDD[TRecord](scc, "order-line", sQry, ChTSchema.orderLineSch).map(r => {
-      OrderLine(r.getValue("OL_O_ID").asInstanceOf[Int],
-        r.getValue("OL_D_ID").asInstanceOf[Short],
-        r.getValue("OL_W_ID").asInstanceOf[Int],
-        r.getValue("OL_NUMBER").asInstanceOf[Short],
-        r.getValue("OL_I_ID").asInstanceOf[Int],
-        r.getValue("OL_SUPPLY_W_ID").asInstanceOf[Int],
-        r.getValue("OL_DELIVERY_D").asInstanceOf[Long],
-        r.getValue("OL_QUANTITY").asInstanceOf[Short],
-        r.getValue("OL_AMOUNT").asInstanceOf[Long],
-        r.getValue("OL_DIST_INFO").asInstanceOf[String])
-    })
 
-    val orderline = oo.toDF()
+    val orderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF()
     logger.info("[Query %d] %s".format(1, orderline.printSchema))
 
     //ToDo push downs

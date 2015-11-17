@@ -22,15 +22,15 @@ class Q15  extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
-    val forderline = orderLineRdd(scc, new ScanQuery).toDF().filter($"ol_delivery_d" >= 20070102)
-    val stock = stockRdd(scc, new ScanQuery).toDF()
-    val supplier = supplierRdd(scc, new ScanQuery).toDF()
+    val forderline = orderLineRdd(scc, new ScanQuery, chTSchema.orderLineSch).toDF().filter($"ol_delivery_d" >= 20070102)
+    val stock = stockRdd(scc, new ScanQuery, chTSchema.stockSch).toDF()
+    val supplier = supplierRdd(scc, new ScanQuery, chTSchema.supplierSch).toDF()
 
     val revenue = forderline.join(stock, ($"ol_i_id" === stock("s_i_id") && $"ol_supply_w_id" === stock("s_w_id")))
       .select((($"s_w_id" * $"s_i_id")%10000).as("supplier_no"))

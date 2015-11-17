@@ -12,7 +12,7 @@ class Q2 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
+  override def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String, chTSchema:ChTSchema): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
@@ -20,22 +20,22 @@ class Q2 extends ChQuery {
     import sqlContext.implicits._
 
     // convert an RDDs to a DataFrames
-    val stk = stockRdd(scc, new ScanQuery)
+    val stk = stockRdd(scc, new ScanQuery, chTSchema.stockSch)
     var cnt = stk.count
     println("=================== Q2 ===================stock:" + cnt )
     val stock = stk.toDF()
 
-    val spp = supplierRdd(scc, new ScanQuery)
+    val spp = supplierRdd(scc, new ScanQuery, chTSchema.supplierSch)
     cnt = spp.count
     println("=================== Q2 ===================supplier:" + cnt )
     val supplier = spp.toDF()
 
-    val nn = nationRdd(scc, new ScanQuery)
+    val nn = nationRdd(scc, new ScanQuery, chTSchema.nationSch)
     cnt = nn.count
     println("=================== Q2 ===================nation:" + cnt) 
    val nation = nn.toDF()
 
-    val rrr = regionRdd(scc, new ScanQuery)
+    val rrr = regionRdd(scc, new ScanQuery, chTSchema.regionSch)
     cnt = rrr.count
     println("=================== Q2 ===================region:" + cnt )
     val region = rrr.toDF()
@@ -54,13 +54,7 @@ class Q2 extends ChQuery {
     .groupBy($"S_I_ID")
     .agg(min($"S_QUANTITY").as("M_S_QUANTITY")).select("S_I_ID as M_I_ID", "M_S_QUANTITY")
 
-    val item = new TRDD[TRecord](scc, "item", new ScanQuery(), ChTSchema.itemSch).map(r => {
-      Item(r.getValue("I_ID").asInstanceOf[Int],
-        r.getValue("I_IM_ID").asInstanceOf[Short],
-        r.getValue("I_NAME").asInstanceOf[String],
-        r.getValue("I_PRICE").asInstanceOf[Double],
-        r.getValue("I_DATA").asInstanceOf[String])
-    }).toDF()
+    val item = itemRdd(scc, new ScanQuery, chTSchema.itemSch).toDF()
 
     /**
      * select su_suppkey, su_name, n_name, i_id, i_name, su_address, su_phone, su_comment
