@@ -13,7 +13,7 @@ class TRecord (var fieldSchema: TSchema, var values : Array[Any])
   def getComplete() = {
     (fieldSchema.fields, values)
   }
-  def getField(idx : Int) = {
+  def getField(idx : Short) = {
     (fieldSchema.fields(idx), values(idx))
   }
 
@@ -21,13 +21,12 @@ class TRecord (var fieldSchema: TSchema, var values : Array[Any])
     fieldSchema.strFields(fieldName)
   }
 
-  def setField(idx: Int, value: Any) = {
+  def setField(idx: Short, value: Any) = {
     values(idx) = value
   }
 
   def getValue(fieldName : String) = {
-    val tellField = fieldSchema.strFields(fieldName)
-    val idx = fieldSchema.fields.indexOf(tellField)
+    val idx = fieldSchema.getField(fieldName).index
     values(idx)
   }
   override def toString():String = {
@@ -35,7 +34,7 @@ class TRecord (var fieldSchema: TSchema, var values : Array[Any])
     sb.append("{")
     fieldSchema.strFields.map(entry => {
       sb.append(entry._1).append(":")
-      sb.append(values(fieldSchema.fields.indexOf(entry._1)))
+      sb.append(values(fieldSchema.getField(entry._1).index))
     })
     sb.append("}")
     sb.toString()

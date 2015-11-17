@@ -13,7 +13,7 @@ class TSchema(tellSchema: Schema) extends Serializable {
     val fieldNames = tellSchema.getFieldNames
     for (fieldName <- fieldNames) {
       val field = tellSchema.getFieldByName(fieldName)
-      fields += field
+      fields.put(field.index, field)
       strFields.put(field.fieldName, field)
       val fType = field.fieldType
       fType match {
@@ -28,12 +28,19 @@ class TSchema(tellSchema: Schema) extends Serializable {
 
   var fixedSizeFields = ArrayBuffer[FieldType]()
   var varSizeFields = ArrayBuffer[FieldType]()
-  var fields = ArrayBuffer[Field]()
+  var fields = HashMap[Short, Field]()
   var strFields = HashMap[String, Field]()
-  var cnt: Short = 0
 
   def getField(fieldName : String) :Field = {
     strFields(fieldName)
+  }
+
+  def getField(fieldIndex : Short) :Field = {
+    fields(fieldIndex)
+  }
+
+  def getSize() : Short = {
+    fields.size.asInstanceOf[Short]
   }
 
   override def toString() : String = {
