@@ -20,38 +20,39 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   var tTable: String = ""
   // Tell query 
   var tQuery: ScanQuery = null
+  // Tell context
+  var tContext: TSparkContext = null
 
-  def this(@transient sc: SparkContext, tbl: String, qry: ScanQuery, sch: TSchema) = {
-    this(sc, Nil)
+  def this(@transient scc: TSparkContext, tbl: String, qry: ScanQuery, sch: TSchema) = {
+    this(scc.sparkContext, Nil)
     tSchema = sch
     tTable = tbl
     tQuery = qry
-  }
-
-  def this(@transient scc: TSparkContext, tbl: String, query: ScanQuery, sch: TSchema) = {
-    this(scc.sparkContext, tbl, query, sch)
+    tContext = scc
   }
 
   def this(@transient oneParent: TRDD[_]) = {
     this(oneParent.context, List(new OneToOneDependency(oneParent)))
   }
 
-  def getIterator(theSplit: TPartition[T]): Iterator[T] = {
+  def getIterator(scanIt: ScanIterator): Iterator[T] = {
+    println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>theSplit")
+    //println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>theSplit" + theSplit.toString)
     val it = new Iterator[T] {
       // TODO a better way to map this?
       var offset = 0L
       var cnt = 0
       var cnt1 = 0
-      var keepGoing = theSplit.scanIt.next()
-      var len = theSplit.scanIt.length()
-      var addr = theSplit.scanIt.address()
+      var keepGoing = scanIt.next()
+      var len = scanIt.length()
+      var addr = scanIt.address()
       var res:(Long, T) = null
       
       override def hasNext: Boolean = {
         if (offset == len) {
-          keepGoing = theSplit.scanIt.next()
-          len = theSplit.scanIt.length()
-          addr = theSplit.scanIt.address()
+          keepGoing = scanIt.next()
+          len = scanIt.length()
+          addr = scanIt.address()
           offset = 0
         }
         keepGoing
@@ -140,20 +141,38 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
-    //TODO for each partition registered, get the customer values out
-    getIterator(split.asInstanceOf[TPartition[T]])
+    //TODO move the client creation somewhere else?
+    TellClientFactory.setConf(
+      tContext.storageMng.value,
+      tContext.commitMng.value,
+      tContext.chNumber.value,
+      tContext.chSize.value)
+    println("=================== COMPUTE :storageMng: ========= " + tContext.storageMng.value)
+    println("=================== COMPUTE :trxId: ========= " + tContext.broadcastTc.value)
+    val trxId = tContext.broadcastTc.value
+    TellClientFactory.startTransaction(trxId)
+    val theSplit = split.asInstanceOf[TPartition[T]]
+    val scanIt = TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, theSplit.index, tQuery), tTable)
+    println("+++++++++++++++++++++++++++++++++++++")
+    getIterator(scanIt)
   }
 
   override protected def getPartitions: Array[Partition] = {
     val array = new Array[Partition](TellClientFactory.chNumber)
-
-//    println("==============PRE TRANSACTION =================")
-//    println("==============POST TRANSACTION2=================")
 //    TellClientFactory.startTransaction()
-//    println("==============POST TRANSACTION=================")
+    //TODO move the client creation somewhere else?
+    TellClientFactory.setConf(
+      tContext.storageMng.value,
+      tContext.commitMng.value,
+      tContext.chNumber.value,
+      tContext.chSize.value)
+
+    val trxId = tContext.broadcastTc.value
+
+    println("=================== GET_PARTITION :trxId: ========= " + trxId)
+    //TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
     (0 to TellClientFactory.chNumber -1).map(pos => {
-      array(pos) = new TPartition(pos, TellClientFactory.trx.scan(
-        new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
+      array(pos) = new TPartition(pos, tQuery, tTable)
       println("PARTITION>>>" + array(pos).toString)
     })
     array

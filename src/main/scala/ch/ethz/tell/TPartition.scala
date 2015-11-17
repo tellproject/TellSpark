@@ -5,13 +5,13 @@ import org.apache.spark.Partition
 /**
  * Contains basic information about TellStore partition
  */
-class TPartition[T] (val index: Int, val scanIt: ScanIterator) extends Partition {
+class TPartition[T] (val index: Int, val scanQry: ScanQuery, val tableName: String) extends Partition {
 
   override def toString = {
     val sb = new StringBuilder
     sb.append("{idx:").append(index).append(",")
-    sb.append("length:").append(scanIt.length).append(",")
-    sb.append("address:").append(scanIt.address)
+    sb.append("query:").append(scanQry.toString).append(",")
+    sb.append("tableName:").append(tableName).append(",")
     sb.append("}")
     sb.toString()
   }

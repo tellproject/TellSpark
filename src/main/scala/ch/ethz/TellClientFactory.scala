@@ -10,17 +10,28 @@ import sun.misc.Unsafe
  * Object mocking the actual tell client
  */
 object TellClientFactory {
+
+  def setConf(strMng: String, cmMng: String, chNum: Int, chSz: Int) = {
+    storageMng = strMng
+    commitMng = cmMng
+    chNumber = chNum
+    chSize = chSz
+  }
+
   var commitMng: String = ""
   var storageMng: String = ""
   var chNumber = 0
   var chSize = 0
   // TODO we should use it properly
   var trx : Transaction = null
+  var trxId : Long = 0L
 
   //  val clientManager : ClientManager = new ClientManager(commitMng, tellStr, chunkCount, chunkSize);
   var clientManager: ClientManager = null
 
   def getConnection(): ClientManager = {
+    //TODO move the client creation somewhere else?
+
     if (clientManager == null) {
       println("================= PRE CLIENT ==============")
       println("=================" + toString + "==============")
@@ -31,10 +42,16 @@ object TellClientFactory {
   }
 
   def startTransaction() = {
-    clientManager = getConnection
-    println("=========== ClientManagerPointer ======= " + clientManager.getImplPtr)
-//    println("=========== ClientManagerPointer ======= " + clientManager.getScanMemoryManagerPtr)
     trx = Transaction.startTransaction(getConnection)
+    trxId = trx.getTransactionId
+    println("==========TRANSACTTION_ID.1. ======" + trx.getTransactionId)
+  }
+
+  def startTransaction(trId: Long) = {
+    trx = Transaction.startTransaction(trId, getConnection)
+    trxId = trx.getTransactionId
+    println("==========TRANSACTTION_ID.2.trId. ======" + trId)
+    println("==========TRANSACTTION_ID.2. ======" + trx.getTransactionId)
   }
 
   def commitTrx() = {

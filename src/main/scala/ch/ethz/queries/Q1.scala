@@ -22,7 +22,7 @@ class Q1 extends ChQuery {
     import sqlContext.implicits._
 
     val sQry = new ScanQuery()
-    val cl1 = new sQry.CNFCLause
+    val cl1 = new CNFClause
     val ff = new PredicateType.FloatType(10)
     cl1.addPredicate(ScanQuery.CmpType.EQUAL, 1, ff)
     // convert an RDDs to a DataFrames

@@ -1,34 +1,41 @@
 package ch.ethz.tell
 
 import ch.ethz.TellClientFactory
+import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * Created by marenato on 11.11.15.
  */
-class TSparkContext (val conf: SparkConf) {
+class TSparkContext (@transient val conf: SparkConf) extends Serializable{
 
   /**
    * SparkContext setup
    */
-  val sparkContext = new SparkContext(conf)
+  @transient val sparkContext = new SparkContext(conf)
 
-  var storageMng: String = ""
-  var commitMng: String = ""
-  var chNumber: Int = 0
-  var chSize: Int = 0
+  var storageMng: Broadcast[String] = null
+  var commitMng: Broadcast[String] = null
+  var chNumber: Broadcast[Int] = null
+  var chSize: Broadcast[Int] = null
+  var broadcastTc: Broadcast[Long] = null
 
   def this(masterUrl: String, appName: String, strMng: String, cmMng: String, chNum: Int, chSz: Int) {
-    this(new SparkConf().setMaster(masterUrl).setAppName(appName))
-    TellClientFactory.storageMng = strMng
-    TellClientFactory.commitMng = cmMng
-    TellClientFactory.chNumber = chNum
-    TellClientFactory.chSize = chSz
 
-    println("==============PRE TRANSACTION =================")
-    println("==============POST TRANSACTION2=================")
-    val trxId = TellClientFactory.startTransaction()
-    println("==============POST TRANSACTION=================")
+    this(new SparkConf().setMaster(masterUrl).setAppName(appName))
+    storageMng = sparkContext.broadcast(strMng)
+    commitMng = sparkContext.broadcast(cmMng)
+    chNumber = sparkContext.broadcast(chNum)
+    chSize = sparkContext.broadcast(chSz)
+
+    TellClientFactory.setConf(strMng, cmMng, chNum,chSz)
+
+    if (broadcastTc == null) {
+      TellClientFactory.startTransaction
+      broadcastTc = sparkContext.broadcast(TellClientFactory.trx.getTransactionId)
+      TellClientFactory.startTransaction(broadcastTc.value)
+      println("==============SPARK_CONTEXT:trxId:=================" + broadcastTc.value)
+    }
   }
 
   def setLocalProperty(key: String, value: String): Unit = {
