@@ -165,6 +165,7 @@ abstract class ChQuery {
     logger.info("[Query %d] Elapsed time: %d msecs. map:%d ress:%d".format(queryNo, (t1-t0)/1000000, cnt, ress.length))
   }
 
+
   def customerRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema:TSchema) = {
     new TRDD[TRecord](scc, "customer", scanQuery, tSchema).map(r => {
       Customer(r.getValue("c_id").asInstanceOf[Int],
@@ -202,7 +203,7 @@ abstract class ChQuery {
     })
   }
   def orderRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema:TSchema) = {
-    new TRDD[TRecord](scc, "orders", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, "order", scanQuery, tSchema).map(r => {
       Order(r.getValue("o_id").asInstanceOf[Int],
         r.getValue("o_d_id").asInstanceOf[Short],
         r.getValue("o_w_id").asInstanceOf[Int],
@@ -293,6 +294,47 @@ abstract class ChQuery {
       r.getValue("su_phone").asInstanceOf[String],
       r.getValue("su_acctbal").asInstanceOf[Double],
       r.getValue("su_comment").asInstanceOf[String])
+    })
+  }
+
+  def warehouseRdd(scc:TSparkContext, scanQuery: ScanQuery, tSchema:TSchema) = {
+    new TRDD[TRecord](scc, "warehouse", scanQuery, tSchema).map(r => {
+      Warehouse(r.getValue("w_id").asInstanceOf[Int],
+        r.getValue("w_name").asInstanceOf[String],
+        r.getValue("w_street_1").asInstanceOf[String],
+        r.getValue("w_street_2").asInstanceOf[String],
+        r.getValue("w_city").asInstanceOf[String],
+        r.getValue("w_state").asInstanceOf[String],
+        r.getValue("w_zip").asInstanceOf[String],
+        r.getValue("w_tax").asInstanceOf[Double],
+        r.getValue("w_ytd").asInstanceOf[Double]
+      )
+    })
+  }
+
+  //TODO use the correct constructor
+  def districtRdd(scc:TSparkContext, scanQuery: ScanQuery, tSchema:TSchema) = {
+    new TRDD[TRecord](scc, "district", scanQuery, tSchema).map(r => {
+      Supplier(r.getValue("su_suppkey").asInstanceOf[Short],
+        r.getValue("su_name").asInstanceOf[String],
+        r.getValue("su_address").asInstanceOf[String],
+        r.getValue("su_nationkey").asInstanceOf[Short],
+        r.getValue("su_phone").asInstanceOf[String],
+        r.getValue("su_acctbal").asInstanceOf[Double],
+        r.getValue("su_comment").asInstanceOf[String])
+    })
+  }
+
+  //TODO use the correct constructor
+  def historyRdd(scc:TSparkContext, scanQuery: ScanQuery, tSchema:TSchema) = {
+    new TRDD[TRecord](scc, "history", scanQuery, tSchema).map(r => {
+      Supplier(r.getValue("su_suppkey").asInstanceOf[Short],
+        r.getValue("su_name").asInstanceOf[String],
+        r.getValue("su_address").asInstanceOf[String],
+        r.getValue("su_nationkey").asInstanceOf[Short],
+        r.getValue("su_phone").asInstanceOf[String],
+        r.getValue("su_acctbal").asInstanceOf[Double],
+        r.getValue("su_comment").asInstanceOf[String])
     })
   }
 }
