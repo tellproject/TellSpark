@@ -54,7 +54,7 @@ class Q10  extends ChQuery {
       (c_n("c_w_id") === o_ol("o_w_id")) &&
       (c_n("c_d_id") === o_ol("o_d_id")) ))
       //c_id, c_last, sum(ol_amount) as revenue, c_city, c_phone, n_name
-    .select("c_id", "c_last", "c_city", "c_phone", "n_name")
+    .select("c_id", "c_last", "c_city", "c_phone", "n_name", "ol_amount")
     .agg(sum($"ol_amount").as("revenue"))
     .orderBy($"revenue".desc)
 
