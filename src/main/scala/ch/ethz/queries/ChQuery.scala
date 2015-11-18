@@ -111,7 +111,7 @@ case class Stock(S_I_ID: Int,
                  S_ORDER_CNT: Short,
                  S_REMOTE_CNT: Short,
                  S_DATA: String,
-                 S_SU_SUPPKEY: Int) {
+                 S_SU_SUPPKEY: Short) {
   def this(S_I_ID: Int, S_W_ID: Short, S_QUANTITY: Int, S_DIST_01: String, S_DIST_02: String, S_DIST_03: String,
            S_DIST_04: String, S_DIST_05: String, S_DIST_06: String, S_DIST_07: String, S_DIST_08: String,
            S_DIST_09: String, S_DIST_10: String, S_YTD: Int, S_ORDER_CNT: Short, S_REMOTE_CNT: Short, S_DATA: String) =
@@ -141,7 +141,7 @@ class ChQuery {
   // get the name of the class excluding dollar signs and package
   val className = this.getClass.getName.split("\\.").last.replaceAll("\\$", "")
 
-  val logger = LoggerFactory.getLogger(ChQuery.getClass)
+  val logger = LoggerFactory.getLogger(this.getClass)
 
   // have the reference date as it appears in many places
 
@@ -343,7 +343,7 @@ class ChQuery {
         r.getValue("s_order_cnt").asInstanceOf[Short],
         r.getValue("s_remote_cnt").asInstanceOf[Short],
         r.getValue("s_data").asInstanceOf[String],
-        r.getValue("s_su_suppkey").asInstanceOf[Int]
+        r.getValue("s_su_suppkey").asInstanceOf[Short]
       )
     })
   }
