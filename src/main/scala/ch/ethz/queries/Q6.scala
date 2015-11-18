@@ -20,22 +20,22 @@ class Q6 extends ChQuery {
     import sqlContext.implicits._
 
     // prepare date selection
-    val oSchema = ChTSchema.orderSch
+    val oSchema = ChTSchema.orderLineSch
     val orderLineQuery = new ScanQuery
     val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
-    val oQuantityIndex = oSchema.getField("ol_quantity").index
 
     val dateSelectionLower = new CNFClause
     dateSelectionLower.addPredicate(
-      ScanQuery.CmpType.GREATER_EQUAL, oDeliveryIndex, referenceDate1999)
+    ScanQuery.CmpType.GREATER_EQUAL, oDeliveryIndex, referenceDate1999)
     orderLineQuery.addSelection(dateSelectionLower)
 
     val dateSelectionUpper = new CNFClause
     dateSelectionUpper.addPredicate(
-      ScanQuery.CmpType.LESS, oDeliveryIndex, referenceDate2020First)
+    ScanQuery.CmpType.LESS, oDeliveryIndex, referenceDate2020First)
     orderLineQuery.addSelection(dateSelectionUpper)
 
     // prepare quantity selection
+    val oQuantityIndex = oSchema.getField("ol_quantity").index
     val quantitySelectionLower = new CNFClause
     quantitySelectionLower.addPredicate(
       ScanQuery.CmpType.GREATER_EQUAL, oQuantityIndex, PredicateType.create(1: Short))
@@ -45,7 +45,7 @@ class Q6 extends ChQuery {
     quantitySelectionUpper.addPredicate(
       ScanQuery.CmpType.LESS, oQuantityIndex, PredicateType.create(100: Short))
     // the original benchmark says 100000 which is not a numeric(2)!!
-    orderLineQuery.addSelection(quantitySelectionLower)
+    orderLineQuery.addSelection(quantitySelectionUpper)
 
     //todo: push down aggregation!
 
