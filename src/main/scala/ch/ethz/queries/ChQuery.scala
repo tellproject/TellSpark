@@ -8,29 +8,28 @@ import ch.ethz.tell.{TSparkContext, ScanQuery, TRecord, TSchema, TRDD}
 import org.slf4j.{LoggerFactory}
 import org.apache.spark.sql.DataFrame
 
-case class Warehouse(W_ID: Int,
-                     W_NAME: String,
-                     W_STREET_1: String,
-                     W_STREET_2: String,
-                     W_CITY: String,
-                     W_STATE: String,
-                     W_ZIP: String,
-                     W_TAX: Int, // numeric (4,4)
-                     W_YTD: Long)
 
-// numeric (12,2)
+case class Warehouse(w_id: Int,
+                     w_name: String,
+                     w_street_1: String,
+                     w_street_2: String,
+                     w_city: String,
+                     w_state: String,
+                     w_zip: String,
+                     w_tax: Int, // numeric (4,4)
+                     w_ytd: Long)
 
-case class District(D_ID: Short,
-                    D_W_ID: Short,
-                    D_NAME: String,
-                    D_STREET_1: String,
-                    D_STREET_2: String,
-                    D_CITY: String,
-                    D_STATE: String,
-                    D_ZIP: String,
-                    D_TAX: Int, // numeric (4,4)
-                    D_YTD: Long, // numeric (12,2)
-                    D_NEXT_O_ID: Int)
+case class District(d_id: Short,
+                    d_w_id: Short,
+                    d_name: String,
+                    d_street_1: String,
+                    d_street_2: String,
+                    d_city: String,
+                    d_state: String,
+                    d_zip: String,
+                    d_tax: Int, // numeric (4,4)
+                    d_ytd: Long, // numeric (12,2)
+                    d_next_o_id: Int)
 
 case class Customer(c_id: Int,
                     c_d_id: Int,
@@ -89,7 +88,7 @@ case class OrderLine(ol_o_id: Int,
                      ol_dist_info: String)
 
 case class Item(i_id: Int,
-                i_im_id: Short,
+                i_im_id: Int,
                 i_name: String,
                 i_price: Int, // numeric (5,2)
                 i_data: String)
@@ -311,7 +310,7 @@ class ChQuery {
   def itemRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "item", scanQuery, tSchema).map(r => {
       Item(r.getValue("i_id").asInstanceOf[Int],
-        r.getValue("i_im_id").asInstanceOf[Short],
+        r.getValue("i_im_id").asInstanceOf[Int],
         r.getValue("i_name").asInstanceOf[String],
         r.getValue("i_price").asInstanceOf[Int],
         r.getValue("i_data").asInstanceOf[String]
