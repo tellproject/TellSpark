@@ -42,12 +42,12 @@ order by ordercount desc
     val nationSelection = new CNFClause
     nationSelection.addPredicate(
       ScanQuery.CmpType.EQUAL, nNameIndex, new StringType("Germany"))
-    nationQuery.addSelection(nationSelection)
+//    nationQuery.addSelection(nationSelection)
 
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
     val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
     val fnation = nationRdd(scc, nationQuery, nSchema).toDF()
-//      .filter($"n_name" === "Germany")
+      .filter($"n_name" === "Germany")
 
     val inner_res = supplier.join(fnation, $"su_nationkey" === fnation("n_nationkey"))
     .join(stock, $"su_suppkey" === (stock("s_w_id")*stock("s_i_id")%10000))

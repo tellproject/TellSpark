@@ -51,7 +51,7 @@ class Q20 extends ChQuery {
     val nationSelection = new CNFClause
     nationSelection.addPredicate(
       ScanQuery.CmpType.EQUAL, nNameIndex, new StringType("Germany"))
-    nationQuery.addSelection(nationSelection)
+//    nationQuery.addSelection(nationSelection)
 
     // prepare date selection
     val iSchema = ChTSchema.itemSch
@@ -72,7 +72,7 @@ class Q20 extends ChQuery {
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
     val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
     val fnation = nationRdd(scc, nationQuery, nSchema).toDF()
-//      .filter($"n_name" === "Germany")
+      .filter($"n_name" === "Germany")
 
     val inner_query = stock
       .join(forderline, (forderline("ol_i_id")===$"s_i_id") && ($"s_i_id".isin(fitem("i_id")) ))//TODO do with a join with item?

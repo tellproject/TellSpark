@@ -47,7 +47,7 @@ class Q22 extends ChQuery {
       phoneSelection.addPredicate(
         ScanQuery.CmpType.LIKE, cPhoneIndex, PredicateType.create(d.asInstanceOf[String]))
     }
-    customerQuery.addSelection(phoneSelection)
+//    customerQuery.addSelection(phoneSelection)
 
     val fcustomer = customerRdd(scc, customerQuery, cSchema).toDF()
       .filter($"c_phone".substr(1,1).isin((0 to 7).toList))

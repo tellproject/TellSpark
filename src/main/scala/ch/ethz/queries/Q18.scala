@@ -38,7 +38,7 @@ class Q18  extends ChQuery {
       orderline("ol_o_id") === $"o_id")
     .select("c_last", "c_id", "o_id", "o_entry_d", "o_ol_cnt")
     .agg(sum($"ol_amount").as("tot_amount"))
-    .filter($"tot_amount" > 200)
+    .filter($"tot_amount" > 20000)
     .orderBy($"tot_amount".desc, $"o_entry_d")
 
     timeCollect(res, 18)
