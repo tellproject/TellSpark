@@ -1,6 +1,7 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.PredicateType.StringType
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 
 /**
  * select	 su_name, su_address
@@ -32,13 +33,46 @@ class Q20 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
+    // prepare date selection
+    val oSchema = ChTSchema.orderSch
+    val orderLineQuery = new ScanQuery
+    val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
+
+    val dateSelection = new CNFClause
+    dateSelection.addPredicate(
+      ScanQuery.CmpType.GREATER_EQUAL, oDeliveryIndex, referenceDate2010)
+    orderLineQuery.addSelection(dateSelection)
+
+    // prepare nation selection
+    val nSchema = ChTSchema.nationSch
+    val nationQuery = new ScanQuery
+    val nNameIndex = nSchema.getField("n_name").index
+
+    val nationSelection = new CNFClause
+    nationSelection.addPredicate(
+      ScanQuery.CmpType.EQUAL, nNameIndex, new StringType("Germany"))
+    nationQuery.addSelection(nationSelection)
+
+    // prepare date selection
+    val iSchema = ChTSchema.itemSch
+    val itemQuery = new ScanQuery
+    val iDataIndex = iSchema.getField("i_data").index
+
+    val dataSelection = new CNFClause
+    dataSelection.addPredicate(
+      ScanQuery.CmpType.LIKE, iDataIndex, new StringType("co%"))
+    itemQuery.addSelection(dataSelection)
+
     //select i_id from item where i_data like 'co%'
-    val fitem = itemRdd(scc, new ScanQuery, ChTSchema.itemSch).toDF()
-      .filter($"i_data".like("co%")).select($"i_id")
-    val forderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF().filter($"ol_delivery_d" > 20100523)
+    val fitem = itemRdd(scc, itemQuery, iSchema).toDF()
+//      .filter($"i_data".like("co%"))
+      .select($"i_id")
+    val forderline = orderLineRdd(scc, orderLineQuery, oSchema).toDF()
+//      .filter($"ol_delivery_d" > 20100523)
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
     val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
-    val fnation = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF().filter($"n_name" === "Germany")
+    val fnation = nationRdd(scc, nationQuery, nSchema).toDF()
+//      .filter($"n_name" === "Germany")
 
     val inner_query = stock
       .join(forderline, (forderline("ol_i_id")===$"s_i_id") && ($"s_i_id".isin(fitem("i_id")) ))//TODO do with a join with item?

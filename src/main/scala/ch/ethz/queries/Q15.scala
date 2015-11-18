@@ -1,6 +1,6 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 
 /**
  * with	 revenue (supplier_no, total_revenue) as (
@@ -28,7 +28,19 @@ class Q15  extends ChQuery {
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
-    val forderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF().filter($"ol_delivery_d" >= 20070102)
+
+    // prepare date selection
+    val oSchema = ChTSchema.orderSch
+    val orderLineQuery = new ScanQuery
+    val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
+
+    val dateSelection = new CNFClause
+    dateSelection.addPredicate(
+      ScanQuery.CmpType.GREATER_EQUAL, oDeliveryIndex, referenceDate2007)
+    orderLineQuery.addSelection(dateSelection)
+
+    val forderline = orderLineRdd(scc, orderLineQuery, oSchema).toDF()
+//      .filter($"ol_delivery_d" >= 20070102)
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
     val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
 

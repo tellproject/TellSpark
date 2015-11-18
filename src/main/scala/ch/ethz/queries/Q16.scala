@@ -1,6 +1,7 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.PredicateType.StringType
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 
 /**
  * select	 i_name,
@@ -28,13 +29,23 @@ class Q16  extends ChQuery {
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
-    val orders = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
+
+    // prepare date selection
+    val iSchema = ChTSchema.itemSch
+    val itemQuery = new ScanQuery
+    val iDataIndex = iSchema.getField("i_data").index
+
+    val dataSelection = new CNFClause
+    dataSelection.addPredicate(
+      ScanQuery.CmpType.NOT_LIKE, iDataIndex, new StringType("zz%"))
+    itemQuery.addSelection(dataSelection)
+
     val fsupplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
       .filter($"su_comment".like("%bad%"))
 //      .select($"su_suppkey")
 
-    val fitem = itemRdd(scc, new ScanQuery, ChTSchema.itemSch).toDF()
-    .filter(!$"i_data".like("zz%"))
+    val fitem = itemRdd(scc, itemQuery, iSchema).toDF()
+//    .filter(!$"i_data".like("zz%"))
 
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
     val res = stock.join(fsupplier, ( ($"s_w_id" * $"s_i_id")%10000 !== (fsupplier("su_suppkey")) ))

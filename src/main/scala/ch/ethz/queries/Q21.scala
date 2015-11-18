@@ -1,6 +1,7 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.PredicateType.StringType
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 
 /**
  * Query21
@@ -32,13 +33,23 @@ class Q21 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
+    // prepare nation selection
+    val nSchema = ChTSchema.nationSch
+    val nationQuery = new ScanQuery
+    val nNameIndex = nSchema.getField("n_name").index
+
+    val nationSelection = new CNFClause
+    nationSelection.addPredicate(
+      ScanQuery.CmpType.EQUAL, nNameIndex, new StringType("Germany"))
+    nationQuery.addSelection(nationSelection)
+
     val oo = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch)
     val orderline1 = oo.toDF()
     val orderline2 = oo.toDF()
-    val nation = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
     val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
-    val fnation = nation.filter($"n_name" === "Germany")
+    val fnation = nationRdd(scc, nationQuery, nSchema).toDF()
+//      .filter($"n_name" === "Germany")
     val order = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
 
     val s_s_n = supplier.join(fnation, $"su_nationkey" === "n_nationkey")

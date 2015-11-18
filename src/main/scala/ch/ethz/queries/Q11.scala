@@ -1,6 +1,7 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.PredicateType.StringType
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 
 /**
  * Query11
@@ -29,13 +30,24 @@ order by ordercount desc
   override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
+
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
+    // prepare nation selection
+    val nSchema = ChTSchema.nationSch
+    val nationQuery = new ScanQuery
+    val nNameIndex = nSchema.getField("n_name").index
+
+    val nationSelection = new CNFClause
+    nationSelection.addPredicate(
+      ScanQuery.CmpType.EQUAL, nNameIndex, new StringType("Germany"))
+    nationQuery.addSelection(nationSelection)
+
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
     val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
-    val nation = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
-    val fnation = nation.toDF().filter($"n_name" === "Germany")
+    val fnation = nationRdd(scc, nationQuery, nSchema).toDF()
+//      .filter($"n_name" === "Germany")
 
     val inner_res = supplier.join(fnation, $"su_nationkey" === fnation("n_nationkey"))
     .join(stock, $"su_suppkey" === (stock("s_w_id")*stock("s_i_id")%10000))
