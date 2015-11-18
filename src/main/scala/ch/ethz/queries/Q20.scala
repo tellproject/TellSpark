@@ -84,7 +84,8 @@ class Q20 extends ChQuery {
 
     //TODO verify the <isin> operation
     val res = supplier.join(fnation, fnation("n_nationkey") === $"su_nationkey")
-    .filter($"su_suppkey".isin(inner_query("inner_suppkey")))
+      .join(inner_query, $"su_suppkey" === inner_query("inner_suppkey"))
+//    .filter($"su_suppkey".isin(inner_query("inner_suppkey")))
 
     timeCollect(res, 20)
   }

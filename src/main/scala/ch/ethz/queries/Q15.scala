@@ -45,7 +45,7 @@ class Q15  extends ChQuery {
     val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
 
     val revenue = forderline.join(stock, ($"ol_i_id" === stock("s_i_id") && $"ol_supply_w_id" === stock("s_w_id")))
-      .select((($"s_w_id" * $"s_i_id")%10000).as("supplier_no"))
+      .select((($"s_w_id" * $"s_i_id")%10000).as("supplier_no"), $"ol_amount")
     .groupBy($"supplier_no")
     .agg(sum($"ol_amount").as("total_revenue"))
 

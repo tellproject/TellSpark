@@ -43,7 +43,7 @@ class Q12  extends ChQuery {
     val res = orders.join(forderline, forderline("ol_w_id") === $"o_w_id" &&
       forderline("ol_d_id") === $"o_d_id" &&
       forderline("ol_o_id") === $"o_id" &&
-      forderline("o_entry_d") <= $"ol_delivery_d")
+      $"o_entry_d" <= forderline("ol_delivery_d"))
 
     .select($"o_ol_cnt")
     .groupBy($"o_ol_cnt")

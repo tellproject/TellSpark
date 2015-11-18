@@ -68,7 +68,7 @@ class Q21 extends ChQuery {
         orderline1("ol_w_id") === $"o_w_id" &&
         orderline1("ol_d_id") === $"o_d_id" &&
         orderline1("ol_delivery_d") > $"o_entry_d")
-    .select($"su_name")
+    .select($"su_name", $"o_id")
     .groupBy($"su_name")
       // todo is this the same? count(*) as numwait
     .agg(count($"o_id").as("numwait"))

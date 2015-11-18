@@ -29,11 +29,11 @@ class Q3 extends ChQuery {
 
     // prepare c_state selection
     val cSchema = ChTSchema.customerSch
-    val stateSelection = new CNFClause
-    stateSelection.addPredicate(
-      ScanQuery.CmpType.LIKE, cSchema.getField("c_state").index, new StringType("A%"))
+//    val stateSelection = new CNFClause
+//    stateSelection.addPredicate(
+//      ScanQuery.CmpType.LIKE, cSchema.getField("c_state").index, new StringType("A%"))
     val customerQuery = new ScanQuery
-    customerQuery.addSelection(stateSelection)
+//    customerQuery.addSelection(stateSelection)
 
     // convert an RDDs to a DataFrames
     val orderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
@@ -51,7 +51,7 @@ class Q3 extends ChQuery {
      * order by revenue desc, o_entry_d
      */
      val res = customer
-//       .filter(customer("c_state").like("A%"))
+       .filter(customer("c_state").like("A%"))
        .join(orders, (($"c_id" === orders("o_c_id")) &&
        ($"c_w_id" === orders("o_w_id")) &&
        ($"c_d_id" === orders("o_d_id"))))
