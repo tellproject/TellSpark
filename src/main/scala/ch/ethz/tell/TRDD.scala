@@ -69,7 +69,6 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
           res = getRecord(addr, offset)
           offset = res._1
           cnt += 1
-          //println(">>>>>>>>cnt:" + cnt + "<<<<<<" + ">>>>>>offset:" + offset + "<<<<<<len:" + len + ">>>>>>>")
         }
         res._2
       }
@@ -90,17 +89,17 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     for (fieldType:Field.FieldType <- tSchema.fixedSizeFields) {
       fieldType match {
         case FieldType.SMALLINT =>
-	  val vv = unsafe.getShort(addr + off)
+          //val vv = unsafe.getShort(addr + off)
           rec.setField(fieldCnt.asInstanceOf[Short], unsafe.getShort(addr + off))
           fieldCnt += 1
           off += 2
         case FieldType.INT | FieldType.FLOAT =>
-	  val vv = unsafe.getInt(addr+off)
+          //val vv = unsafe.getInt(addr+off)
           rec.setField(fieldCnt.asInstanceOf[Short], unsafe.getInt(addr + off))
           fieldCnt += 1
           off += 4
         case FieldType.BIGINT | FieldType.DOUBLE =>
-	  val vv = unsafe.getLong(addr + off)
+          //val vv = unsafe.getLong(addr + off)
           rec.setField(fieldCnt.asInstanceOf[Short], unsafe.getLong(addr + off))
           fieldCnt += 1
           off += 8;
