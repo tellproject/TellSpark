@@ -3,7 +3,9 @@ package ch.ethz.queries
 import java.text.SimpleDateFormat
 import java.util.{Date, GregorianCalendar}
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell
+import ch.ethz.tell.PredicateType.{StringType, IntType}
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 import org.apache.spark.sql.functions._
 
 /**
@@ -65,18 +67,53 @@ class Q8 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
+    // prepare date selection
+    val oSchema = ChTSchema.orderSch
+    val orderQuery = new ScanQuery
+    val oEntryIndex = oSchema.getField("o_entry_d").index
+
+    val dateSelectionLower = new CNFClause
+    dateSelectionLower.addPredicate(
+      ScanQuery.CmpType.GREATER_EQUAL, oEntryIndex, referenceDate2007)
+    orderQuery.addSelection(dateSelectionLower)
+
+    val dateSelectionUpper = new CNFClause
+    dateSelectionUpper.addPredicate(
+      ScanQuery.CmpType.LESS_EQUAL, oEntryIndex, referenceDate2012)
+    orderQuery.addSelection(dateSelectionUpper)
+
+    // prepare orderline id selection
+    val olSchema = ChTSchema.orderLineSch
+    val orderLineQuery = new ScanQuery
+    val olIdIndex = olSchema.getField("ol_i_id").index
+
+    val olIdSelection = new CNFClause
+    olIdSelection.addPredicate(
+      ScanQuery.CmpType.LESS, olIdIndex, new IntType(1000))
+    orderLineQuery.addSelection(olIdSelection)
+
+    // prepare region selection (not sure whether that helps)
+    val rSchema = ChTSchema.regionSch
+    val regionSelection = new CNFClause
+    regionSelection.addPredicate(
+      ScanQuery.CmpType.EQUAL, rSchema.getField("r_name").index, new StringType("Europe"))
+    val regionQuery = new ScanQuery
+    regionQuery.addSelection(regionSelection)
+
     // supplier, stock, orderline, orders, customer, nation n1, nation n2
-    val orderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
-    val forderline = orderline.filter($"ol_i_id" < 1000)
+    val forderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
+//      .filter($"ol_i_id" < 1000)
     val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
-    val n1 = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
-    val n2 = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
+    val n = nationRdd(scc, new ScanQuery, ChTSchema.nationSch)
+    val n1 = n.toDF()
+    val n2 = n.toDF()
     val customer = customerRdd(scc, new ScanQuery, ChTSchema.customerSch).toDF()
-    val forder = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
-    .filter($"o_entry_d".between(20070102, 20120102))
+    val forder = orderRdd(scc, orderQuery, oSchema).toDF()
+//    .filter($"o_entry_d".between(20070102, 20120102))
 
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
-    val fregion = regionRdd(scc, new ScanQuery, ChTSchema.regionSch).toDF().filter($"r_name" === "Europe")
+    val fregion = regionRdd(scc, regionQuery, rSchema).toDF()
+//      .filter($"r_name" === "Europe")
 
     val fitem = itemRdd(scc, new ScanQuery, ChTSchema.itemSch).toDF().filter($"i_data".like("%b"))
     val s_n2 = supplier.join(n2, $"su_nationkey" === n2("n_nationkey"))

@@ -1,6 +1,6 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.{PredicateType, CNFClause, ScanQuery, TSparkContext}
 
 /**
  * Query22
@@ -37,8 +37,20 @@ class Q22 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
-    val customer = customerRdd(scc, new ScanQuery, ChTSchema.customerSch).toDF()
-    val fcustomer = customer.filter($"c_phone".substr(1,1).isin((0 to 7).toList))
+    // prepare phone selection
+    val cSchema = ChTSchema.customerSch
+    val customerQuery = new ScanQuery
+    val cPhoneIndex = cSchema.getField("c_phone").index
+
+    val phoneSelection = new CNFClause
+    for( d <- 1 to 7){
+      phoneSelection.addPredicate(
+        ScanQuery.CmpType.LIKE, cPhoneIndex, PredicateType.create(d.asInstanceOf[String]))
+    }
+    customerQuery.addSelection(phoneSelection)
+
+    val fcustomer = customerRdd(scc, customerQuery, cSchema).toDF()
+      .filter($"c_phone".substr(1,1).isin((0 to 7).toList))
     val order = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
 
     val avg_cbal = fcustomer.filter($"c_balance" > 0).select($"c_balance").agg(avg($"c_balance").as("avg_balance"))
