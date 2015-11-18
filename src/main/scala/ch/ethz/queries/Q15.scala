@@ -48,7 +48,7 @@ class Q15  extends ChQuery {
       .select((($"s_w_id" * $"s_i_id")%10000).as("supplier_no"), $"ol_amount")
     .groupBy($"supplier_no")
     .agg(sum($"ol_amount").as("total_revenue"))
-    .select($"total_revenue")
+    .select($"total_revenue", $"supplier_no")
 
     val res = supplier.join(revenue, $"su_suppkey" === revenue("supplier_no"))
     .filter(revenue("total_revenue") === max(revenue("total_revenue")))

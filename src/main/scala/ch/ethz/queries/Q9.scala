@@ -1,5 +1,6 @@
 package ch.ethz.queries
 
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.{GregorianCalendar, Date}
 
@@ -28,11 +29,11 @@ class Q9 extends ChQuery {
 //  val cal = new GregorianCalendar()
 
   val getYear = udf { (x: Long) => {
+    new Timestamp(x).toString.substring(0,4)
 //    val dt = new Date(x)
 //    sdf.setCalendar(cal)
 //    cal.setTime(dt)
 //    sdf.format(dt)
-    "2010"
     }
   }
 

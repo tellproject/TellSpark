@@ -42,7 +42,7 @@ class Q16  extends ChQuery {
 
     val fsupplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
       .filter($"su_comment".like("%bad%"))
-//      .select($"su_suppkey")
+      .select($"su_suppkey")
 
     val fitem = itemRdd(scc, itemQuery, iSchema).toDF()
     .filter(!$"i_data".like("zz%"))

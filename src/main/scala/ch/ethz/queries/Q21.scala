@@ -52,8 +52,9 @@ class Q21 extends ChQuery {
       .filter($"n_name" === "Germany")
     val order = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
 
-    val s_s_n = supplier.join(fnation, $"su_nationkey" === "n_nationkey")
-    .join(stock, (($"s_w_id" * $"s_i_id")%10000) === $"su_suppkey")
+    val s_n = supplier.join(fnation, $"su_nationkey" === "n_nationkey")
+    val s_s_n = stock.filter((($"s_w_id" * $"s_i_id")%10000) === s_n("su_suppkey"))
+//    .join(stock, (($"s_w_id" * $"s_i_id")%10000) === $"su_suppkey")
 
     val res = orderline1.join(orderline2, ((orderline1("ol_o_id") !== orderline2("ol_o_id")) &&
       (orderline1("ol_w_id") !== orderline2("ol_w_id")) &&
