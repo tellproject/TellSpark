@@ -53,13 +53,13 @@ class Q4 extends ChQuery {
      * where o_id = ol_o_id and o_w_id = ol_w_id and o_d_id = ol_d_id and ol_delivery_d >= o_entry_d
      */
     val forderline = orderline
-      .filter(orderline("ol_delivery_d").geq(orders("o_entry_d")))
-      .select($"ol_o_id", $"ol_w_id", $"ol_d_id").distinct
+      .select($"ol_o_id", $"ol_w_id", $"ol_d_id", $"ol_delivery_d").distinct
 
     val res = forderline.join(orders, ((orders("o_id") === $"ol_o_id") &&
       (orders("o_w_id") === $"ol_w_id") &&
-      (orders("o_d_id") === $"ol_d_id")))
-    .select($"o_ol_cnt")
+      (orders("o_d_id") === $"ol_d_id") &&
+      (orderline("ol_delivery_d").geq(orders("o_entry_d")))))
+    .select($"o_ol_cnt", $"o_id")
     .groupBy($"o_ol_cnt").agg(count($"o_id"))
 
 

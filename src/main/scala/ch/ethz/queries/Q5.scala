@@ -78,7 +78,7 @@ class Q5 extends ChQuery {
 
     val forder = orders.filter(orders("o_entry_d").geq(20070102))
     val fregion = region.filter(region("r_name").eqNullSafe("Europe"))
-    val part_res = customer.join(forder, ($"c_id" === forder("O_C_ID")) &&
+    val part_res = customer.join(forder, ($"c_id" === forder("o_c_id")) &&
       ($"c_w_id" === forder("o_w_id")) &&
       ($"c_d_id" === forder("o_d_id")))
     .join(orderline, (orderline("ol_o_id") === forder("o_id")) &&
