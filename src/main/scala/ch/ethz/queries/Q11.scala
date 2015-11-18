@@ -51,7 +51,7 @@ order by ordercount desc
 
     val inner_res = supplier.join(fnation, $"su_nationkey" === fnation("n_nationkey"))
     .join(stock, $"su_suppkey" === (stock("s_w_id")*stock("s_i_id")%10000))
-    .select($"s_order_cnt", $"sum_order")
+    .select($"s_order_cnt")
     .agg((sum($"s_order_cnt")*0.005).as("sum_order"))
 
     val res = supplier.join(fnation, $"su_nationkey" === fnation("n_nationkey"))

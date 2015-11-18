@@ -30,7 +30,7 @@ class Q17 extends ChQuery {
     val fitem = it.toDF()
       .filter($"i_data".like("%d"))
     val t = fitem.join(orderline1, fitem("i_id") === orderline1("ol_i_id"))
-      .select(fitem("i_id"))
+      .select(fitem("i_id"), orderline1("ol_quantity"))
     .groupBy(fitem("i_id"))
     .agg(avg(orderline1("ol_quantity").as("a")))
 

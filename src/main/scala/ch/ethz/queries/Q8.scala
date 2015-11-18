@@ -134,7 +134,8 @@ class Q8 extends ChQuery {
       ( ($"ol_w_id" === $"o_w_id") &&
       ($"ol_d_id" === $"o_d_id") &&
       ($"ol_o_id" === $"o_id")))
-      .select(getYear($"o_entry_d").as("o_entry_d"), part_res2("n_name"), $"ol_amount")
+      // todo check the "first function"
+      .select(getYear($"o_entry_d").as("o_entry_d"), first(part_res2("n_name")), $"ol_amount")
     .groupBy(getYear($"o_entry_d"))
     .agg(mkr_share(part_res2("n_name"), $"ol_amount")/sum($"ol_amount"))
 

@@ -36,7 +36,7 @@ class Q18  extends ChQuery {
     .join(orderline, orderline("ol_w_id") === $"o_w_id" &&
       orderline("ol_d_id") === $"o_d_id" &&
       orderline("ol_o_id") === $"o_id")
-    .select("c_last", "c_id", "o_id", "o_entry_d", "o_ol_cnt")
+    .select("c_last", "c_id", "o_id", "o_entry_d", "o_ol_cnt", "ol_amount")
     .agg(sum($"ol_amount").as("tot_amount"))
     .filter($"tot_amount" > 20000)
     .orderBy($"tot_amount".desc, $"o_entry_d")

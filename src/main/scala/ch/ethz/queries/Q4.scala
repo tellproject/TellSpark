@@ -43,7 +43,7 @@ class Q4 extends ChQuery {
     val dateSelectionUpper = new CNFClause
     dateSelectionUpper.addPredicate(
       ScanQuery.CmpType.LESS, oEntryIndex, referenceDate2012)
-    orderQuery.addSelection(dateSelectionUpper)
+//    orderQuery.addSelection(dateSelectionUpper)
 
     val oo = orderRdd(scc, orderQuery, oSchema)
 //    if (logger.isDebugEnabled) {

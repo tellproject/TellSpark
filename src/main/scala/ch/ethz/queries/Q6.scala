@@ -32,20 +32,20 @@ class Q6 extends ChQuery {
     val dateSelectionUpper = new CNFClause
     dateSelectionUpper.addPredicate(
     ScanQuery.CmpType.LESS, oDeliveryIndex, referenceDate2020First)
-    orderLineQuery.addSelection(dateSelectionUpper)
+//    orderLineQuery.addSelection(dateSelectionUpper)
 
     // prepare quantity selection
     val oQuantityIndex = oSchema.getField("ol_quantity").index
     val quantitySelectionLower = new CNFClause
     quantitySelectionLower.addPredicate(
       ScanQuery.CmpType.GREATER_EQUAL, oQuantityIndex, PredicateType.create(1: Short))
-    orderLineQuery.addSelection(quantitySelectionLower)
+//    orderLineQuery.addSelection(quantitySelectionLower)
 
     val quantitySelectionUpper = new CNFClause
     quantitySelectionUpper.addPredicate(
       ScanQuery.CmpType.LESS, oQuantityIndex, PredicateType.create(100: Short))
     // the original benchmark says 100000 which is not a numeric(2)!!
-    orderLineQuery.addSelection(quantitySelectionUpper)
+    //orderLineQuery.addSelection(quantitySelectionUpper)
 
     //todo: push down aggregation!
 

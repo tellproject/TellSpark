@@ -55,7 +55,7 @@ class Q9 extends ChQuery {
     .join(fitem, $"ol_i_id" === fitem("i_id"))
     .join(orders, $"ol_w_id" === orders("o_w_id") && $"ol_d_id" === orders("o_d_id") && $"ol_o_id" === orders("o_id"))
     val res = part_res
-      .select($"n_name", getYear($"o_entry_d").as("l_year"))
+      .select($"n_name", getYear($"o_entry_d").as("l_year"), $"ol_amount")
       //n_name, extract(year from o_entry_d) as l_year, sum(ol_amount) as sum_profit
       .groupBy($"n_name", $"l_year")
       .agg(sum($"ol_amount").as("sum_profit"))

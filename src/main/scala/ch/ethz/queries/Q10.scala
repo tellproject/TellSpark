@@ -33,7 +33,7 @@ class Q10  extends ChQuery {
     dateSelection.addPredicate(
       ScanQuery.CmpType.GREATER_EQUAL, oSchema.getField("o_entry_d").index, referenceDate2007)
     val orderQuery = new ScanQuery
-    orderQuery.addSelection(dateSelection)
+//    orderQuery.addSelection(dateSelection)
 
     val cc = customerRdd(scc, new ScanQuery, ChTSchema.customerSch)
     val oo = orderRdd(scc, orderQuery, oSchema)

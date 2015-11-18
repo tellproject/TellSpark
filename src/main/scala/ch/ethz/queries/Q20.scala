@@ -34,9 +34,9 @@ class Q20 extends ChQuery {
     import sqlContext.implicits._
 
     // prepare date selection
-    val oSchema = ChTSchema.orderSch
+    val olSchema = ChTSchema.orderLineSch
     val orderLineQuery = new ScanQuery
-    val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
+    val oDeliveryIndex = olSchema.getField("ol_delivery_d").index
 
     val dateSelection = new CNFClause
     dateSelection.addPredicate(
@@ -67,7 +67,7 @@ class Q20 extends ChQuery {
     val fitem = itemRdd(scc, itemQuery, iSchema).toDF()
 //      .filter($"i_data".like("co%"))
       .select($"i_id")
-    val forderline = orderLineRdd(scc, orderLineQuery, oSchema).toDF()
+    val forderline = orderLineRdd(scc, orderLineQuery, olSchema).toDF()
 //      .filter($"ol_delivery_d" > 20100523)
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
     val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()

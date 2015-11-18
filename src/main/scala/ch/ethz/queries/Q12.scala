@@ -27,7 +27,7 @@ class Q12  extends ChQuery {
     val low_line_count = udf { (x: Int) => if (x != 1 && x != 2) 1 else 0 }
 
     // prepare date selection
-    val oSchema = ChTSchema.orderSch
+    val oSchema = ChTSchema.orderLineSch
     val orderlineQuery = new ScanQuery
     val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
 

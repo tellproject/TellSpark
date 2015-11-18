@@ -52,7 +52,7 @@ class Q16  extends ChQuery {
     .join(fitem, $"i_id" === $"s_i_id")
     .select($"i_name",
         $"i_data".substr(1, 3).as("brand"),
-        $"i_price,",
+        $"i_price",
         countDistinct(($"s_w_id" * $"s_i_id")%10000).as("supplier_cnt"))
     //TODO double check other queries with similar structure
     timeCollect(res, 16)

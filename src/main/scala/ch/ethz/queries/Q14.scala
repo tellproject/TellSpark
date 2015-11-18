@@ -21,9 +21,9 @@ class Q14 extends ChQuery {
     import sqlContext.implicits._
 
     // prepare date selection
-    val oSchema = ChTSchema.orderSch
+    val olSchema = ChTSchema.orderLineSch
     val orderLineQuery = new ScanQuery
-    val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
+    val oDeliveryIndex = olSchema.getField("ol_delivery_d").index
 
     val dateSelectionLower = new CNFClause
     dateSelectionLower.addPredicate(
@@ -37,7 +37,7 @@ class Q14 extends ChQuery {
 
     val promo = udf { (x: String, y: Double) => if (x.startsWith("PR")) y else 0 }
 
-    val forderline = orderLineRdd(scc, orderLineQuery, oSchema).toDF()
+    val forderline = orderLineRdd(scc, orderLineQuery, olSchema).toDF()
 //      .filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" < 20200102)
     val item = itemRdd(scc, new ScanQuery, ChTSchema.itemSch).toDF()
     val res = forderline.join(item, $"ol_i_id" === item("i_id"))

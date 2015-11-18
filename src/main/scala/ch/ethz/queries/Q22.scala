@@ -45,7 +45,7 @@ class Q22 extends ChQuery {
     val phoneSelection = new CNFClause
     for( d <- 1 to 7){
       phoneSelection.addPredicate(
-        ScanQuery.CmpType.LIKE, cPhoneIndex, PredicateType.create(d.asInstanceOf[String]))
+        ScanQuery.CmpType.LIKE, cPhoneIndex, PredicateType.create(String.valueOf(d)))
     }
 //    customerQuery.addSelection(phoneSelection)
 
