@@ -79,10 +79,10 @@ case class Order(O_ID: Int,
 
 case class OrderLine(OL_O_ID: Int,
                      OL_D_ID: Short,
-                     OL_W_ID: Int,
+                     OL_W_ID: Short,
                      OL_NUMBER: Short,
                      OL_I_ID: Int,
-                     OL_SUPPLY_W_ID: Int,
+                     OL_SUPPLY_W_ID: Short,
                      OL_DELIVERY_D: Long, // datetime
                      OL_QUANTITY: Short,
                      OL_AMOUNT: Int, // numeric (6,2)
@@ -301,10 +301,10 @@ class ChQuery {
     new TRDD[TRecord](scc, "order-line", scanQuery, tSchema).map(r => {
       OrderLine(r.getValue("ol_o_id").asInstanceOf[Int],
         r.getValue("ol_d_id").asInstanceOf[Short],
-        r.getValue("ol_e_id").asInstanceOf[Int],
+        r.getValue("ol_w_id").asInstanceOf[Short],
         r.getValue("ol_number").asInstanceOf[Short],
         r.getValue("ol_i_id").asInstanceOf[Int],
-        r.getValue("ol_supply_w_id").asInstanceOf[Int],
+        r.getValue("ol_supply_w_id").asInstanceOf[Short],
         r.getValue("ol_delivery_d").asInstanceOf[Long],
         r.getValue("ol_quantity").asInstanceOf[Short],
         r.getValue("ol_amount").asInstanceOf[Int],
