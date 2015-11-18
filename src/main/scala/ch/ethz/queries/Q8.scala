@@ -136,7 +136,7 @@ class Q8 extends ChQuery {
       ($"ol_o_id" === $"o_id")))
       .select(getYear($"o_entry_d").as("o_entry_d"), $"n_name", $"ol_amount")
     .groupBy(getYear($"o_entry_d"))
-    .agg(mkr_share($"n_name", $"ol_amount")/sum($"ol_amount"))
+    .agg(mkr_share(part_res2("n_name"), $"ol_amount")/sum($"ol_amount"))
 
     timeCollect(res, 8)
   }

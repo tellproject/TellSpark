@@ -97,7 +97,7 @@ class Q5 extends ChQuery {
       (part_res("c_state").substr(1,1).eq(jsupp("su_nationkey"))))
     //todo push down filter
     val res = part_2.groupBy(part_2("n_name"))
-    .agg(sum("$ol_amount").as("revenue"))
+    .agg(sum($"ol_amount").as("revenue"))
     .orderBy("revenue")
     .select("n_name", "revenue")
 
