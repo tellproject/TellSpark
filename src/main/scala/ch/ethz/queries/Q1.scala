@@ -36,13 +36,13 @@ class Q1 extends ChQuery {
 
     //ToDo projection push downs
     val res = orderline
-      .groupBy($"OL_NUMBER")
-      .agg(sum($"OL_AMOUNT"),
-        sum($"OL_QUANTITY"),
-        avg($"OL_QUANTITY"),
-        avg($"OL_AMOUNT"),
-        count($"OL_NUMBER"))
-      .sort($"OL_NUMBER")
+      .groupBy($"ol_number")
+      .agg(sum($"ol_amount"),
+        sum($"ol_quantity"),
+        avg($"ol_quantity"),
+        avg($"ol_amount"),
+        count($"ol_number"))
+      .sort($"ol_number")
 
     timeCollect(res, 1)
   }
