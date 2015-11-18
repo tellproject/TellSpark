@@ -1,6 +1,6 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 
 /**
  * select	 c_id, c_last, sum(ol_amount) as revenue, c_city, c_phone, n_name
@@ -27,20 +27,29 @@ class Q10  extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
+    // prepare date selection
+    val oSchema = ChTSchema.orderSch
+    val dateSelection = new CNFClause
+    dateSelection.addPredicate(
+      ScanQuery.CmpType.GREATER_EQUAL, oSchema.getField("o_entry_d").index, referenceDate2007)
+    val orderQuery = new ScanQuery
+    orderQuery.addSelection(dateSelection)
+
     val cc = customerRdd(scc, new ScanQuery, ChTSchema.customerSch)
-    val oo = orderRdd(scc, new ScanQuery, ChTSchema.orderSch)
+    val oo = orderRdd(scc, orderQuery, oSchema)
     val ol = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch)
     val nn = nationRdd(scc, new ScanQuery, ChTSchema.nationSch)
 
-    val forderline = oo.toDF().filter($"o_entry_d" >= 20070102)
+    val orderline = ol.toDF()
     val customer = cc.toDF()
     val nation = nn.toDF()
-    val orders = oo.toDF()
+    val forders = oo.toDF()
+    //      .filter($"o_entry_d" >= 20070102)
     val c_n = customer.join(nation, $"c_state".substr(1,1) === nation("n_nationkey"))
-    val o_ol = orders.join(forderline, (forderline("ol_w_id") === $"o_w_id" &&
-      forderline("ol_d_id") === $"o_d_id" &&
-      forderline("ol_o_id") === $"o_id" &&
-      forderline("ol_delivery_d") >= $"o_entry_d" ) )
+    val o_ol = forders.join(orderline, (orderline("ol_w_id") === $"o_w_id" &&
+      orderline("ol_d_id") === $"o_d_id" &&
+      orderline("ol_o_id") === $"o_id" &&
+      orderline("ol_delivery_d") >= $"o_entry_d" ) )
     val res = c_n.join(o_ol, ( (c_n("c_id") === o_ol("o_c_id")) &&
       (c_n("c_w_id") === o_ol("o_w_id")) &&
       (c_n("c_d_id") === o_ol("o_d_id")) ))
