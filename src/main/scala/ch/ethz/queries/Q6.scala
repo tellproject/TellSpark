@@ -45,7 +45,7 @@ class Q6 extends ChQuery {
     quantitySelectionUpper.addPredicate(
       ScanQuery.CmpType.LESS, oQuantityIndex, PredicateType.create(100: Short))
     // the original benchmark says 100000 which is not a numeric(2)!!
-    orderLineQuery.addSelection(quantitySelectionLower)
+    orderLineQuery.addSelection(quantitySelectionUpper)
 
     //todo: push down aggregation!
 

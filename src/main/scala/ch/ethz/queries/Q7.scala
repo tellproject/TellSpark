@@ -59,7 +59,7 @@ class Q7 extends ChQuery {
     import sqlContext.implicits._
 
     // prepare date selection
-    val oSchema = ChTSchema.orderSch
+    val oSchema = ChTSchema.orderLineSch
     val orderlineQuery = new ScanQuery
     val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
 
