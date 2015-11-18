@@ -94,29 +94,24 @@ case class Item(I_ID: Int,
                 I_PRICE: Int, // numeric (5,2)
                 I_DATA: String)
 
-case class Stock(S_I_ID: Int,
-                 S_W_ID: Short,
-                 S_QUANTITY: Int,
-                 S_DIST_01: String,
-                 S_DIST_02: String,
-                 S_DIST_03: String,
-                 S_DIST_04: String,
-                 S_DIST_05: String,
-                 S_DIST_06: String,
-                 S_DIST_07: String,
-                 S_DIST_08: String,
-                 S_DIST_09: String,
-                 S_DIST_10: String,
-                 S_YTD: Int,
-                 S_ORDER_CNT: Short,
-                 S_REMOTE_CNT: Short,
-                 S_DATA: String,
-                 S_SU_SUPPKEY: Short) {
-  def this(S_I_ID: Int, S_W_ID: Short, S_QUANTITY: Int, S_DIST_01: String, S_DIST_02: String, S_DIST_03: String,
-           S_DIST_04: String, S_DIST_05: String, S_DIST_06: String, S_DIST_07: String, S_DIST_08: String,
-           S_DIST_09: String, S_DIST_10: String, S_YTD: Int, S_ORDER_CNT: Short, S_REMOTE_CNT: Short, S_DATA: String) =
-    this(S_I_ID, S_W_ID, S_QUANTITY, S_DIST_01, S_DIST_02, S_DIST_03, S_DIST_04, S_DIST_05, S_DIST_06, S_DIST_07,
-      S_DIST_08, S_DIST_09, S_DIST_10, S_YTD, S_ORDER_CNT, S_REMOTE_CNT, S_DATA, 0)
+case class Stock(s_i_id: Int,
+                 s_w_id: Short,
+                 s_quantity: Int,
+                 s_dist_01: String,
+                 s_dist_02: String,
+                 s_dist_03: String,
+                 s_dist_04: String,
+                 s_dist_05: String,
+                 s_dist_06: String,
+                 s_dist_07: String,
+                 s_dist_08: String,
+                 s_dist_09: String,
+                 s_dist_10: String,
+                 s_ytd: Int,
+                 s_order_cnt: Short,
+                 s_remote_cnt: Short,
+                 s_data: String,
+                 s_su_suppkey: Short) {
 }
 
 case class Nation(N_NATIONKEY: Short,
