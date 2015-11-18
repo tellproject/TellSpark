@@ -32,28 +32,28 @@ case class District(D_ID: Short,
                     D_YTD: Long, // numeric (12,2)
                     D_NEXT_O_ID: Int)
 
-case class Customer(C_ID: Int,
-                    C_D_ID: Int,
-                    C_W_ID: Int,
-                    C_FIRST: String,
-                    C_MIDDLE: String,
-                    C_LAST: String,
-                    C_STREET_1: String,
-                    C_STREET_2: String,
-                    C_CITY: String,
-                    C_STATE: String,
-                    C_ZIP: String,
-                    C_PHONE: String,
-                    C_SINCE: Long,
-                    C_CREDIT: String,
-                    C_CREDIT_LIM: Long, // numeric (12,2)
-                    C_DISCOUNT: Int, // numeric (4,4)
-                    C_BALANCE: Long, // numeric (12,2)
-                    C_YTD_PAYMENT: Long, // numeric (12,2)
-                    C_PAYMENT_CNT: Short,
-                    C_DELIVERY_CNT: Short,
-                    C_DATA: String,
-                    C_N_NATIONKEY: Int)
+case class Customer(c_id: Int,
+                    c_d_id: Int,
+                    c_w_id: Int,
+                    c_first: String,
+                    c_middle: String,
+                    c_last: String,
+                    c_street_1: String,
+                    c_street_2: String,
+                    c_city: String,
+                    c_state: String,
+                    c_zip: String,
+                    c_phone: String,
+                    c_since: Long,
+                    c_credit: String,
+                    c_credit_lim: Long, // numeric (12,2)
+                    c_discount: Int, // numeric (4,4)
+                    c_balance: Long, // numeric (12,2)
+                    c_ytd_payment: Long, // numeric (12,2)
+                    c_payment_cnt: Short,
+                    c_delivery_cnt: Short,
+                    c_data: String,
+                    c_n_nationkey: Int)
 
 case class History(H_C_ID: Int,
                    H_C_D_ID: Short,
