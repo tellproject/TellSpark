@@ -14,14 +14,19 @@ where	 i_id = s_i_id
    and i_id = ol_i_id
 	 and ol_i_id = s_i_id
 	 and ol_supply_w_id = s_w_id
+
 	 and mod((s_w_id * s_i_id),10000) = su_suppkey
+
 	 and ol_w_id = o_w_id
 	 and ol_d_id = o_d_id
 	 and ol_o_id = o_id
+
 	 and c_id = o_c_id
 	 and c_w_id = o_w_id
 	 and c_d_id = o_d_id
+
 	 and n1.n_nationkey = ascii(substr(c_state,1,1))
+
 	 and n1.n_regionkey = r_regionkey
 
 	 and ol_i_id < 1000
@@ -77,6 +82,22 @@ class Q8 extends ChQuery {
     val fitem = itemRdd(scc, new ScanQuery, ChTSchema.itemSch).toDF().filter($"i_data".like("%b"))
     val s_n2 = supplier.join(n2, $"su_nationkey" === n2("n_nationkey"))
     val r_n1 = region.join(n1, $"r_regionkey" === n1("n_regionkey"))
+
+    //mod((s_w_id * s_i_id),10000) = su_suppkey
+    val part_res1 = stock.join(s_n2, ($"s_w_id"*$"s_i_id")%10000 === s_n2("su_suppkey"))
+      //and ol_i_id = s_i_id and ol_supply_w_id = s_w_id
+    .join(forderline, ($"s_i_id" === forderline("ol_i_id") && ($"s_w_id" === forderline("ol_supply_w_id"))) )
+    .join(fitem, (($"i_id" === $"s_i_id") && ($"i_id" === $"ol_i_id")))
+
+    // n1.n_nationkey = ascii(substr(c_state,1,1)) and
+    // c_id = o_c_id and c_w_id = o_w_id and c_d_id = o_d_id
+    val part_res2 = customer.join(r_n1, $"c_state".substr(1,1) === r_n1("n_nationkey"))
+    .join(forder, (($"o_c_id" === $"c_id") && ($"c_w_id" === $"o_w_id") && ($"c_d_id" === $"o_d_id")))
+    //ol_w_id = o_w_id and ol_d_id = o_d_id and ol_o_id = o_id
+    val res = part_res1.join(part_res2,
+      ( ($"ol_w_id" === $"o_w_id") &&
+      ($"ol_d_id" === $"o_d_id") &&
+      ($"ol_o_id" === $"o_id")))
 
   }
 
