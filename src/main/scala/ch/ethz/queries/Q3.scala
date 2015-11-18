@@ -50,7 +50,7 @@ class Q3 extends ChQuery {
      * group by ol_o_id, ol_w_id, ol_d_id, o_entry_d
      * order by revenue desc, o_entry_d
      */
-     customer
+     val res = customer
 //       .filter(customer("c_state").like("A%"))
        .join(orders, (($"c_id" === orders("o_c_id")) &&
        ($"c_w_id" === orders("o_w_id")) &&
@@ -64,10 +64,9 @@ class Q3 extends ChQuery {
 //    .filter(orders("o_entry_d") > 20070102)
     .groupBy(orderline("ol_o_id"), orderline("ol_w_id"), orderline("ol_d_id"), orders("o_entry_d"))
     .agg(sum($"ol_amount").as("revenue"))
-    .select(orderline("OL_O_ID"), orderline("ol_w_id"), orderline("ol_d_id"), orders("o_entry_d"))
+    .select(orderline("ol_o_id"), orderline("ol_w_id"), orderline("ol_d_id"), orders("o_entry_d"))
     .orderBy($"revenue".desc, orders("o_entry_d"))
 
-//    res.collect()
-    //    println("[TUPLES] %d".format(result.length))
+    timeCollect(res, 3)
   }
 }
