@@ -83,7 +83,7 @@ class Q7 extends ChQuery {
       ScanQuery.CmpType.EQUAL, nNameIndex, new StringType("Germany"))
     nationSelection.addPredicate(
       ScanQuery.CmpType.EQUAL, nNameIndex, new StringType("Cambodia"))
-    nationQuery.addSelection(nationSelection)
+//    nationQuery.addSelection(nationSelection)
 
     // supplier, stock, orderline, orders, customer, nation n1, nation n2
     val forderline = orderLineRdd(scc, orderlineQuery, oSchema).toDF()

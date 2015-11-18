@@ -98,7 +98,7 @@ class Q8 extends ChQuery {
     regionSelection.addPredicate(
       ScanQuery.CmpType.EQUAL, rSchema.getField("r_name").index, new StringType("Europe"))
     val regionQuery = new ScanQuery
-    regionQuery.addSelection(regionSelection)
+//    regionQuery.addSelection(regionSelection)
 
     // supplier, stock, orderline, orders, customer, nation n1, nation n2
     val forderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
@@ -113,7 +113,7 @@ class Q8 extends ChQuery {
 
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
     val fregion = regionRdd(scc, regionQuery, rSchema).toDF()
-//      .filter($"r_name" === "Europe")
+      .filter($"r_name" === "Europe")
 
     val fitem = itemRdd(scc, new ScanQuery, ChTSchema.itemSch).toDF().filter($"i_data".like("%b"))
     val s_n2 = supplier.join(n2, $"su_nationkey" === n2("n_nationkey"))
