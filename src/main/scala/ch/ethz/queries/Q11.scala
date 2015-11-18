@@ -60,7 +60,7 @@ order by ordercount desc
     .groupBy($"s_i_id")
     .agg(sum($"s_order_cnt").as("ordercount"))
       //TODO to be checked
-    .filter($"ordercount" > inner_res("sum_order"))
+    .join(inner_res, $"ordercount" > inner_res("sum_order"))
 
     timeCollect(res, 11)
   }

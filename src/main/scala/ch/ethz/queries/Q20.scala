@@ -75,7 +75,8 @@ class Q20 extends ChQuery {
       .filter($"n_name" === "Germany")
 
     val inner_query = stock
-      .join(forderline, (forderline("ol_i_id")===$"s_i_id") && ($"s_i_id".isin(fitem("i_id")) ))//TODO do with a join with item?
+      .join(forderline, (forderline("ol_i_id")===$"s_i_id"))
+      .join(fitem, $"s_i_id".isin(fitem("i_id")) )//TODO do with a join with item?
       .groupBy($"s_i_id", $"s_w_id", $"s_quantity")
       .agg(sum($"ol_quantity").as("sum_qty"))
       .filter($"s_quantity".*(2) > $"sum_qty")

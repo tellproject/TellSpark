@@ -106,14 +106,14 @@ class Q7 extends ChQuery {
     .join(order, (order("o_c_id") === customer("c_id")) &&
       (order("o_w_id") === customer("c_w_id")) &&
       (order("o_d_id") === customer("c_d_id")))
-    .select($"o_d_id", $"o_id", $"o_w_id", $"c_state")
+    .select($"o_d_id", $"o_id", $"o_w_id", $"c_state", $"su_suppkey")
 
     val c_o_fol = c_s_o.join(forderline, ((forderline("ol_w_id") === order("o_w_id")) &&
       (forderline("ol_d_id") === order("o_d_id")) &&
       (forderline("ol_o_id") === order("o_id"))))
     .join(stock, ((stock("s_w_id") === forderline("ol_supply_w_id")) &&
       (stock("s_i_id") === forderline("ol_i_id")) &&
-      ( stock("s_i_id")*stock("s_w_id") % 10000 === suppNation("su_suppkey"))))
+      ( stock("s_i_id")*stock("s_w_id") % 10000 === c_s_o("su_suppkey"))))
 
     val res = c_o_fol
       .select($"su_nationkey".as("supp_nation"),

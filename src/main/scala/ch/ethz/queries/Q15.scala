@@ -46,7 +46,7 @@ class Q15  extends ChQuery {
 
     val revenue = forderline.join(stock, ($"ol_i_id" === stock("s_i_id") && $"ol_supply_w_id" === stock("s_w_id")))
       .select((($"s_w_id" * $"s_i_id")%10000).as("supplier_no"))
-    .groupBy((($"s_w_id" * $"s_i_id")%10000))
+    .groupBy($"supplier_no")
     .agg(sum($"ol_amount").as("total_revenue"))
 
     val res = supplier.join(revenue, $"su_suppkey" === revenue("supplier_no"))

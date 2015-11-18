@@ -62,12 +62,12 @@ class Q21 extends ChQuery {
       //ol_w_id = s_w_id and ol_i_id = s_i_id
     .join(s_s_n,
         orderline1("ol_w_id") === $"s_w_id" &&
-        orderline1("ol_i_id") === $"s_i_id" &&
-        orderline1("ol_delivery_d") > $"o_entry_d")
+        orderline1("ol_i_id") === $"s_i_id")
     .join(order,
         orderline1("ol_o_id") === $"o_id" &&
         orderline1("ol_w_id") === $"o_w_id" &&
-        orderline1("ol_d_id") === $"o_d_id")
+        orderline1("ol_d_id") === $"o_d_id" &&
+        orderline1("ol_delivery_d") > $"o_entry_d")
     .select($"su_name")
     .groupBy($"su_name")
       // todo is this the same? count(*) as numwait

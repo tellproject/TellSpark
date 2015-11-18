@@ -40,10 +40,11 @@ class Q12  extends ChQuery {
     val forderline = orderLineRdd(scc, orderlineQuery, oSchema).toDF()
 //      .filter($"ol_delivery_d" < 20200101)
 
-    val res = orders.join(forderline, ($"ol_w_id" === forderline("o_w_id")) &&
-      ($"ol_d_id" === forderline("o_d_id")) &&
-      ($"ol_o_id" === forderline("o_id")) &&
-      (forderline("o_entry_d") <= $"ol_delivery_d"))
+    val res = orders.join(forderline, forderline("ol_w_id") === $"o_w_id" &&
+      forderline("ol_d_id") === $"o_d_id" &&
+      forderline("ol_o_id") === $"o_id" &&
+      forderline("o_entry_d") <= $"ol_delivery_d")
+
     .select($"o_ol_cnt")
     .groupBy($"o_ol_cnt")
     .agg(sum(high_line_count($"o_carrier_id")), sum(low_line_count($"o_carrier_id")) )

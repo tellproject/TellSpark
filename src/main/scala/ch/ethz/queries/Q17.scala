@@ -32,10 +32,10 @@ class Q17 extends ChQuery {
     val t = fitem.join(orderline1, fitem("i_id") === orderline1("ol_i_id"))
       .select(fitem("i_id"), orderline1("ol_quantity"))
     .groupBy(fitem("i_id"))
-    .agg(avg(orderline1("ol_quantity").as("a")))
+    .agg(avg(orderline1("ol_quantity").as("avg_qty")))
 
     val res = orderline2
-      .join(t, t("i_id") === $"ol_i_id" && $"ol_quantity" < t("a"))
+      .join(t, t("i_id") === $"ol_i_id" && $"ol_quantity" < t("avg_qty"))
       .agg(sum("ol_amount")./(2.0).as("avg_yearly"))
 
     timeCollect(res, 17)
