@@ -53,7 +53,7 @@ class Q22 extends ChQuery {
       .filter($"c_phone".substr(1,1).isin("1","2","3","4","5","6","7"))
     val order = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
 
-    val avg_cbal = fcustomer.filter($"c_balance" > 0).select($"c_balance").agg(avg($"c_balance").as("avg_balance"))
+    val avg_cbal = fcustomer.filter($"c_balance" > 0).select($"c_balance").agg(avg($"c_balance")).as("avg_balance")
 
     val res = fcustomer.join(order,
       $"c_id" !== order("o_c_id")

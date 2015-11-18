@@ -45,7 +45,7 @@ class Q12  extends ChQuery {
       forderline("ol_o_id") === $"o_id" &&
       $"o_entry_d" <= forderline("ol_delivery_d"))
 
-    .select($"o_ol_cnt")
+    .select($"o_ol_cnt", $"o_carrier_id")
     .groupBy($"o_ol_cnt")
     .agg(sum(high_line_count($"o_carrier_id")), sum(low_line_count($"o_carrier_id")) )
     .orderBy($"o_ol_cnt")

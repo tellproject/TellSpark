@@ -51,7 +51,7 @@ class Q20 extends ChQuery {
     val nationSelection = new CNFClause
     nationSelection.addPredicate(
       ScanQuery.CmpType.EQUAL, nNameIndex, new StringType("Germany"))
-//    nationQuery.addSelection(nationSelection)
+    nationQuery.addSelection(nationSelection)
 
     // prepare date selection
     val iSchema = ChTSchema.itemSch
@@ -61,11 +61,11 @@ class Q20 extends ChQuery {
     val dataSelection = new CNFClause
     dataSelection.addPredicate(
       ScanQuery.CmpType.LIKE, iDataIndex, new StringType("co%"))
-    itemQuery.addSelection(dataSelection)
+//    itemQuery.addSelection(dataSelection)
 
     //select i_id from item where i_data like 'co%'
     val fitem = itemRdd(scc, itemQuery, iSchema).toDF()
-//      .filter($"i_data".like("co%"))
+      .filter($"i_data".like("co%"))
       .select($"i_id")
     val forderline = orderLineRdd(scc, orderLineQuery, olSchema).toDF()
 //      .filter($"ol_delivery_d" > 20100523)
