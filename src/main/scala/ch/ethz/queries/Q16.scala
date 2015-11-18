@@ -38,14 +38,14 @@ class Q16  extends ChQuery {
     val dataSelection = new CNFClause
     dataSelection.addPredicate(
       ScanQuery.CmpType.NOT_LIKE, iDataIndex, new StringType("zz%"))
-    itemQuery.addSelection(dataSelection)
+//    itemQuery.addSelection(dataSelection)
 
     val fsupplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
       .filter($"su_comment".like("%bad%"))
 //      .select($"su_suppkey")
 
     val fitem = itemRdd(scc, itemQuery, iSchema).toDF()
-//    .filter(!$"i_data".like("zz%"))
+    .filter(!$"i_data".like("zz%"))
 
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
     val res = stock.join(fsupplier, ( ($"s_w_id" * $"s_i_id")%10000 !== (fsupplier("su_suppkey")) ))
