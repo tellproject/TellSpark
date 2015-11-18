@@ -59,7 +59,7 @@ class Q5 extends ChQuery {
     regionSelection.addPredicate(
       ScanQuery.CmpType.EQUAL, rSchema.getField("r_name").index, new StringType("Europe"))
     val regionQuery = new ScanQuery
-    regionQuery.addSelection(regionSelection)
+//    regionQuery.addSelection(regionSelection)
 
     //orderline
     val orderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
@@ -76,8 +76,10 @@ class Q5 extends ChQuery {
     //region
     val region = regionRdd(scc, regionQuery, rSchema).toDF()
 
-    val forder = orders.filter(orders("o_entry_d").geq(20070102))
-    val fregion = region.filter(region("r_name").eqNullSafe("Europe"))
+    val forder = orders
+//      .filter(orders("o_entry_d").geq(20070102))
+    val fregion = region
+      .filter(region("r_name").eqNullSafe("Europe"))
     val part_res = customer.join(forder, ($"c_id" === forder("O_C_ID")) &&
       ($"c_w_id" === forder("o_w_id")) &&
       ($"c_d_id" === forder("o_d_id")))
