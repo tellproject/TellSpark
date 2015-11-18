@@ -3,6 +3,8 @@ package ch.ethz.queries
 import java.text.SimpleDateFormat
 import java.util.{Date, GregorianCalendar}
 
+import ch.ethz.tell
+import ch.ethz.tell.PredicateType.StringType
 import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 import org.apache.spark.sql.functions.udf
 
@@ -60,7 +62,6 @@ class Q7 extends ChQuery {
     val oSchema = ChTSchema.orderSch
     val orderlineQuery = new ScanQuery
     val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
-    val oQuantityIndex = oSchema.getField("ol_quantity").index
 
     val dateSelectionLower = new CNFClause
     dateSelectionLower.addPredicate(
@@ -72,12 +73,25 @@ class Q7 extends ChQuery {
       ScanQuery.CmpType.LESS_EQUAL, oDeliveryIndex, referenceDate2012)
     orderlineQuery.addSelection(dateSelectionUpper)
 
+    // prepare nation selection
+    val nSchema = ChTSchema.nationSch
+    val nationQuery = new ScanQuery
+    val nNameIndex = nSchema.getField("n_name").index
+
+    val nationSelection = new CNFClause
+    nationSelection.addPredicate(
+      ScanQuery.CmpType.EQUAL, nNameIndex, new StringType("Germany"))
+    nationSelection.addPredicate(
+      ScanQuery.CmpType.EQUAL, nNameIndex, new StringType("Cambodia"))
+    nationQuery.addSelection(nationSelection)
+
     // supplier, stock, orderline, orders, customer, nation n1, nation n2
-    val orderline = orderLineRdd(scc, orderlineQuery, oSchema).toDF()
-    val forderline = orderline.filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" <= 20120102 )
+    val forderline = orderLineRdd(scc, orderlineQuery, oSchema).toDF()
+//    val forderline = orderline.filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" <= 20120102 )
     val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
-    val n1 = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
-    val n2 = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
+    val nRDD = nationRdd(scc, new ScanQuery, ChTSchema.nationSch)
+    val n1 = nRDD.toDF()
+    val n2 = nRDD.toDF()
     val customer = customerRdd(scc, new ScanQuery, ChTSchema.customerSch).toDF()
     val order = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()

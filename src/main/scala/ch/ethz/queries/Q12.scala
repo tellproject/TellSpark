@@ -1,6 +1,6 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 
 /**
  * select	 o_ol_cnt,
@@ -26,8 +26,19 @@ class Q12  extends ChQuery {
     val high_line_count = udf { (x: Int) => if (x == 1 || x == 2) 1 else 0 }
     val low_line_count = udf { (x: Int) => if (x != 1 && x != 2) 1 else 0 }
 
+    // prepare date selection
+    val oSchema = ChTSchema.orderSch
+    val orderlineQuery = new ScanQuery
+    val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
+
+    val dateSelection = new CNFClause
+    dateSelection.addPredicate(
+      ScanQuery.CmpType.LESS, oDeliveryIndex, referenceDate2020First)
+    orderlineQuery.addSelection(dateSelection)
+
     val orders = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
-    val forderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF().filter($"ol_delivery_d" < 20200101)
+    val forderline = orderLineRdd(scc, orderlineQuery, oSchema).toDF()
+//      .filter($"ol_delivery_d" < 20200101)
 
     val res = orders.join(forderline, ($"ol_w_id" === forderline("o_w_id")) &&
       ($"ol_d_id" === forderline("o_d_id")) &&

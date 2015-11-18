@@ -1,6 +1,7 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
+import ch.ethz.tell.PredicateType.ShortType
 
 /**
  * select	 c_count, count(*) as custdist
@@ -22,9 +23,20 @@ class Q13 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
+    // prepare date selection
+    val oSchema = ChTSchema.orderSch
+    val orderQuery = new ScanQuery
+    val oCarrierIndex = oSchema.getField("o_carrier_id").index
+
+    val carrierSelection = new CNFClause
+    carrierSelection.addPredicate(
+      ScanQuery.CmpType.GREATER, oCarrierIndex, new ShortType((8).asInstanceOf[Short]))
+    orderQuery.addSelection(carrierSelection)
+
     val customer = customerRdd(scc, new ScanQuery, ChTSchema.customerSch).toDF()
 
-    val forders = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF().filter($"o_carrier_id" > 8)
+    val forders = orderRdd(scc, orderQuery, oSchema).toDF()
+//      .filter($"o_carrier_id" > 8)
 
     val c_orders = customer.join(forders, $"c_w_id" === forders("o_w_id") &&
       $"c_d_id" === forders("o_d_id") &&
