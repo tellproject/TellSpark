@@ -51,7 +51,7 @@ case class Customer(c_id: Int,
                     c_payment_cnt: Short,
                     c_delivery_cnt: Short,
                     c_data: String,
-                    c_n_nationkey: Int)
+                    c_n_nationkey: Short)
 
 case class History(h_c_id: Int,
                    h_c_d_id: Short,
@@ -64,12 +64,12 @@ case class History(h_c_id: Int,
 
 case class NewOrder(no_o_id: Int,
                     no_d_id: Short,
-                    no_w_id: Int)
+                    no_w_id: Short)
 
 case class Order(o_id: Int,
                  o_d_id: Short,
-                 o_w_id: Int,
-                 o_c_id: Short,
+                 o_w_id: Short,
+                 o_c_id: Int,
                  o_entry_d: Long, // datetime
                  o_carrier_id: Short,
                  o_ol_cnt: Short,
@@ -218,8 +218,8 @@ class ChQuery {
   def customerRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "customer", scanQuery, tSchema).map(r => {
       Customer(r.getValue("c_id").asInstanceOf[Int],
-        r.getValue("c_d_id").asInstanceOf[Int],
-        r.getValue("c_w_id").asInstanceOf[Int],
+        r.getValue("c_d_id").asInstanceOf[Short],
+        r.getValue("c_w_id").asInstanceOf[Short],
         r.getValue("c_first").asInstanceOf[String],
         r.getValue("c_middle").asInstanceOf[String],
         r.getValue("c_last").asInstanceOf[String],
@@ -238,7 +238,7 @@ class ChQuery {
         r.getValue("c_payment_cnt").asInstanceOf[Short],
         r.getValue("c_delivery_cnt").asInstanceOf[Short],
         r.getValue("c_data").asInstanceOf[String],
-        r.getValue("c_n_nationkey").asInstanceOf[Int]
+        r.getValue("c_n_nationkey").asInstanceOf[Short]
       )
     })
   }
@@ -261,7 +261,7 @@ class ChQuery {
     new TRDD[TRecord](scc, "new_order", new ScanQuery(), tSchema).map(r => {
       NewOrder(r.getValue("no_o_id").asInstanceOf[Int],
         r.getValue("no_d_id").asInstanceOf[Short],
-        r.getValue("no_w_id").asInstanceOf[Int]
+        r.getValue("no_w_id").asInstanceOf[Short]
       )
     })
   }
@@ -270,8 +270,8 @@ class ChQuery {
     new TRDD[TRecord](scc, "order", scanQuery, tSchema).map(r => {
       Order(r.getValue("o_id").asInstanceOf[Int],
         r.getValue("o_d_id").asInstanceOf[Short],
-        r.getValue("o_w_id").asInstanceOf[Int],
-        r.getValue("o_c_id").asInstanceOf[Short],
+        r.getValue("o_w_id").asInstanceOf[Short],
+        r.getValue("o_c_id").asInstanceOf[Int],
         r.getValue("o_entry_d").asInstanceOf[Long],
         r.getValue("o_carrier_id").asInstanceOf[Short],
         r.getValue("o_ol_cnt").asInstanceOf[Short],
