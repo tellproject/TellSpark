@@ -53,7 +53,7 @@ class Q8 extends ChQuery {
     val dt = new Date(input)
     sdf.setCalendar(cal)
     cal.setTime(dt)
-    sdf.format(dt).substring(0, 4)
+    sdf.format(dt)
   }
 
   /**
@@ -72,7 +72,6 @@ class Q8 extends ChQuery {
     val n1 = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
     val n2 = nationRdd(scc, new ScanQuery, ChTSchema.nationSch).toDF()
     val customer = customerRdd(scc, new ScanQuery, ChTSchema.customerSch).toDF()
-    val region = regionRdd(scc, new ScanQuery, ChTSchema.regionSch).toDF()
     val forder = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
     .filter($"o_entry_d".between(20070102, 20120102))
 
@@ -81,7 +80,7 @@ class Q8 extends ChQuery {
 
     val fitem = itemRdd(scc, new ScanQuery, ChTSchema.itemSch).toDF().filter($"i_data".like("%b"))
     val s_n2 = supplier.join(n2, $"su_nationkey" === n2("n_nationkey"))
-    val r_n1 = region.join(n1, $"r_regionkey" === n1("n_regionkey"))
+    val r_n1 = fregion.join(n1, $"r_regionkey" === n1("n_regionkey"))
 
     //mod((s_w_id * s_i_id),10000) = su_suppkey
     val part_res1 = stock.join(s_n2, ($"s_w_id"*$"s_i_id")%10000 === s_n2("su_suppkey"))
@@ -98,7 +97,10 @@ class Q8 extends ChQuery {
       ( ($"ol_w_id" === $"o_w_id") &&
       ($"ol_d_id" === $"o_d_id") &&
       ($"ol_o_id" === $"o_id")))
+      .select(getYear($"o_entry_d"))
+    .groupBy(getYear($"o_entry_d"))
+    .agg(mkr_share($"n_name", $"ol_amount")/sum($"ol_amount"))
 
+    timeCollect(res, 8)
   }
-
 }

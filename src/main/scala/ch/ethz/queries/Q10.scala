@@ -32,10 +32,10 @@ class Q10  extends ChQuery {
     val ol = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch)
     val nn = nationRdd(scc, new ScanQuery, ChTSchema.nationSch)
 
-    val forderline = oo.toDF().filter($"o_entry_d" >= 20070102)
+    val forderline = ol.toDF()
     val customer = cc.toDF()
     val nation = nn.toDF()
-    val orders = oo.toDF()
+    val orders = oo.toDF().filter($"o_entry_d" >= 20070102)
     val c_n = customer.join(nation, $"c_state".substr(1,1) === nation("n_nationkey"))
     val o_ol = orders.join(forderline, (forderline("ol_w_id") === $"o_w_id" &&
       forderline("ol_d_id") === $"o_d_id" &&

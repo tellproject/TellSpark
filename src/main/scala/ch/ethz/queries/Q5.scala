@@ -41,6 +41,8 @@ class Q5 extends ChQuery {
 
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import sqlContext.implicits._
+    import org.apache.spark.sql.functions._
+
     println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
 
     // prepare date selection
@@ -93,7 +95,7 @@ class Q5 extends ChQuery {
       (part_res("c_state").substr(1,1).eq(jsupp("su_nationkey"))))
     //todo push down filter
     val res = part_2.groupBy(part_res("n_name"))
-    .agg(part_res("ol_amount").as("revenue"))
+    .agg(sum("$ol_amount").as("revenue"))
     .orderBy("revenue")
     .select("n_name", "revenue")
 

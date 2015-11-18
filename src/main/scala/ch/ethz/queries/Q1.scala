@@ -1,5 +1,6 @@
 package ch.ethz.queries
 
+import ch.ethz.tell.Field.FieldType
 import ch.ethz.tell._
 
 /**
