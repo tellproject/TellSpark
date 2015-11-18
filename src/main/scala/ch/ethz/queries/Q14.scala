@@ -1,6 +1,6 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.{ScanQuery, TSparkContext}
+import ch.ethz.tell.{CNFClause, ScanQuery, TSparkContext}
 
 /**
  * select	100.00 * sum(case when i_data like 'PR%' then ol_amount else 0 end) / (1+sum(ol_amount)) as promo_revenue
@@ -20,10 +20,25 @@ class Q14 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
 
+    // prepare date selection
+    val oSchema = ChTSchema.orderSch
+    val orderLineQuery = new ScanQuery
+    val oDeliveryIndex = oSchema.getField("ol_delivery_d").index
+
+    val dateSelectionLower = new CNFClause
+    dateSelectionLower.addPredicate(
+      ScanQuery.CmpType.GREATER_EQUAL, oDeliveryIndex, referenceDate2007)
+    orderLineQuery.addSelection(dateSelectionLower)
+
+    val dateSelectionUpper = new CNFClause
+    dateSelectionUpper.addPredicate(
+      ScanQuery.CmpType.LESS, oDeliveryIndex, referenceDate2020Second)
+    orderLineQuery.addSelection(dateSelectionUpper)
+
     val promo = udf { (x: String, y: Double) => if (x.startsWith("PR")) y else 0 }
 
-    val forderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
-      .filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" < 20200102)
+    val forderline = orderLineRdd(scc, orderLineQuery, oSchema).toDF()
+//      .filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" < 20200102)
     val item = itemRdd(scc, new ScanQuery, ChTSchema.itemSch).toDF()
     val res = forderline.join(item, $"ol_i_id" === item("i_id"))
       .agg(sum(promo($"i_data", $"ol_amount")) * 100 / (sum($"ol_amount").+(1))).as("promo_revenue")
