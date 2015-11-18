@@ -258,7 +258,7 @@ class ChQuery {
   }
 
   def newOrderRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "new_order", new ScanQuery(), tSchema).map(r => {
+    new TRDD[TRecord](scc, "new-order", new ScanQuery(), tSchema).map(r => {
       NewOrder(r.getValue("no_o_id").asInstanceOf[Int],
         r.getValue("no_d_id").asInstanceOf[Short],
         r.getValue("no_w_id").asInstanceOf[Short]
