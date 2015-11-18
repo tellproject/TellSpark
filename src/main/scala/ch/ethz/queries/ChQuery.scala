@@ -8,7 +8,6 @@ import ch.ethz.tell.{TSparkContext, ScanQuery, TRecord, TSchema, TRDD}
 import org.slf4j.{LoggerFactory}
 import org.apache.spark.sql.DataFrame
 
-
 case class Warehouse(w_id: Int,
                      w_name: String,
                      w_street_1: String,
@@ -54,27 +53,27 @@ case class Customer(c_id: Int,
                     c_data: String,
                     c_n_nationkey: Int)
 
-case class History(H_C_ID: Int,
-                   H_C_D_ID: Short,
-                   H_C_W_ID: Int,
-                   H_D_ID: Short,
-                   H_W_ID: Int,
-                   H_DATE: Long, // datetime
-                   H_AMOUNT: Int, // numeric (6,2)
-                   H_DATA: String)
+case class History(h_c_id: Int,
+                   h_c_d_id: Short,
+                   h_c_w_id: Int,
+                   h_d_id: Short,
+                   h_w_id: Int,
+                   h_date: Long, // datetime
+                   h_amount: Int, // numeric (6,2)
+                   h_data: String)
 
 case class NewOrder(no_o_id: Int,
                     no_d_id: Short,
                     no_w_id: Int)
 
-case class Order(O_ID: Int,
-                 O_D_ID: Short,
-                 O_W_ID: Int,
-                 O_C_ID: Short,
-                 O_ENTRY_D: Long, // datetime
-                 O_CARRIER_ID: Short,
-                 O_OL_CNT: Short,
-                 O_ALL_LOCAL: Short)
+case class Order(o_id: Int,
+                 o_d_id: Short,
+                 o_w_id: Int,
+                 o_c_id: Short,
+                 o_entry_d: Long, // datetime
+                 o_carrier_id: Short,
+                 o_ol_cnt: Short,
+                 o_all_local: Short)
 
 case class OrderLine(ol_o_id: Int,
                      ol_d_id: Short,
@@ -166,16 +165,6 @@ class ChQuery {
     calendar.set(2020, 1, 2)
     referenceDate2020Second = new LongType(calendar.getTimeInMillis)
   }
-
-
-  // create spark context and set class name as the app name
-  //  val sc = new SparkContext(new SparkConf().setAppName("Query: " + className))
-  //
-  //  convert an RDDs to a DataFrames
-  //  val sqlContext = new org.apache.spark.sql.SQLContext(sc)
-  //
-  //  import sqlContext.implicits._
-  //  import org.apache.spark.sql.functions._
 
   /**
    * implemented in children classes and hold the actual query
