@@ -96,7 +96,7 @@ class Q5 extends ChQuery {
       .join(jsupp, (part_res("s_w_id")*part_res("s_i_id")%10000 === jsupp("su_suppkey")) &&
       (part_res("c_state").substr(1,1).eq(jsupp("su_nationkey"))))
     //todo push down filter
-    val res = part_2.groupBy(part_res("n_name"))
+    val res = part_2.groupBy(part_2("n_name"))
     .agg(sum("$ol_amount").as("revenue"))
     .orderBy("revenue")
     .select("n_name", "revenue")

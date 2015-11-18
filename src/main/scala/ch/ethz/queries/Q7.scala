@@ -111,11 +111,13 @@ class Q7 extends ChQuery {
     .join(stock, ((stock("s_w_id") === forderline("ol_supply_w_id")) &&
       (stock("s_i_id") === forderline("ol_i_id")) &&
       ( stock("s_i_id")*stock("s_w_id") % 10000 === suppNation("su_suppkey"))))
+
     val res = part_res
       .select($"su_nationkey".as("supp_nation"),
         $"c_state".substr(1,1).as("cust_nation"),
         getYear($"o_entry_d").as("l_year")
       )
+      .select($"ol_amount")
       .groupBy(supplier("su_nationkey"), customer("c_state").substr(1,1), getYear(order("o_entry_d")))
       .agg(sum("ol_amount").as("revenue"))
       .sort($"supp_nation", $"cust_nation", $"l_year")
