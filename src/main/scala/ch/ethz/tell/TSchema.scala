@@ -13,24 +13,11 @@ class TSchema extends Serializable {
   var varSizeFields = ArrayBuffer[FieldType]()
   var fields = HashMap[Short, Field]()
   var strFields = HashMap[String, Field]()
-  val tellSchema: Schema = null
-
-  def printFixedSize():String = {
-    val sb = new StringBuilder
-    sb.append("{")
-    fixedSizeFields.map(sb.append(_).append("-"))
-    sb.toString()
-  }
-
-  def printVarFixedSize():String = {
-    val sb = new StringBuilder
-    sb.append("{")
-    varSizeFields.map(sb.append(_).append("-"))
-    sb.toString()
-  }
+  var headerLength = 0L
 
   def this(tellSchema: Schema) {
     this()
+    headerLength = tellSchema.getHeaderLength
     val fieldNames = tellSchema.getFieldNames
     for (fieldName <- fieldNames) {
       val field = tellSchema.getFieldByName(fieldName)
@@ -57,6 +44,20 @@ class TSchema extends Serializable {
 
   def getSize() : Short = {
     fields.size.asInstanceOf[Short]
+  }
+
+  def printFixedSize():String = {
+    val sb = new StringBuilder
+    sb.append("{")
+    fixedSizeFields.map(sb.append(_).append("-"))
+    sb.toString()
+  }
+
+  def printVarFixedSize():String = {
+    val sb = new StringBuilder
+    sb.append("{")
+    varSizeFields.map(sb.append(_).append("-"))
+    sb.toString()
   }
 
   override def toString() : String = {

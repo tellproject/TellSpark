@@ -10,9 +10,11 @@ class TRecord (var fieldSchema: TSchema, var values : Array[Any])
     this(fSchema, new Array[Any](valSz))
   }
 
-  def getComplete() = {
-    (fieldSchema.fields, values)
-  }
+  //TODO:
+//  def getComplete() = {
+//    (fieldSchema.fields., values)
+//  }
+
   def getField(idx : Short) = {
     (fieldSchema.fields(idx), values(idx))
   }

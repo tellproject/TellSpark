@@ -84,6 +84,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     val unsafe: sun.misc.Unsafe = Unsafe.getUnsafe()
     var off = offset
     off += 8
+    off += tSchema.headerLength
     val rec:TRecord = new TRecord(tSchema, new Array[Any](tSchema.getSize()))
     // fixed size fields
     for (fieldType:Field.FieldType <- tSchema.fixedSizeFields) {
