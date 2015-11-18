@@ -64,9 +64,9 @@ case class History(H_C_ID: Int,
                    H_AMOUNT: Int, // numeric (6,2)
                    H_DATA: String)
 
-case class NewOrder(NO_O_ID: Int,
-                    NO_D_ID: Short,
-                    NO_W_ID: Int)
+case class NewOrder(no_o_id: Int,
+                    no_d_id: Short,
+                    no_w_id: Int)
 
 case class Order(O_ID: Int,
                  O_D_ID: Short,
@@ -77,22 +77,22 @@ case class Order(O_ID: Int,
                  O_OL_CNT: Short,
                  O_ALL_LOCAL: Short)
 
-case class OrderLine(OL_O_ID: Int,
-                     OL_D_ID: Short,
-                     OL_W_ID: Short,
-                     OL_NUMBER: Short,
-                     OL_I_ID: Int,
-                     OL_SUPPLY_W_ID: Short,
-                     OL_DELIVERY_D: Long, // datetime
-                     OL_QUANTITY: Short,
-                     OL_AMOUNT: Int, // numeric (6,2)
-                     OL_DIST_INFO: String)
+case class OrderLine(ol_o_id: Int,
+                     ol_d_id: Short,
+                     ol_w_id: Short,
+                     ol_number: Short,
+                     ol_i_id: Int,
+                     ol_supply_w_id: Short,
+                     ol_delivery_d: Long, // datetime
+                     ol_quantity: Short,
+                     ol_amount: Int, // numeric (6,2)
+                     ol_dist_info: String)
 
-case class Item(I_ID: Int,
-                I_IM_ID: Short,
-                I_NAME: String,
-                I_PRICE: Int, // numeric (5,2)
-                I_DATA: String)
+case class Item(i_id: Int,
+                i_im_id: Short,
+                i_name: String,
+                i_price: Int, // numeric (5,2)
+                i_data: String)
 
 case class Stock(s_i_id: Int,
                  s_w_id: Short,
@@ -114,22 +114,22 @@ case class Stock(s_i_id: Int,
                  s_su_suppkey: Short) {
 }
 
-case class Nation(N_NATIONKEY: Short,
-                  N_NAME: String,
-                  N_REGIONKEY: Short,
-                  N_COMMENT: String)
+case class Nation(n_nationkey: Short,
+                  n_name: String,
+                  n_regionkey: Short,
+                  n_comment: String)
 
-case class Region(R_REGIONKEY: Short,
-                  R_NAME: String,
-                  R_COMMENT: String)
+case class Region(r_regionkey: Short,
+                  r_name: String,
+                  r_comment: String)
 
-case class Supplier(SU_SUPPKEY: Short,
-                    SU_NAME: String,
-                    SU_ADDRESS: String,
-                    SU_NATIONKEY: Short,
-                    SU_PHONE: String,
-                    SU_ACCTBAL: Long, // numberic (12,2)
-                    SU_COMMENT: String)
+case class Supplier(su_suppkey: Short,
+                    su_name: String,
+                    su_address: String,
+                    su_nationkey: Short,
+                    su_phone: String,
+                    su_acctbal: Long, // numberic (12,2)
+                    su_comment: String)
 
 class ChQuery {
 
