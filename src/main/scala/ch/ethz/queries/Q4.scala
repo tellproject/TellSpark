@@ -45,7 +45,11 @@ class Q4 extends ChQuery {
       ScanQuery.CmpType.LESS, oEntryIndex, referenceDate2012)
     orderQuery.addSelection(dateSelectionUpper)
 
-    val orders = orderRdd(scc, orderQuery, oSchema).toDF()
+    val oo = orderRdd(scc, orderQuery, oSchema)
+//    if (logger.isDebugEnabled) {
+      logger.debug("[Query %s] Tuples:%d".format(this.className, oo.count))
+//    }
+      val orders = oo.toDF()
 
     val orderline = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
     /**

@@ -115,9 +115,9 @@ class Q7 extends ChQuery {
     val res = part_res
       .select($"su_nationkey".as("supp_nation"),
         $"c_state".substr(1,1).as("cust_nation"),
-        getYear($"o_entry_d").as("l_year")
+        getYear($"o_entry_d").as("l_year"),
+        $"ol_amount"
       )
-      .select($"ol_amount")
       .groupBy(supplier("su_nationkey"), customer("c_state").substr(1,1), getYear(order("o_entry_d")))
       .agg(sum("ol_amount").as("revenue"))
       .sort($"supp_nation", $"cust_nation", $"l_year")
