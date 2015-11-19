@@ -4,6 +4,7 @@ import ch.ethz.TellClientFactory
 import ch.ethz.tell.Field.FieldType
 import org.apache.spark.{SparkContext, _}
 import org.apache.spark.rdd.RDD
+import org.slf4j.LoggerFactory
 
 import scala.reflect.ClassTag
 
@@ -13,6 +14,8 @@ import scala.reflect.ClassTag
 class TRDD [T: ClassTag]( @transient var sc: SparkContext,
                              @transient var deps: Seq[Dependency[_]])
   extends RDD [T](sc, deps) with Logging {
+
+  val logger = LoggerFactory.getLogger(this.getClass)
 
   // Tell schema
   var tSchema: TSchema = null
@@ -36,8 +39,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   }
 
   def getIterator(scanIt: ScanIterator): Iterator[T] = {
-    println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>theSplit")
-    //println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>theSplit" + theSplit.toString)
+    logger.info("[TRDD] Iterating through a split")
     val it = new Iterator[T] {
       // TODO a better way to map this?
       var offset = 0L
@@ -65,12 +67,6 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       }
 
       override def next(): T = {
-//       if (offset == len) {
-//          keepGoing = theSplit.scanIt.next()
-//          len = theSplit.scanIt.length()
-//          addr = theSplit.scanIt.address()
-//          offset = 0
-//       }
         if (offset <= len) {
           res = getRecord(addr, offset)
           offset = res._1
@@ -142,7 +138,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   override def collect(): Array[T] = {
     val results = sc.runJob(this, (iter: Iterator[T]) => iter.toArray)
     TellClientFactory.trx.commit()
-    println("============POST COMMIT=================") 
+    logger.info("[TRDD] TellStore transaction has been committed.")
     Array.concat(results: _*)
   }
 
@@ -153,14 +149,12 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       tContext.commitMng.value,
       tContext.chNumber.value,
       tContext.chSize.value)
-    println("=================== COMPUTE :storageMng: ========= " + tContext.storageMng.value)
-    println("=================== COMPUTE :trxId: ========= " + tContext.broadcastTc.value)
+
     val trxId = tContext.broadcastTc.value
     TellClientFactory.startTransaction(trxId)
     val theSplit = split.asInstanceOf[TPartition[T]]
     val scanIt = TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, theSplit.index, tQuery), tTable)
-
-    println("+++++++++++++++++++++++++++++++++++++")
+    logger.info("[TRDD] TellStore scanQuery using transactionId: %s".format(tContext.broadcastTc.value))
     getIterator(scanIt)
   }
 
@@ -176,11 +170,11 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
     val trxId = tContext.broadcastTc.value
 
-    println("=================== GET_PARTITION :trxId: ========= " + trxId)
+    logger.info("[TRDD] Partition processing using trxId: %d".format(trxId))
     //TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
     (0 to TellClientFactory.chNumber -1).map(pos => {
       array(pos) = new TPartition(pos, tQuery, tTable)
-      println("PARTITION>>>" + array(pos).toString)
+      logger.info("[TRDD] Partition used: %s".format(array(pos).toString))
     })
     array
   }

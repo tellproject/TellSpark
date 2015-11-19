@@ -3,6 +3,7 @@ package ch.ethz
 import java.lang.reflect.Field
 import ch.ethz.tell.ClientManager
 import ch.ethz.tell.Transaction
+import org.slf4j.LoggerFactory
 
 import sun.misc.Unsafe
 
@@ -11,11 +12,14 @@ import sun.misc.Unsafe
  */
 object TellClientFactory {
 
+  val logger = LoggerFactory.getLogger(this.getClass)
+
   def setConf(strMng: String, cmMng: String, chNum: Int, chSz: Int) = {
     storageMng = strMng
     commitMng = cmMng
     chNumber = chNum
     chSize = chSz
+    logger.info("[%s] TellStore configured to: %s".format(this.getClass.getName, this.toString()))
   }
 
   var commitMng: String = ""
@@ -31,10 +35,9 @@ object TellClientFactory {
   def getConnection(): ClientManager = {
     //TODO move the client creation somewhere else?
     if (clientManager == null) {
-      println("================= PRE CLIENT ==============")
-      println("=================" + toString + "==============")
+      logger.info("[%s] ClientManager is about to be created.".format(this.getClass.getName))
       clientManager = new ClientManager(commitMng, storageMng, chNumber, chSize)
-      println("================= POST CLIENT ==============")
+      logger.info("[%s] ClientManager has been created.".format(this.getClass.getName))
     }
     clientManager
   }
@@ -42,14 +45,13 @@ object TellClientFactory {
   def startTransaction() = {
     trx = Transaction.startTransaction(getConnection)
     trxId = trx.getTransactionId
-    println("==========TRANSACTTION_ID.1. ======" + trx.getTransactionId)
+    logger.info("[%s] Starting transaction with trxId %d.".format(this.getClass.getName, trxId))
   }
 
   def startTransaction(trId: Long) = {
     trx = Transaction.startTransaction(trId, getConnection)
     trxId = trx.getTransactionId
-    println("==========TRANSACTTION_ID.2.trId. ======" + trId)
-    println("==========TRANSACTTION_ID.2. ======" + trx.getTransactionId)
+    logger.info("[%s] Starting transaction with trxId %d.".format(this.getClass.getName, trxId))
   }
 
   def commitTrx() = {

@@ -368,6 +368,7 @@ class ChQuery {
 object ChQuery {
 
 
+  val logger = LoggerFactory.getLogger(this.getClass)
 
   /**
    * Execute query reflectively
@@ -375,9 +376,9 @@ object ChQuery {
   def executeQuery(queryNo: Int, st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
     assert(queryNo >= 1 && queryNo <= 22, "Invalid query number")
     val m = Class.forName(f"ch.ethz.queries.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String)}]
-    println("=========== pre execute =============")
+    logger.info("[%s] Pre query execution".format(this.getClass.getName))
     val res = m.execute(st, cm, cn, cs, mUrl)
-    println("=========== post execute =============")
+    logger.info("[%s] Post query execution".format(this.getClass.getName))
   }
 
   def main(args: Array[String]): Unit = {
@@ -410,16 +411,14 @@ object ChQuery {
     ChTSchema.init_schem(TellClientFactory.trx)
     TellClientFactory.commitTrx()
 
-    println("***********************************************")
-    println("********************q:" + qryNum + "***st:" + st + "***cm:" + cm)
-    println("***********************************************")
+    logger.warn("[%s] Query %d: %s".format(this.getClass.getName,  qryNum, TellClientFactory.toString ))
     val excludeList = List(16,20,21)
     if (qryNum > 0) {
       executeQuery(qryNum, st, cm, cn, cs, masterUrl)
     } else {
       (1 to 22).map(i =>
         if (!excludeList.contains(i)) {
-          println("Executig query " + i)
+          logger.warn("Executig query " + i)
           executeQuery(i, st, cm, cn, cs, masterUrl)
         }
       )
