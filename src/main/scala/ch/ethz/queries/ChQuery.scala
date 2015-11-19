@@ -173,14 +173,14 @@ class ChQuery {
 
   def timeCollect(df: DataFrame, queryNo: Int): Unit = {
     val t0 = System.nanoTime()
-    var cnt = df.count
+    var cnt = 0 //df.count
 
 
-//    val ress = df.collect()
-//    ress.foreach(r => {
-//      println("[TTTTTTTTTTTTTTTT]" + r.toString())
-//      cnt += 1
-//    })
+    val ress = df.collect()
+    ress.foreach(r => {
+      println("[TTTTTTTTTTTTTTTT]" + r.toString())
+      cnt += 1
+    })
 
     val t1 = System.nanoTime()
     logger.info("[Query %d] Elapsed time: %d msecs. map:%d".format(queryNo, (t1 - t0) / 1000000, cnt))
