@@ -59,6 +59,7 @@ class Q10  extends ChQuery {
     .orderBy($"revenue".desc)
 
     timeCollect(res, 10)
+    scc.sparkContext.stop()
   }
 
 }

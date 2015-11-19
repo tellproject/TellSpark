@@ -115,6 +115,7 @@ class Q7 extends ChQuery {
       .sort($"supp_nation", $"cust_nation", $"l_year")
 
     timeCollect(res, 7)
+    scc.sparkContext.stop()
   }
 }
 

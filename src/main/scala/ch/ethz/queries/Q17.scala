@@ -39,6 +39,7 @@ class Q17 extends ChQuery {
       .agg(sum("ol_amount")./(2.0).as("avg_yearly"))
 
     timeCollect(res, 17)
+    scc.sparkContext.stop()
 
   }
 

@@ -65,5 +65,6 @@ class Q22 extends ChQuery {
     .agg(count("c_balance").as("numcust"), sum("c_balance").as("totacctbal"))
 
     timeCollect(res, 22)
+    scc.sparkContext.stop()
   }
 }

@@ -88,6 +88,7 @@ class Q20 extends ChQuery {
 //    .filter($"su_suppkey".isin(inner_query("inner_suppkey")))
 
     timeCollect(res, 20)
+    scc.sparkContext.stop()
   }
 
 }

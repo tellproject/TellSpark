@@ -57,6 +57,7 @@ class Q15  extends ChQuery {
     .orderBy($"su_suppkey")
 
     timeCollect(res, 15)
+    scc.sparkContext.stop()
   }
 
 }

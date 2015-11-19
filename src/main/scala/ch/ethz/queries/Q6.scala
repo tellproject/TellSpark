@@ -61,5 +61,6 @@ class Q6 extends ChQuery {
         .agg(sum($"ol_amount"))
 
     timeCollect(res, 6)
+    scc.sparkContext.stop()
   }
 }

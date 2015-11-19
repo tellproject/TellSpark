@@ -71,5 +71,6 @@ class Q4 extends ChQuery {
 
 
     timeCollect(res, 4)
+    scc.sparkContext.stop()
   }
 }

@@ -63,6 +63,7 @@ order by ordercount desc
     .join(inner_res, $"ordercount" > inner_res("sum_order"))
 
     timeCollect(res, 11)
+    scc.sparkContext.stop()
   }
 
 }

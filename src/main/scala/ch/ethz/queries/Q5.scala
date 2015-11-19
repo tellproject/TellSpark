@@ -102,7 +102,7 @@ class Q5 extends ChQuery {
     .select("n_name", "revenue")
 
     timeCollect(res, 5)
-
+    scc.sparkContext.stop()
   }
 
 }

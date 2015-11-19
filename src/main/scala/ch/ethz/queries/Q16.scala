@@ -56,6 +56,7 @@ class Q16  extends ChQuery {
         countDistinct(($"s_w_id" * $"s_i_id")%10000).as("supplier_cnt"))
     //TODO double check other queries with similar structure
     timeCollect(res, 16)
+    scc.sparkContext.stop()
   }
 
 }
