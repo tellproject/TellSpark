@@ -50,9 +50,10 @@ class Q15  extends ChQuery {
     .agg(sum($"ol_amount").as("total_revenue"))
     .select($"total_revenue", $"supplier_no")
 
-    val max_revenue = revenue.select($"total_revenue").agg(max($"total_revenue"))
+    val max_revenue = revenue.select($"total_revenue").agg(max($"total_revenue").as("total_revenue"))
     val res = supplier.join(revenue, $"su_suppkey" === revenue("supplier_no"))
-    .filter(revenue("total_revenue") === max_revenue("total_revenue"))
+    //.filter(revenue("total_revenue") === max_revenue("total_revenue"))
+    .join(max_revenue, revenue("total_revenue") === max_revenue("total_revenue"))
     .orderBy($"su_suppkey")
 
     timeCollect(res, 15)
