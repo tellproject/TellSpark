@@ -68,5 +68,6 @@ class Q3 extends ChQuery {
     .orderBy($"revenue".desc, orders("o_entry_d"))
 
     timeCollect(res, 3)
+    scc.sparkContext.stop()
   }
 }

@@ -56,7 +56,7 @@ class Q16  extends ChQuery {
     .orderBy("supplier_cnt")
 
     timeCollect(res, 16)
-
+    scc.sparkContext.stop()
   }
 
 }

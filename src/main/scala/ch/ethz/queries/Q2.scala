@@ -80,5 +80,6 @@ class Q2 extends ChQuery {
       .orderBy(nation("n_name"), supplier("su_name"), item("i_id"))
 
     timeCollect(res, 2)
+    scc.sparkContext.stop()
   }
 }

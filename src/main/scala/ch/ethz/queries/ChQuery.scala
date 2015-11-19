@@ -173,17 +173,17 @@ class ChQuery {
 
   def timeCollect(df: DataFrame, queryNo: Int): Unit = {
     val t0 = System.nanoTime()
-    var cnt = df.count
+    var cnt = 0 //df.count
 
 
-//    val ress = df.collect()
-//    ress.foreach(r => {
-//      println("[TTTTTTTTTTTTTTTT]" + r.toString())
-//      cnt += 1
-//    })
+    val ress = df.collect()
+    ress.foreach(r => {
+      println("[TTTTTTTTTTTTTTTT]" + r.toString())
+      cnt += 1
+    })
 
     val t1 = System.nanoTime()
-    logger.info("[Query %d] Elapsed time: %d msecs. map:%d".format(queryNo, (t1 - t0) / 1000000, cnt))
+    logger.warn("[Query %d] Elapsed time: %d msecs. map:%d".format(queryNo, (t1 - t0) / 1000000, cnt))
   }
 
   def warehouseRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
@@ -413,11 +413,16 @@ object ChQuery {
     println("***********************************************")
     println("********************q:" + qryNum + "***st:" + st + "***cm:" + cm)
     println("***********************************************")
+    val excludeList = List(16,20,21)
     if (qryNum > 0) {
       executeQuery(qryNum, st, cm, cn, cs, masterUrl)
     } else {
-      (1 to 22).map(i => executeQuery(i, st, cm, cn, cs, masterUrl))
+      (1 to 22).map(i =>
+        if (!excludeList.contains(i)) {
+          println("Executig query " + i)
+          executeQuery(i, st, cm, cn, cs, masterUrl)
+        }
+      )
     }
-
   }
 }

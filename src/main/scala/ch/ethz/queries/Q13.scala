@@ -51,6 +51,7 @@ class Q13 extends ChQuery {
       .orderBy($"custdist".desc, $"c_count".desc)
 
     timeCollect(res, 13)
+    scc.sparkContext.stop()
   }
 
 }

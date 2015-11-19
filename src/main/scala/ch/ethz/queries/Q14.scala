@@ -43,6 +43,7 @@ class Q14 extends ChQuery {
     val res = forderline.join(item, $"ol_i_id" === item("i_id"))
       .agg(sum(promo($"i_data", $"ol_amount")) * 100 / (sum($"ol_amount").+(1))).as("promo_revenue")
     timeCollect(res, 14)
+    scc.sparkContext.stop()
   }
 
 }

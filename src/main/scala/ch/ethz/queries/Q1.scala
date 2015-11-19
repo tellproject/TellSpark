@@ -45,5 +45,6 @@ class Q1 extends ChQuery {
       .sort($"ol_number")
 
     timeCollect(res, 1)
+    scc.sparkContext.stop()
   }
 }

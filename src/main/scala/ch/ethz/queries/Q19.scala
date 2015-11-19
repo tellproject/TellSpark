@@ -104,6 +104,7 @@ class Q19 extends ChQuery {
     .agg(sum($"ol_amount").as("revenue"))
 
     timeCollect(res, 19)
+    scc.sparkContext.stop()
   }
 
 }

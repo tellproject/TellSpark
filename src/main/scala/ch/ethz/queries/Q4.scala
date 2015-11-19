@@ -59,7 +59,10 @@ class Q4 extends ChQuery {
     val forderline = orderline
       .select($"ol_o_id", $"ol_w_id", $"ol_d_id", $"ol_delivery_d").distinct
 
-    val res = forderline.join(orders, ((orders("o_id") === $"ol_o_id") &&
+    val res = forderline.join(orders
+      // we know that the filter on dates below 2012, returns 0 results
+//      .filter($"o_id" <= 0)
+      , ((orders("o_id") === $"ol_o_id") &&
       (orders("o_w_id") === $"ol_w_id") &&
       (orders("o_d_id") === $"ol_d_id") &&
       (orderline("ol_delivery_d").geq(orders("o_entry_d")))))
@@ -68,5 +71,6 @@ class Q4 extends ChQuery {
 
 
     timeCollect(res, 4)
+    scc.sparkContext.stop()
   }
 }

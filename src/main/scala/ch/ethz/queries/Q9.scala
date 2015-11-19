@@ -54,6 +54,7 @@ class Q9 extends ChQuery {
       .orderBy($"n_name", $"l_year".desc)
 
     timeCollect(res, 9)
+    scc.sparkContext.stop()
   }
 
 }

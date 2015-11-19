@@ -42,6 +42,7 @@ class Q18  extends ChQuery {
     .orderBy($"tot_amount".desc, $"o_entry_d")
 
     timeCollect(res, 18)
+    scc.sparkContext.stop()
   }
 
 }

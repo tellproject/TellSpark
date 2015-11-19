@@ -75,5 +75,6 @@ class Q21 extends ChQuery {
     .orderBy($"numwait".desc, $"su_name")
 
     timeCollect(res, 21)
+    scc.sparkContext.stop()
   }
 }

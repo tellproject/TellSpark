@@ -32,6 +32,7 @@ class Q6 extends ChQuery {
     val dateSelectionUpper = new CNFClause
     dateSelectionUpper.addPredicate(
     ScanQuery.CmpType.LESS, oDeliveryIndex, referenceDate2020First)
+    // as anything satisfy the query, we can leave this filter away
 //    orderLineQuery.addSelection(dateSelectionUpper)
 
     // prepare quantity selection
@@ -39,12 +40,13 @@ class Q6 extends ChQuery {
     val quantitySelectionLower = new CNFClause
     quantitySelectionLower.addPredicate(
       ScanQuery.CmpType.GREATER_EQUAL, oQuantityIndex, PredicateType.create(1: Short))
-//    orderLineQuery.addSelection(quantitySelectionLower)
+    orderLineQuery.addSelection(quantitySelectionLower)
 
     val quantitySelectionUpper = new CNFClause
     quantitySelectionUpper.addPredicate(
       ScanQuery.CmpType.LESS, oQuantityIndex, PredicateType.create(100: Short))
     // the original benchmark says 100000 which is not a numeric(2)!!
+    // as anything satisfy the query, we can leave this filter away
     //orderLineQuery.addSelection(quantitySelectionUpper)
 
     //todo: push down aggregation!
@@ -59,5 +61,6 @@ class Q6 extends ChQuery {
         .agg(sum($"ol_amount"))
 
     timeCollect(res, 6)
+    scc.sparkContext.stop()
   }
 }

@@ -51,5 +51,6 @@ class Q12  extends ChQuery {
     .orderBy($"o_ol_cnt")
 
     timeCollect(res, 12)
+    scc.sparkContext.stop()
   }
 }

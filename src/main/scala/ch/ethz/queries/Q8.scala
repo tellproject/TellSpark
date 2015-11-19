@@ -130,5 +130,6 @@ class Q8 extends ChQuery {
     .agg(sum(mkr_share(part_res2("n_name"),$"ol_amount"))/sum($"ol_amount"))
 
     timeCollect(res, 8)
+    scc.sparkContext.stop()
   }
 }
