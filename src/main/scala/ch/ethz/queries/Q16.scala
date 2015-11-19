@@ -50,12 +50,13 @@ class Q16  extends ChQuery {
     val stock = stockRdd(scc, new ScanQuery, ChTSchema.stockSch).toDF()
     val res = stock.join(fsupplier, ( ($"s_w_id" * $"s_i_id")%10000 !== (fsupplier("su_suppkey")) ))
     .join(fitem, $"i_id" === $"s_i_id")
-    .select(first($"i_name"),
-        first($"i_data".substr(1, 3).as("brand")),
-        first($"i_price"),
-        countDistinct(($"s_w_id" * $"s_i_id")%10000).as("supplier_cnt"))
-    //TODO double check other queries with similar structure
+    .select($"i_name", $"i_data".substr(1, 3).as("brand"), $"i_price")
+    .groupBy($"i_name",$"brand", $"i_price")
+    .agg(countDistinct(($"s_w_id" * $"s_i_id")%10000).as("supplier_cnt"))
+    .orderBy("supplier_cnt")
+
     timeCollect(res, 16)
+
   }
 
 }
