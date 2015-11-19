@@ -2,6 +2,8 @@ package ch.ethz.queries
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.time.{Instant, ZoneOffset, LocalDateTime}
 import java.util.{GregorianCalendar, Date}
 
 import ch.ethz.tell.{ScanQuery, TSparkContext}
@@ -24,18 +26,7 @@ order by n_name, l_year desc
  */
 class Q9 extends ChQuery {
 
-  //TODO double check
-//  val sdf = new SimpleDateFormat("yyyy")
-//  val cal = new GregorianCalendar()
-
-  val getYear = udf { (x: Long) => {
-    new Timestamp(x).toString.substring(0,4)
-//    val dt = new Date(x)
-//    sdf.setCalendar(cal)
-//    cal.setTime(dt)
-//    sdf.format(dt)
-    }
-  }
+  val getYear = udf { (x: Long) => Instant.ofEpochSecond(x).toString.substring(0,4) }
 
   override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)

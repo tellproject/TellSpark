@@ -34,7 +34,7 @@ class Q12  extends ChQuery {
     val dateSelection = new CNFClause
     dateSelection.addPredicate(
       ScanQuery.CmpType.LESS, oDeliveryIndex, referenceDate2020First)
-    orderlineQuery.addSelection(dateSelection)
+//    orderlineQuery.addSelection(dateSelection)
 
     val orders = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
     val forderline = orderLineRdd(scc, orderlineQuery, oSchema).toDF()

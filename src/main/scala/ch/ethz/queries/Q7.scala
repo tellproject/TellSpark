@@ -1,6 +1,7 @@
 package ch.ethz.queries
 
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.{Date, GregorianCalendar}
 
 import ch.ethz.tell
@@ -36,18 +37,7 @@ order by su_nationkey, cust_nation, l_year
  */
 class Q7 extends ChQuery {
 
-  //TODO double check
-  val sdf = new SimpleDateFormat("yyyy")
-  val cal = new GregorianCalendar()
-
-  val getYear = udf { (x: Long) => timestampToString(x) }
-
-  def timestampToString(input : Long): String = {
-    val dt = new Date(input)
-    sdf.setCalendar(cal)
-    cal.setTime(dt)
-    sdf.format(dt).substring(0, 4)
-  }
+  val getYear = udf { (x: Long) => Instant.ofEpochSecond(x).toString.substring(0,4) }
 
   /**
    * implemented in children classes and hold the actual query
