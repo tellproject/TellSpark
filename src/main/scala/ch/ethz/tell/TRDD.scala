@@ -44,15 +44,21 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       var cnt = 0
       var cnt1 = 0
       var keepGoing = scanIt.next()
-      var len = scanIt.length()
-      var addr = scanIt.address()
+      var len = 0L
+      var addr = 0L
+      if (keepGoing) {
+        len = scanIt.length()
+        addr = scanIt.address()
+      }
       var res:(Long, T) = null
 
       override def hasNext: Boolean = {
-        if (offset == len) {
+        if (offset == len && keepGoing) {
           keepGoing = scanIt.next()
-          len = scanIt.length()
-          addr = scanIt.address()
+          if (keepGoing) {
+            len = scanIt.length()
+            addr = scanIt.address()
+          }
           offset = 0
         }
         keepGoing
