@@ -54,13 +54,12 @@ class Q22 extends ChQuery {
     val order = orderRdd(scc, new ScanQuery, ChTSchema.orderSch).toDF()
 
     val avg_cbal = fcustomer.filter($"c_balance" > 0).select($"c_balance").agg(avg($"c_balance").as("avg_balance"))
-
     val res = fcustomer.join(order,
       $"c_id" !== order("o_c_id")
 //        && $"c_w_id" !== order("o_w_id")
 //        && $"c_d_id" !== order("o_d_id")
     )
-    .join(avg_cbal, $"c_balance" > avg_cbal("avg_balance"))
+    .join(avg_cbal, $"c_balance" > avg_cbal("avg_balance"))//.filter($"c_balance" > avg_cbal("avg_balance"))
     .select($"c_state".substr(1,1).as("country"), $"c_balance")
     .groupBy($"country")
     .agg(count("c_balance").as("numcust"), sum("c_balance").as("totacctbal"))

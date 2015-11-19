@@ -1,5 +1,6 @@
 package ch.ethz.queries
 
+import java.time.Instant
 import java.text.SimpleDateFormat
 import java.util.{Date, GregorianCalendar}
 
@@ -44,19 +45,8 @@ order by l_year
  */
 class Q8 extends ChQuery {
 
-  //TODO double check
-  val sdf = new SimpleDateFormat("yyyy")
-  val cal = new GregorianCalendar()
-
-  val getYear = udf { (x: Long) => timestampToString(x) }
+  val getYear = udf { (x: Long) => Instant.ofEpochSecond(x).toString.substring(0,4) }
   val mkr_share = udf { (x: String, y: Double) => if (x.equals("Germany")) y else 0 }
-
-  def timestampToString(input : Long): String = {
-    val dt = new Date(input)
-    sdf.setCalendar(cal)
-    cal.setTime(dt)
-    sdf.format(dt)
-  }
 
   /**
    * implemented in children classes and hold the actual query
@@ -80,7 +70,7 @@ class Q8 extends ChQuery {
     val dateSelectionUpper = new CNFClause
     dateSelectionUpper.addPredicate(
       ScanQuery.CmpType.LESS_EQUAL, oEntryIndex, referenceDate2012)
-    orderQuery.addSelection(dateSelectionUpper)
+    //orderQuery.addSelection(dateSelectionUpper)
 
     // prepare orderline id selection
     val olSchema = ChTSchema.orderLineSch
@@ -135,9 +125,9 @@ class Q8 extends ChQuery {
       ($"ol_d_id" === $"o_d_id") &&
       ($"ol_o_id" === $"o_id")))
       // todo check the "first function"
-      .select(getYear($"o_entry_d").as("o_entry_dd"), first(part_res2("n_name")), $"ol_amount")
-    .groupBy($"o_entry_dd")
-    .agg(mkr_share(part_res2("n_name"), $"ol_amount")/sum($"ol_amount"))
+      .select( getYear($"o_entry_d").as("l_year"), $"ol_amount", part_res2("n_name"))
+    .groupBy($"l_year")
+    .agg(sum(mkr_share(part_res2("n_name"),$"ol_amount"))/sum($"ol_amount"))
 
     timeCollect(res, 8)
   }
