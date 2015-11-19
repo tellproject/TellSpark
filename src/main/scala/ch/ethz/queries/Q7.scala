@@ -61,7 +61,7 @@ class Q7 extends ChQuery {
     val dateSelectionUpper = new CNFClause
     dateSelectionUpper.addPredicate(
       ScanQuery.CmpType.LESS_EQUAL, oDeliveryIndex, referenceDate2012)
-    orderlineQuery.addSelection(dateSelectionUpper)
+//    orderlineQuery.addSelection(dateSelectionUpper)
 
     // prepare nation selection
     val nSchema = ChTSchema.nationSch
