@@ -77,6 +77,8 @@ class Q7 extends ChQuery {
 
     // supplier, stock, orderline, orders, customer, nation n1, nation n2
     val forderline = orderLineRdd(scc, orderlineQuery, oSchema).toDF()
+    // we know that the filter on dates below 2012, returns 0 results
+    //      .filter($"ol_o_id" <= 0)
 //    val forderline = orderline.filter($"ol_delivery_d" >= 20070102 && $"ol_delivery_d" <= 20120102 )
     val supplier = supplierRdd(scc, new ScanQuery, ChTSchema.supplierSch).toDF()
     val nRDD = nationRdd(scc, new ScanQuery, ChTSchema.nationSch)
