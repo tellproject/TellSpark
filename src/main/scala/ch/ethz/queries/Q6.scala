@@ -1,6 +1,7 @@
 package ch.ethz.queries
 
-import ch.ethz.tell.PredicateType.ShortType
+import ch.ethz.tell.Field.FieldType
+import ch.ethz.tell.ScanQuery.AggrType
 import ch.ethz.tell._
 
 /**
@@ -49,18 +50,24 @@ class Q6 extends ChQuery {
     // as anything satisfy the query, we can leave this filter away
     //orderLineQuery.addSelection(quantitySelectionUpper)
 
-    //todo: push down aggregation!
+    val olAmountIndex = oSchema.getField("ol_amount").index
+    val amountAggregation = new Aggregation(AggrType.SUM, olAmountIndex, "sum_ol_amount", FieldType.BIGINT)
+    orderLineQuery.addAggregation(amountAggregation)
+
+    val resultSchema = orderLineQuery.getAggregationResultSchema
 
     // convert an RDDs to a DataFrames
-    val orderline = orderLineRdd(scc, orderLineQuery, oSchema).toDF()
-    //Do push downs
-      val res = orderline
-//      .filter($"ol_delivery_d" >= 19990101)
-//        .filter($"ol_delivery_d" < 20200101)
-//        .filter($"ol_quantity" >= 1).filter($"ol_quantity" <= 10000)
-        .agg(sum($"ol_amount"))
+    val aggrTrdd = new TRDD[TRecord](scc, "order-line", orderLineQuery, new TSchema(resultSchema)).map(r => {
+      r.getValue("sum_ol_amount").asInstanceOf[Long]
+    })
 
-    timeCollect(res, 6)
+    val t0 = System.nanoTime()
+
+    var amount:Long = 0
+    val res = aggrTrdd.collect().map(r => amount += r)
+
+    val t1 = System.nanoTime()
+    logger.warn("[Query %d] Elapsed time: %d msecs. map:%d".format(6, (t1 - t0) / 1000000, amount))
     scc.sparkContext.stop()
   }
 }
