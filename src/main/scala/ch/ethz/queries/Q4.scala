@@ -61,7 +61,7 @@ class Q4 extends ChQuery {
 
     val res = forderline.join(orders
       // we know that the filter on dates below 2012, returns 0 results
-//      .filter($"o_id" <= 0)
+      .filter($"o_id" <= 0)
       , ((orders("o_id") === $"ol_o_id") &&
       (orders("o_w_id") === $"ol_w_id") &&
       (orders("o_d_id") === $"ol_d_id") &&
