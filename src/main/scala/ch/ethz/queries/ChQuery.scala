@@ -420,8 +420,9 @@ object ChQuery {
       (1 to 22).map(i =>
         if (!excludeList.contains(i)) {
           println("Executig query " + i)
-          executeQuery(i, st, cm, cn, cs, masterUrl))
+          executeQuery(i, st, cm, cn, cs, masterUrl)
         }
+      )
     }
   }
 }
