@@ -11,6 +11,10 @@ class ExperimentalTest extends FunSuite {
   val sc = new SparkContext(conf)
 
   test("Test") {
+    val data = Array(1, 2, 3, 4, 5)
+    val ddata = sc.parallelize(data)
+//    readLine()
+    ddata.count()
     println("====")
     assert(true)
   }

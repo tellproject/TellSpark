@@ -8,8 +8,8 @@ version := "1.0"
 
 scalaVersion := "2.10.5"
 
-mainClass in Compile := Some("ch.ethz.queries.ChQuery")
-//mainClass in Compile := Some("ch.ethz.Experimental")
+//mainClass in Compile := Some("ch.ethz.queries.ChQuery")
+mainClass in Compile := Some("ch.ethz.Debugger")
 
 resolvers ++= Seq(
   Resolver.mavenLocal,
