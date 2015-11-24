@@ -1,6 +1,5 @@
 package ch.ethz.tell
 
-import ch.ethz.TellClientFactory
 import ch.ethz.tell.Field.FieldType
 import org.apache.spark.{SparkContext, _}
 import org.apache.spark.rdd.RDD
@@ -15,8 +14,8 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
                              @transient var deps: Seq[Dependency[_]])
   extends RDD [T](sc, deps) with Logging {
 
+  // class logger
   val logger = LoggerFactory.getLogger(this.getClass)
-
   // Tell schema
   var tSchema: TSchema = null
   // Tell table
@@ -137,32 +136,32 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
    */
   override def collect(): Array[T] = {
     val results = sc.runJob(this, (iter: Iterator[T]) => iter.toArray)
-    TellClientFactory.trx.commit()
+    TClientFactory.trx.commit()
     logger.info("[TRDD] TellStore transaction has been committed.")
     Array.concat(results: _*)
   }
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
     //TODO move the client creation somewhere else?
-    TellClientFactory.setConf(
+    TClientFactory.setConf(
       tContext.storageMng.value,
       tContext.commitMng.value,
       tContext.chNumber.value,
       tContext.chSize.value)
 
     val trxId = tContext.broadcastTc.value
-    TellClientFactory.startTransaction(trxId)
+    TClientFactory.startTransaction(trxId)
     val theSplit = split.asInstanceOf[TPartition[T]]
-    val scanIt = TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, theSplit.index, tQuery), tTable)
+    val scanIt = TClientFactory.trx.scan(new ScanQuery(TClientFactory.chNumber, theSplit.index, tQuery), tTable)
     logger.info("[TRDD] TellStore scanQuery using transactionId: %s".format(tContext.broadcastTc.value))
     getIterator(scanIt)
   }
 
   override protected def getPartitions: Array[Partition] = {
-    val array = new Array[Partition](TellClientFactory.chNumber)
+    val array = new Array[Partition](TClientFactory.chNumber)
 //    TellClientFactory.startTransaction()
     //TODO move the client creation somewhere else?
-    TellClientFactory.setConf(
+    TClientFactory.setConf(
       tContext.storageMng.value,
       tContext.commitMng.value,
       tContext.chNumber.value,
@@ -172,7 +171,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
     logger.info("[TRDD] Partition processing using trxId: %d".format(trxId))
     //TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
-    (0 to TellClientFactory.chNumber -1).map(pos => {
+    (0 to TClientFactory.chNumber -1).map(pos => {
       array(pos) = new TPartition(pos, tQuery, tTable)
       logger.info("[TRDD] Partition used: %s".format(array(pos).toString))
     })

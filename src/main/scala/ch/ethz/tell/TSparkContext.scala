@@ -1,11 +1,11 @@
 package ch.ethz.tell
 
-import ch.ethz.TellClientFactory
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.{SparkConf, SparkContext}
+import org.slf4j.LoggerFactory
 
 /**
- * Created by marenato on 11.11.15.
+ * Spark context in charge of sending configuration parameters
  */
 class TSparkContext (@transient val conf: SparkConf) extends Serializable{
 
@@ -13,6 +13,8 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
    * SparkContext setup
    */
   @transient val sparkContext = new SparkContext(conf)
+  // class logger
+  val logger = LoggerFactory.getLogger(this.getClass)
 
   var storageMng: Broadcast[String] = null
   var commitMng: Broadcast[String] = null
@@ -28,13 +30,13 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
     chNumber = sparkContext.broadcast(chNum)
     chSize = sparkContext.broadcast(chSz)
 
-    TellClientFactory.setConf(strMng, cmMng, chNum,chSz)
+    TClientFactory.setConf(strMng, cmMng, chNum,chSz)
 
     if (broadcastTc == null) {
-      TellClientFactory.startTransaction
-      broadcastTc = sparkContext.broadcast(TellClientFactory.trx.getTransactionId)
-      TellClientFactory.startTransaction(broadcastTc.value)
-      println("==============SPARK_CONTEXT:trxId:=================" + broadcastTc.value)
+      TClientFactory.startTransaction
+      broadcastTc = sparkContext.broadcast(TClientFactory.trx.getTransactionId)
+      TClientFactory.startTransaction(broadcastTc.value)
+      logger.debug("[%s] TransactionId set through SPARK_CONTEXT: %d".format(this.getClass.getSimpleName, broadcastTc.value))
     }
   }
 

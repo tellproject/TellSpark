@@ -2,11 +2,11 @@ package ch.ethz.queries
 
 import java.util.Calendar
 
-import ch.ethz.TellClientFactory
-import ch.ethz.tell.PredicateType.LongType
-import ch.ethz.tell.{TSparkContext, ScanQuery, TRecord, TSchema, TRDD}
-import org.slf4j.{LoggerFactory}
+import _root_.ch.ethz.queries.chb._
+import _root_.ch.ethz.tell.PredicateType.LongType
+import _root_.ch.ethz.tell._
 import org.apache.spark.sql.DataFrame
+import org.slf4j.LoggerFactory
 
 case class Warehouse(w_id: Int,
                      w_name: String,
@@ -173,14 +173,14 @@ class ChQuery {
 
   def timeCollect(df: DataFrame, queryNo: Int): Unit = {
     val t0 = System.nanoTime()
-    var cnt = 0 //df.count
+    var cnt = df.count
 
 
-    val ress = df.collect()
-    ress.foreach(r => {
-      println("[TTTTTTTTTTTTTTTT]" + r.toString())
-      cnt += 1
-    })
+//    val ress = df.collect()
+//    ress.foreach(r => {
+//      println("[TTTTTTTTTTTTTTTT]" + r.toString())
+//      cnt += 1
+//    })
 
     val t1 = System.nanoTime()
     logger.warn("[Query %d] Elapsed time: %d msecs. map:%d".format(queryNo, (t1 - t0) / 1000000, cnt))
@@ -367,7 +367,6 @@ class ChQuery {
 
 object ChQuery {
 
-
   val logger = LoggerFactory.getLogger(this.getClass)
 
   /**
@@ -375,7 +374,7 @@ object ChQuery {
    */
   def executeQuery(queryNo: Int, st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
     assert(queryNo >= 1 && queryNo <= 22, "Invalid query number")
-    val m = Class.forName(f"ch.ethz.queries.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String)}]
+    val m = Class.forName(f"ch.ethz.queries.ch.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String)}]
     logger.info("[%s] Pre query execution".format(this.getClass.getName))
     val res = m.execute(st, cm, cn, cs, mUrl)
     logger.info("[%s] Post query execution".format(this.getClass.getName))
@@ -405,13 +404,13 @@ object ChQuery {
       }
     }
 
-    TellClientFactory.setConf(st, cm, cn, cs)
-    TellClientFactory.getConnection()
-    TellClientFactory.startTransaction()
-    ChTSchema.init_schem(TellClientFactory.trx)
-    TellClientFactory.commitTrx()
+    TClientFactory.setConf(st, cm, cn, cs)
+    TClientFactory.getConnection()
+    TClientFactory.startTransaction()
+    ChTSchema.init_schem(TClientFactory.trx)
+    TClientFactory.commitTrx()
 
-    logger.warn("[%s] Query %d: %s".format(this.getClass.getName,  qryNum, TellClientFactory.toString ))
+    logger.warn("[%s] Query %d: %s".format(this.getClass.getName,  qryNum, TClientFactory.toString ))
     val excludeList = List(16,20,21)
     if (qryNum > 0) {
       executeQuery(qryNum, st, cm, cn, cs, masterUrl)

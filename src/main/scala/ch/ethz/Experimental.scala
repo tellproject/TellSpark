@@ -25,18 +25,18 @@ object Experimental {
       cs = args(3).toInt
     }
 
-    TellClientFactory.storageMng = st
-    TellClientFactory.commitMng = cm
-    TellClientFactory.chNumber = cn
-    TellClientFactory.chSize = cs
+    TClientFactory.storageMng = st
+    TClientFactory.commitMng = cm
+    TClientFactory.chNumber = cn
+    TClientFactory.chSize = cs
 
-    println("[TELL] PARAMETERS USED: " + TellClientFactory.toString())
+    println("[TELL] PARAMETERS USED: " + TClientFactory.toString())
 
     val tblName = "testTable"
 
     // schema to be read
-    TellClientFactory.startTransaction()
-    val sch: TSchema = new TSchema(TellClientFactory.trx.schemaForTable(tblName))
+    TClientFactory.startTransaction()
+    val sch: TSchema = new TSchema(TClientFactory.trx.schemaForTable(tblName))
 
     // rdd creation
     // readLine()

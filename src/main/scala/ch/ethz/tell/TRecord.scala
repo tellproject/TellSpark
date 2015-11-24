@@ -1,7 +1,7 @@
 package ch.ethz.tell
 
 /**
- * Created by marenato on 10.11.15.
+ * Generic TellRecord wrapper
  */
 class TRecord (var fieldSchema: TSchema, var values : Array[Any])
   extends Serializable {
