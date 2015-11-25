@@ -29,13 +29,23 @@ class Q1 extends ChQuery {
     orderLineQuery.addSelection(dateSelection)
 
     val orderline = orderLineRdd(scc, orderLineQuery, ChTSchema.orderLineSch).toDF()
-    logger.info("[MicroQuery %d] Filter at storage level: %s".format(1, orderline.printSchema))
+    logger.info("[MICRO_QUERY %d] Filter at storage level: %s".format(1, orderline.printSchema))
     timeCollect(orderline, 1)
 
     val orderline2 = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF()
     orderline2.filter($"ol_delivery_d" >= 20071212)
-    logger.info("[MicroQuery %s] Filter at compute level: %s".format(1, orderline2.printSchema))
+    logger.info("[MICRO_QUERY %s] Filter at compute level: %s".format(1, orderline2.printSchema))
     timeCollect(orderline2, 1)
+
+    val orderline3 = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF().repartition(32)
+    orderline3.filter($"ol_delivery_d" >= 20071212)
+    logger.info("[MICRO_QUERY %s] Filter at compute level. Repartition [%d]: %s".format(1, 32, orderline3.printSchema))
+    timeCollect(orderline3, 1)
+
+    val orderline4 = orderLineRdd(scc, new ScanQuery, ChTSchema.orderLineSch).toDF().repartition(16)
+    orderline4.filter($"ol_delivery_d" >= 20071212)
+    logger.info("[MICRO_QUERY %s] Filter at compute level. Repartition [%d]: %s".format(1, 16, orderline3.printSchema))
+    timeCollect(orderline3, 1)
 
     scc.sparkContext.stop()
   }
