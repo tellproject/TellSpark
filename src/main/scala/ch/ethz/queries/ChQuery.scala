@@ -372,7 +372,7 @@ object ChQuery {
    */
   def executeQuery(queryNo: Int, st: String, cm: String, cn: Int, cs: Long, mUrl: String): Unit = {
     assert(queryNo >= 1 && queryNo <= 22, "Invalid query number")
-    val m = Class.forName(f"ch.ethz.queries.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Long, mUrl: String)}]
+    val m = Class.forName(f"ch.ethz.queries.chb.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Long, mUrl: String)}]
     logger.info("[%s] Pre query execution".format(this.getClass.getName))
     val res = m.execute(st, cm, cn, cs, mUrl)
     logger.info("[%s] Post query execution".format(this.getClass.getName))
@@ -415,12 +415,6 @@ object ChQuery {
     if (qryNum > 0) {
       executeQuery(qryNum, st, cm, cn, cs, masterUrl)
     } else {
-//      (1 to 22).map(i =>
-//        if (!excludeList.contains(i)) {
-//          logger.warn("Executig query " + i)
-//          executeQuery(i, st, cm, cn, cs, masterUrl)
-//        }
-//      )
       includeList.map(i => {
         logger.warn("Executig query " + i)
         executeQuery(i, st, cm, cn, cs, masterUrl)
