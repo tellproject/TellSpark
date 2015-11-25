@@ -372,11 +372,7 @@ object ChQuery {
    */
   def executeQuery(queryNo: Int, st: String, cm: String, cn: Int, cs: Long, mUrl: String): Unit = {
     assert(queryNo >= 1 && queryNo <= 22, "Invalid query number")
-<<<<<<< Updated upstream
-    val m = Class.forName(f"ch.ethz.queries.ch.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String)}]
-=======
     val m = Class.forName(f"ch.ethz.queries.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Long, mUrl: String)}]
->>>>>>> Stashed changes
     logger.info("[%s] Pre query execution".format(this.getClass.getName))
     val res = m.execute(st, cm, cn, cs, mUrl)
     logger.info("[%s] Post query execution".format(this.getClass.getName))
@@ -412,14 +408,10 @@ object ChQuery {
     ChTSchema.init_schem(TClientFactory.trx)
     TClientFactory.commitTrx()
 
-<<<<<<< Updated upstream
     logger.warn("[%s] Query %d: %s".format(this.getClass.getName,  qryNum, TClientFactory.toString ))
     val excludeList = List(16,20,21)
-=======
-    logger.warn("[%s] Query %d: %s".format(this.getClass.getName,  qryNum, TellClientFactory.toString ))
 //    val excludeList = List(16,20,21
      val includeList = List(1,4,6,7,11,17,18,22)
->>>>>>> Stashed changes
     if (qryNum > 0) {
       executeQuery(qryNum, st, cm, cn, cs, masterUrl)
     } else {

@@ -1,5 +1,6 @@
 package ch.ethz.queries
 
+import ch.ethz.queries.chb.ChTSchema
 import ch.ethz.tell.Field.FieldType
 import ch.ethz.tell.ScanQuery.AggrType
 import ch.ethz.tell._

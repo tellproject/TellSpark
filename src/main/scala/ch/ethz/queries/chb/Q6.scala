@@ -1,9 +1,6 @@
 package ch.ethz.queries.chb
 
 import ch.ethz.queries.ChQuery
-import ch.ethz.tell.Field.FieldType
-import ch.ethz.tell.ScanQuery.AggrType
-import ch.ethz.tell.PredicateType.ShortType
 import ch.ethz.tell._
 
 /**
@@ -20,6 +17,8 @@ class Q6 extends ChQuery {
   override def execute(st: String, cm: String, cn:Int, cs:Long, mUrl:String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
+    import org.apache.spark.sql.functions._
+    import sqlContext.implicits._
 
     // prepare date selection
     val oSchema = ChTSchema.orderLineSch
