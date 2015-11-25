@@ -25,7 +25,7 @@ class Q9 extends ChQuery {
 
   val getYear = udf { (x: Long) => Instant.ofEpochSecond(x).toString.substring(0,4) }
 
-  override def execute(st: String, cm: String, cn:Int, cs:Int, mUrl:String): Unit = {
+  override def execute(st: String, cm: String, cn:Int, cs:Long, mUrl:String): Unit = {
     val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
     val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
     import org.apache.spark.sql.functions._

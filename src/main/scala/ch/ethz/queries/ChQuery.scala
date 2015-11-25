@@ -169,13 +169,11 @@ class ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = ???
+  def execute(st: String, cm: String, cn: Int, cs: Long, mUrl: String): Unit = ???
 
   def timeCollect(df: DataFrame, queryNo: Int): Unit = {
     val t0 = System.nanoTime()
-    var cnt = df.count
-
-
+    val cnt = df.count
 //    val ress = df.collect()
 //    ress.foreach(r => {
 //      println("[TTTTTTTTTTTTTTTT]" + r.toString())
@@ -372,9 +370,13 @@ object ChQuery {
   /**
    * Execute query reflectively
    */
-  def executeQuery(queryNo: Int, st: String, cm: String, cn: Int, cs: Int, mUrl: String): Unit = {
+  def executeQuery(queryNo: Int, st: String, cm: String, cn: Int, cs: Long, mUrl: String): Unit = {
     assert(queryNo >= 1 && queryNo <= 22, "Invalid query number")
+<<<<<<< Updated upstream
     val m = Class.forName(f"ch.ethz.queries.ch.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Int, mUrl: String)}]
+=======
+    val m = Class.forName(f"ch.ethz.queries.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Long, mUrl: String)}]
+>>>>>>> Stashed changes
     logger.info("[%s] Pre query execution".format(this.getClass.getName))
     val res = m.execute(st, cm, cn, cs, mUrl)
     logger.info("[%s] Post query execution".format(this.getClass.getName))
@@ -384,7 +386,7 @@ object ChQuery {
     var st = "192.168.0.21:7241"
     var cm = "192.168.0.21:7242"
     var cn = 4
-    var cs = 5120000
+    var cs = 5120000L
     var masterUrl = "local[1]"
     var qryNum = 6
 
@@ -393,7 +395,7 @@ object ChQuery {
       st = args(0)
       cm = args(1)
       cn = args(2).toInt
-      cs = args(3).toInt
+      cs = args(3).toLong
       if (args.length == 6) {
         masterUrl = args(4)
         qryNum = args(5).toInt
@@ -410,16 +412,27 @@ object ChQuery {
     ChTSchema.init_schem(TClientFactory.trx)
     TClientFactory.commitTrx()
 
+<<<<<<< Updated upstream
     logger.warn("[%s] Query %d: %s".format(this.getClass.getName,  qryNum, TClientFactory.toString ))
     val excludeList = List(16,20,21)
+=======
+    logger.warn("[%s] Query %d: %s".format(this.getClass.getName,  qryNum, TellClientFactory.toString ))
+//    val excludeList = List(16,20,21
+     val includeList = List(1,4,6,7,11,17,18,22)
+>>>>>>> Stashed changes
     if (qryNum > 0) {
       executeQuery(qryNum, st, cm, cn, cs, masterUrl)
     } else {
-      (1 to 22).map(i =>
-        if (!excludeList.contains(i)) {
-          logger.warn("Executig query " + i)
-          executeQuery(i, st, cm, cn, cs, masterUrl)
-        }
+//      (1 to 22).map(i =>
+//        if (!excludeList.contains(i)) {
+//          logger.warn("Executig query " + i)
+//          executeQuery(i, st, cm, cn, cs, masterUrl)
+//        }
+//      )
+      includeList.map(i => {
+        logger.warn("Executig query " + i)
+        executeQuery(i, st, cm, cn, cs, masterUrl)
+      }
       )
     }
   }

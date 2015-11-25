@@ -19,10 +19,10 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
   var storageMng: Broadcast[String] = null
   var commitMng: Broadcast[String] = null
   var chNumber: Broadcast[Int] = null
-  var chSize: Broadcast[Int] = null
+  var chSize: Broadcast[Long] = null
   var broadcastTc: Broadcast[Long] = null
 
-  def this(masterUrl: String, appName: String, strMng: String, cmMng: String, chNum: Int, chSz: Int) {
+  def this(masterUrl: String, appName: String, strMng: String, cmMng: String, chNum: Int, chSz: Long) {
 
     this(new SparkConf().setMaster(masterUrl).setAppName(appName))
     storageMng = sparkContext.broadcast(strMng)

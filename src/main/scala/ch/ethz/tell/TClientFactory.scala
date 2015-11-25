@@ -9,7 +9,7 @@ object TClientFactory {
 
   val logger = LoggerFactory.getLogger(this.getClass)
 
-  def setConf(strMng: String, cmMng: String, chNum: Int, chSz: Int) = {
+  def setConf(strMng: String, cmMng: String, chNum: Int, chSz: Long) = {
     storageMng = strMng
     commitMng = cmMng
     chNumber = chNum
@@ -20,7 +20,7 @@ object TClientFactory {
   var commitMng: String = ""
   var storageMng: String = ""
   var chNumber = 0
-  var chSize = 0
+  var chSize = 0L
   // TODO we should use it properly
   var trx : Transaction = null
   var trxId : Long = 0L
