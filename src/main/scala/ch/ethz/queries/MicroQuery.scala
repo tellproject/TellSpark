@@ -12,7 +12,7 @@ object MicroQuery {
    * Execute query reflectively
    */
   def executeQuery(queryNo: Int, st: String, cm: String, cn: Int, cs: Long, mUrl: String): Unit = {
-    assert(queryNo >= 'A' && queryNo <= 'Z', "Invalid query id")
+    assert(queryNo >= 1 && queryNo <= 22, "Invalid query id")
     val m = Class.forName(f"ch.ethz.queries.micro.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Long, mUrl: String)}]
     logger.info("[%s] Pre query execution".format(this.getClass.getName))
     val res = m.execute(st, cm, cn, cs, mUrl)
