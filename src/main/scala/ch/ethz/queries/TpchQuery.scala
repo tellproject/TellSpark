@@ -310,13 +310,12 @@ object TpchQuery {
         qryNum = args(5).toInt
       } else {
         println("[TELL] Incorrect number of parameters")
-        println("[TELL] <strMng> <commitMng> <chunkNum> <chunkSz> <masterUrl> <appName>")
+        println("[TELL] <strMng> <commitMng> <partNum> <chunkSz> <masterUrl> <appName>")
         throw new RuntimeException("Invalid number of arguments")
       }
     }
 
-    TClientFactory.setConf(st, cm, cn, cs)
-    TClientFactory.getConnection()
+    TClientFactory.setConf(st, cm, cs)
     TClientFactory.startTransaction()
     ChTSchema.init_schem(TClientFactory.trx)
     TClientFactory.commitTrx()
@@ -328,7 +327,7 @@ object TpchQuery {
     } else {
       (1 to 22).map(i =>
         if (!excludeList.contains(i)) {
-          logger.warn("Executig query " + i)
+          logger.warn("Executing query " + i)
           executeQuery(i, st, cm, cn, cs, masterUrl)
         }
       )

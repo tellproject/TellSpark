@@ -381,7 +381,7 @@ object ChQuery {
   def main(args: Array[String]): Unit = {
     var st = "192.168.0.21:7241"
     var cm = "192.168.0.21:7242"
-    var cn = 4
+    var partNum = 4
     var cs = 5120000L
     var masterUrl = "local[1]"
     var qryNum = 6
@@ -390,20 +390,19 @@ object ChQuery {
     if (args.length >= 4) {
       st = args(0)
       cm = args(1)
-      cn = args(2).toInt
+      partNum = args(2).toInt
       cs = args(3).toLong
       if (args.length == 6) {
         masterUrl = args(4)
         qryNum = args(5).toInt
       } else {
         println("[TELL] Incorrect number of parameters")
-        println("[TELL] <strMng> <commitMng> <chunkNum> <chunkSz> <masterUrl> <appName>")
+        println("[TELL] <strMng> <commitMng> <partNum> <chunkSz> <masterUrl> <appName>")
         throw new RuntimeException("Invalid number of arguments")
       }
     }
 
-    TClientFactory.setConf(st, cm, cn, cs)
-    TClientFactory.getConnection()
+    TClientFactory.setConf(st, cm, cs)
     TClientFactory.startTransaction()
     ChTSchema.init_schem(TClientFactory.trx)
     TClientFactory.commitTrx()
@@ -413,11 +412,11 @@ object ChQuery {
 //    val excludeList = List(16,20,21
      val includeList = List(1,4,6,7,11,17,18,22)
     if (qryNum > 0) {
-      executeQuery(qryNum, st, cm, cn, cs, masterUrl)
+      executeQuery(qryNum, st, cm, partNum, cs, masterUrl)
     } else {
       includeList.map(i => {
-        logger.warn("Executig query " + i)
-        executeQuery(i, st, cm, cn, cs, masterUrl)
+        logger.warn("Executing query " + i)
+        executeQuery(i, st, cm, partNum, cs, masterUrl)
       }
       )
     }

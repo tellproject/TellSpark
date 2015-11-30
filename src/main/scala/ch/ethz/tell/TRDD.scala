@@ -146,7 +146,6 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     TClientFactory.setConf(
       tContext.storageMng.value,
       tContext.commitMng.value,
-      tContext.chNumber.value,
       tContext.chSize.value)
 
     val trxId = tContext.broadcastTc.value
@@ -159,20 +158,19 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
   override protected def getPartitions: Array[Partition] = {
     val array = new Array[Partition](TClientFactory.chNumber)
-//    TellClientFactory.startTransaction()
     //TODO move the client creation somewhere else?
     TClientFactory.setConf(
       tContext.storageMng.value,
       tContext.commitMng.value,
-      tContext.chNumber.value,
       tContext.chSize.value)
 
     val trxId = tContext.broadcastTc.value
+    val partNum = tContext.partNum.value
 
     logger.info("[TRDD] Partition processing using trxId: %d".format(trxId))
     //TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
-    (0 to TClientFactory.chNumber-1).map(pos => {
-      val scn = new ScanQuery(TClientFactory.chNumber, pos + 1, tQuery)
+    (0 to partNum-1).map(pos => {
+      val scn = new ScanQuery(TClientFactory.chNumber, pos, tQuery)
       array(pos) = new TPartition(pos, scn, tTable)
       logger.info("[TRDD] Partition used: %s".format(array(pos).toString))
     })

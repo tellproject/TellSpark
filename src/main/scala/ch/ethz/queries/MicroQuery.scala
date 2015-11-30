@@ -38,13 +38,13 @@ object MicroQuery {
         qryNum = args(5).toInt
       } else {
         println("[TELL] Incorrect number of parameters")
-        println("[TELL] <strMng> <commitMng> <chunkNum> <chunkSz> <masterUrl> <appName>")
+        println("[TELL] <strMng> <commitMng> <partNum> <chunkSz> <masterUrl> <appName>")
         throw new RuntimeException("Invalid number of arguments")
       }
     }
 
-    TClientFactory.setConf(st, cm, cn, cs)
-    TClientFactory.getConnection()
+    TClientFactory.setConf(st, cm, cs)
+//    TClientFactory.getConnection()
     TClientFactory.startTransaction()
     ChTSchema.init_schem(TClientFactory.trx)
     TClientFactory.commitTrx()
@@ -57,7 +57,7 @@ object MicroQuery {
       executeQuery(qryNum, st, cm, cn, cs, masterUrl)
 //    } else {
 //      includeList.map(i => {
-//        logger.warn("Executig query " + i)
+//        logger.warn("Executing query " + i)
 //        executeQuery(i, st, cm, cn, cs, masterUrl)
 //      }
 //      )

@@ -9,10 +9,10 @@ object TClientFactory {
 
   val logger = LoggerFactory.getLogger(this.getClass)
 
-  def setConf(strMng: String, cmMng: String, chNum: Int, chSz: Long) = {
+  def setConf(strMng: String, cmMng: String, chSz: Long) = {
     storageMng = strMng
     commitMng = cmMng
-    chNumber = chNum
+    chNumber = strMng.split(";").length
     chSize = chSz
     logger.info("[%s] TellStore configured to: %s".format(this.getClass.getName, this.toString()))
   }
@@ -25,26 +25,18 @@ object TClientFactory {
   var trx : Transaction = null
   var trxId : Long = 0L
 
-  var clientManager: ClientManager = null
-
-  def getConnection(): ClientManager = {
-    //TODO move the client creation somewhere else?
-    if (clientManager == null) {
-      logger.info("[%s] ClientManager is about to be created.".format(this.getClass.getName))
-      clientManager = new ClientManager(commitMng, storageMng, chNumber, chSize)
-      logger.info("[%s] ClientManager has been created.".format(this.getClass.getName))
-    }
-    clientManager
-  }
-
   def startTransaction() = {
-    trx = Transaction.startTransaction(getConnection)
+    //trx = Transaction.startTransaction(getConnection)
+    trx = Transaction.startTransaction(new ClientManager(commitMng, storageMng, chNumber, chSize))
+    logger.info("[%s] New client created.".format(this.getClass.getName))
     trxId = trx.getTransactionId
     logger.info("[%s] Starting transaction with trxId %d.".format(this.getClass.getName, trxId))
   }
 
   def startTransaction(trId: Long) = {
-    trx = Transaction.startTransaction(trId, getConnection)
+    //trx = Transaction.startTransaction(trId, getConnection)
+    trx = Transaction.startTransaction(trId, new ClientManager(commitMng, storageMng, chNumber, chSize))
+    logger.info("[%s] New client created.".format(this.getClass.getName))
     trxId = trx.getTransactionId
     logger.info("[%s] Starting transaction with trxId %d.".format(this.getClass.getName, trxId))
   }

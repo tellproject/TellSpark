@@ -18,19 +18,19 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
 
   var storageMng: Broadcast[String] = null
   var commitMng: Broadcast[String] = null
-  var chNumber: Broadcast[Int] = null
+  var partNum: Broadcast[Int] = null
   var chSize: Broadcast[Long] = null
   var broadcastTc: Broadcast[Long] = null
 
-  def this(masterUrl: String, appName: String, strMng: String, cmMng: String, chNum: Int, chSz: Long) {
+  def this(masterUrl: String, appName: String, strMng: String, cmMng: String, pNum: Int, chSz: Long) {
 
     this(new SparkConf().setMaster(masterUrl).setAppName(appName))
     storageMng = sparkContext.broadcast(strMng)
     commitMng = sparkContext.broadcast(cmMng)
-    chNumber = sparkContext.broadcast(chNum)
+    partNum = sparkContext.broadcast(pNum)
     chSize = sparkContext.broadcast(chSz)
 
-    TClientFactory.setConf(strMng, cmMng, chNum,chSz)
+    TClientFactory.setConf(strMng, cmMng,chSz)
 
     if (broadcastTc == null) {
       TClientFactory.startTransaction
