@@ -171,8 +171,9 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
     logger.info("[TRDD] Partition processing using trxId: %d".format(trxId))
     //TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
-    (0 to TClientFactory.chNumber -1).map(pos => {
-      array(pos) = new TPartition(pos, tQuery, tTable)
+    (1 to TClientFactory.chNumber).map(pos => {
+      val scn = new ScanQuery(TClientFactory.chNumber, pos, tQuery)
+      array(pos) = new TPartition(pos, scn, tTable)
       logger.info("[TRDD] Partition used: %s".format(array(pos).toString))
     })
     array
