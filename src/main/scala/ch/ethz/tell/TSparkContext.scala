@@ -25,6 +25,7 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
   def this(masterUrl: String, appName: String, strMng: String, cmMng: String, pNum: Int, chSz: Long) {
 
     this(new SparkConf().setMaster(masterUrl).setAppName(appName))
+    logger.warn("[%s] SPARK_EXECUTOR_MEMORY_STATUS: %d".format(this.getClass.getSimpleName, sparkContext.getExecutorMemoryStatus))
     storageMng = sparkContext.broadcast(strMng)
     commitMng = sparkContext.broadcast(cmMng)
     partNum = sparkContext.broadcast(pNum)
