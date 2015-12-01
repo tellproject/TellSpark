@@ -24,7 +24,7 @@ object ChTSchema  extends Serializable{
   var nationSch: TSchema = null
   var supplierSch: TSchema = null
 
-  def init_schem(transaction: Transaction) = {
+  def init_schema(transaction: Transaction) = {
     var tellSchema = transaction.schemaForTable("warehouse")
     warehouseSch = new TSchema(tellSchema)
 

@@ -370,11 +370,11 @@ object ChQuery {
   /**
    * Execute query reflectively
    */
-  def executeQuery(queryNo: Int, st: String, cm: String, cn: Int, cs: Long, mUrl: String): Unit = {
+  def executeQuery(queryNo: Int, st: String, cm: String, pn: Int, cs: Long, mUrl: String): Unit = {
     assert(queryNo >= 1 && queryNo <= 22, "Invalid query number")
     val m = Class.forName(f"ch.ethz.queries.chb.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Long, mUrl: String)}]
     logger.info("[%s] Pre query execution".format(this.getClass.getName))
-    val res = m.execute(st, cm, cn, cs, mUrl)
+    val res = m.execute(st, cm, pn, cs, mUrl)
     logger.info("[%s] Post query execution".format(this.getClass.getName))
   }
 
@@ -404,12 +404,11 @@ object ChQuery {
 
     TClientFactory.setConf(st, cm, cs)
     TClientFactory.startTransaction()
-    ChTSchema.init_schem(TClientFactory.trx)
+    ChTSchema.init_schema(TClientFactory.mainTrx)
     TClientFactory.commitTrx()
 
     logger.warn("[%s] Query %d: %s".format(this.getClass.getName,  qryNum, TClientFactory.toString ))
     val excludeList = List(16,20,21)
-//    val excludeList = List(16,20,21
      val includeList = List(1,4,6,7,11,17,18,22)
     if (qryNum > 0) {
       executeQuery(qryNum, st, cm, partNum, cs, masterUrl)

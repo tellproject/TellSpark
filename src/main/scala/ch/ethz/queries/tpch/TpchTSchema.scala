@@ -2,8 +2,6 @@ package ch.ethz.queries.tpch
 
 import ch.ethz.tell.{TSchema, Transaction}
 
-
-//TODO: probably, this class becomes obsolete at some point, remove it!
 /**
  * Wrapper for getting the right schema from Tell
  */
@@ -18,7 +16,7 @@ object TpchTSchema  extends Serializable {
   var nationSch: TSchema = null
   var regionSch: TSchema = null
 
-  def init_schem(transaction: Transaction) = {
+  def init_schema(transaction: Transaction) = {
     var tellSchema = transaction.schemaForTable("part")
     partSch = new TSchema(tellSchema)
 

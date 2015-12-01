@@ -46,7 +46,7 @@ object MicroQuery {
     TClientFactory.setConf(st, cm, cs)
 //    TClientFactory.getConnection()
     TClientFactory.startTransaction()
-    ChTSchema.init_schem(TClientFactory.trx)
+    ChTSchema.init_schema(TClientFactory.mainTrx)
     TClientFactory.commitTrx()
 
     logger.warn("[%s] Query %d: %s".format(this.getClass.getName,  qryNum, TClientFactory.toString ))

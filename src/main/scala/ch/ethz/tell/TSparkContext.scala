@@ -35,8 +35,7 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
 
     if (broadcastTc == null) {
       TClientFactory.startTransaction
-      broadcastTc = sparkContext.broadcast(TClientFactory.trx.getTransactionId)
-      TClientFactory.startTransaction(broadcastTc.value)
+      broadcastTc = sparkContext.broadcast(TClientFactory.getMainTrxId)
       logger.debug("[%s] TransactionId set through SPARK_CONTEXT: %d".format(this.getClass.getSimpleName, broadcastTc.value))
     }
   }

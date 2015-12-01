@@ -22,27 +22,29 @@ object TClientFactory {
   var chNumber = 0
   var chSize = 0L
   // TODO we should use it properly
-  var trx : Transaction = null
-  var trxId : Long = 0L
+  var mainTrx : Transaction = null  // used by driver program
 
+  // creates a new transaction with only a small dummy buffer
+  // used mainly to get a new transaction-id
   def startTransaction() = {
-    //trx = Transaction.startTransaction(getConnection)
-    trx = Transaction.startTransaction(new ClientManager(commitMng, storageMng, chNumber, chSize))
+    mainTrx = Transaction.startTransaction(new ClientManager(commitMng, storageMng, 1, 64))
     logger.info("[%s] New client created.".format(this.getClass.getName))
-    trxId = trx.getTransactionId
-    logger.info("[%s] Starting transaction with trxId %d.".format(this.getClass.getName, trxId))
+    logger.info("[%s] Starting transaction with trxId %d.".format(this.getClass.getName, mainTrx.getTransactionId))
   }
 
-  def startTransaction(trId: Long) = {
-    //trx = Transaction.startTransaction(trId, getConnection)
-    trx = Transaction.startTransaction(trId, new ClientManager(commitMng, storageMng, chNumber, chSize))
+  // gets a transaction object for the given transaction-id. Allocates necessary result buffers.
+  def getTransaction(trId: Long) = {
     logger.info("[%s] New client created.".format(this.getClass.getName))
-    trxId = trx.getTransactionId
-    logger.info("[%s] Starting transaction with trxId %d.".format(this.getClass.getName, trxId))
+    logger.info("[%s] Starting transaction with trxId %d.".format(this.getClass.getName, trId))
+    Transaction.startTransaction(trId, new ClientManager(commitMng, storageMng, chNumber, chSize))
   }
 
   def commitTrx() = {
-    trx.commit()
+    mainTrx.commit
+  }
+
+  def getMainTrxId() = {
+    mainTrx.getTransactionId
   }
 
   override def toString() : String = {

@@ -136,7 +136,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
    */
   override def collect(): Array[T] = {
     val results = sc.runJob(this, (iter: Iterator[T]) => iter.toArray)
-    TClientFactory.trx.commit()
+    TClientFactory.commitTrx()
     logger.info("[TRDD] TellStore transaction has been committed.")
     Array.concat(results: _*)
   }
@@ -148,22 +148,15 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       tContext.commitMng.value,
       tContext.chSize.value)
 
-    val trxId = tContext.broadcastTc.value
-    // starting a new transaction implies creating a new connection
-    TClientFactory.startTransaction(trxId)
+    // getting the transaction object (including allocating result buffers for it)
+    val trx = TClientFactory.getTransaction(tContext.broadcastTc.value)
     val theSplit = split.asInstanceOf[TPartition[T]]
-    val scanIt = TClientFactory.trx.scan(new ScanQuery(TClientFactory.chNumber, theSplit.index, tQuery), tTable)
+    val scanIt = trx.scan(new ScanQuery(TClientFactory.chNumber, theSplit.index, tQuery), tTable)
     logger.info("[TRDD] TellStore scanQuery using transactionId: %s".format(tContext.broadcastTc.value))
     getIterator(scanIt)
   }
 
   override protected def getPartitions: Array[Partition] = {
-
-//    TODO move the client creation somewhere else?
-//    TClientFactory.setConf(
-//      tContext.storageMng.value,
-//      tContext.commitMng.value,
-//      tContext.chSize.value)
 
     val trxId = tContext.broadcastTc.value
     val partNum = tContext.partNum.value

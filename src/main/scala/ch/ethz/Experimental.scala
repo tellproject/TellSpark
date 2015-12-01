@@ -36,7 +36,7 @@ object Experimental {
 
     // schema to be read
     TClientFactory.startTransaction()
-    val sch: TSchema = new TSchema(TClientFactory.trx.schemaForTable(tblName))
+    val sch: TSchema = new TSchema(TClientFactory.mainTrx.schemaForTable(tblName))
 
     // rdd creation
     // readLine()
