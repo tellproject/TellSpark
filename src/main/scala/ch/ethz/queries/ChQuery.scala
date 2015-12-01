@@ -148,22 +148,22 @@ class ChQuery {
 
    {
     calendar.set(1999, 1, 1)
-    referenceDate1999 = new LongType(calendar.getTimeInMillis)
+    referenceDate1999 = new LongType(calendar.getTimeInMillis * 1000 * 1000)  // create nano seconds
 
     calendar.set(2007, 1, 2)
-    referenceDate2007 = new LongType(calendar.getTimeInMillis)
+    referenceDate2007 = new LongType(calendar.getTimeInMillis * 1000 * 1000)  // create nano seconds
 
     calendar.set(2010, 5, 23, 12, 0)
-    referenceDate2010 = new LongType(calendar.getTimeInMillis)
+    referenceDate2010 = new LongType(calendar.getTimeInMillis * 1000 * 1000)  // create nano seconds
 
     calendar.set(2012, 1, 2)
-    referenceDate2012 = new LongType(calendar.getTimeInMillis)
+    referenceDate2012 = new LongType(calendar.getTimeInMillis * 1000 * 1000)  // create nano seconds
 
     calendar.set(2020, 1, 1)
-    referenceDate2020First = new LongType(calendar.getTimeInMillis)
+    referenceDate2020First = new LongType(calendar.getTimeInMillis * 1000 * 1000)  // create nano seconds
 
     calendar.set(2020, 1, 2)
-    referenceDate2020Second = new LongType(calendar.getTimeInMillis)
+    referenceDate2020Second = new LongType(calendar.getTimeInMillis * 1000 * 1000)  // create nano seconds
   }
 
   /**
