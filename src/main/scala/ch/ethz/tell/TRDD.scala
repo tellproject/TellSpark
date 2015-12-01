@@ -149,6 +149,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
       tContext.chSize.value)
 
     val trxId = tContext.broadcastTc.value
+    // starting a new transaction implies creating a new connection
     TClientFactory.startTransaction(trxId)
     val theSplit = split.asInstanceOf[TPartition[T]]
     val scanIt = TClientFactory.trx.scan(new ScanQuery(TClientFactory.chNumber, theSplit.index, tQuery), tTable)
@@ -158,19 +159,20 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
   override protected def getPartitions: Array[Partition] = {
     val array = new Array[Partition](TClientFactory.chNumber)
-    //TODO move the client creation somewhere else?
-    TClientFactory.setConf(
-      tContext.storageMng.value,
-      tContext.commitMng.value,
-      tContext.chSize.value)
+//    TODO move the client creation somewhere else?
+//    TClientFactory.setConf(
+//      tContext.storageMng.value,
+//      tContext.commitMng.value,
+//      tContext.chSize.value)
 
     val trxId = tContext.broadcastTc.value
     val partNum = tContext.partNum.value
 
     logger.info("[TRDD] Partition processing using trxId: %d".format(trxId))
     //TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
+    val numTellStorage = tContext.storageMng.value.split(";").length
     (0 to partNum-1).map(pos => {
-      val scn = new ScanQuery(TClientFactory.chNumber, pos, tQuery)
+      val scn = new ScanQuery(numTellStorage, pos, tQuery)
       array(pos) = new TPartition(pos, scn, tTable)
       logger.info("[TRDD] Partition used: %s".format(array(pos).toString))
     })
