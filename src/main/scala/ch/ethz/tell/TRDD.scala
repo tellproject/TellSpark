@@ -1,5 +1,6 @@
 package ch.ethz.tell
 
+import ch.ethz.TScanQuery
 import ch.ethz.tell.Field.FieldType
 import org.apache.spark.{SparkContext, _}
 import org.apache.spark.rdd.RDD
@@ -21,11 +22,11 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   // Tell table
   var tTable: String = ""
   // Tell query
-  var tQuery: ScanQuery = null
+  var tQuery: TScanQuery = null
   // Tell context
   var tContext: TSparkContext = null
 
-  def this(@transient scc: TSparkContext, tbl: String, qry: ScanQuery, sch: TSchema) = {
+  def this(@transient scc: TSparkContext, tbl: String, qry: TScanQuery, sch: TSchema) = {
     this(scc.sparkContext, Nil)
     tSchema = sch
     tTable = tbl
@@ -136,22 +137,13 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
    */
   override def collect(): Array[T] = {
     val results = sc.runJob(this, (iter: Iterator[T]) => iter.toArray)
-    TClientFactory.commitTrx()
     logger.info("[TRDD] TellStore transaction has been committed.")
     Array.concat(results: _*)
   }
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
-    //TODO move the client creation somewhere else?
-    TClientFactory.setConf(
-      tContext.storageMng.value,
-      tContext.commitMng.value,
-      tContext.chSize.value)
-
-    // getting the transaction object (including allocating result buffers for it)
-    val trx = TClientFactory.getTransaction(tContext.broadcastTc.value)
     val theSplit = split.asInstanceOf[TPartition[T]]
-    val scanIt = trx.scan(new ScanQuery(TClientFactory.chNumber, theSplit.index, tQuery), tTable)
+    val scanIt = sparkContext.asInstanceOf[TSparkContext].startScan(theSplit.scanQry)
     logger.info("[TRDD] TellStore scanQuery using transactionId: %s".format(tContext.broadcastTc.value))
     getIterator(scanIt)
   }
@@ -162,11 +154,9 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
     val partNum = tContext.partNum.value
     val array = new Array[Partition](partNum)
     logger.info("[TRDD] Partition processing using trxId: %d".format(trxId))
-    //TellClientFactory.trx.scan(new ScanQuery(TellClientFactory.chNumber, pos, tQuery), tTable))
 
-    val numTellStorage = tContext.storageMng.value.split(";").length
     (0 to partNum-1).map(pos => {
-      val scn = new ScanQuery(numTellStorage, pos, tQuery)
+      val scn = new TScanQuery(pos, tQuery)
       array(pos) = new TPartition(pos, scn, tTable)
       logger.info("[TRDD] Partition used: %s".format(array(pos).toString))
     })

@@ -1,5 +1,8 @@
 package ch.ethz.queries
 
+import ch.ethz.TScanQuery
+import org.apache.spark.sql.SQLContext
+
 import java.util.Calendar
 
 import _root_.ch.ethz.queries.chb._
@@ -169,7 +172,7 @@ class ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  def execute(st: String, cm: String, cn: Int, cs: Long, mUrl: String): Unit = ???
+  def execute(tSparkContext: TSparkContext, sqlContext: SQLContext): Unit = ???
 
   def timeCollect(df: DataFrame, queryNo: Int): Unit = {
     val t0 = System.nanoTime()
@@ -184,7 +187,7 @@ class ChQuery {
     logger.warn("[Query %d] Elapsed time: %d msecs. map:%d".format(queryNo, (t1 - t0) / 1000000, cnt))
   }
 
-  def warehouseRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
+  def warehouseRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "warehouse", scanQuery, tSchema).map(r => {
       Warehouse(r.getValue("w_id").asInstanceOf[Int],
         r.getValue("w_name").asInstanceOf[String],
@@ -199,7 +202,7 @@ class ChQuery {
     })
   }
 
-  def districtRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
+  def districtRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "district", scanQuery, tSchema).map(r => {
       District(r.getValue("d_id").asInstanceOf[Short],
         r.getValue("d_w_id").asInstanceOf[Short],
@@ -216,7 +219,7 @@ class ChQuery {
     })
   }
 
-  def customerRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
+  def customerRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "customer", scanQuery, tSchema).map(r => {
       Customer(r.getValue("c_id").asInstanceOf[Int],
         r.getValue("c_d_id").asInstanceOf[Short],
@@ -244,7 +247,7 @@ class ChQuery {
     })
   }
 
-  def historyRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
+  def historyRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "history", scanQuery, tSchema).map(r => {
       History(r.getValue("h_c_id").asInstanceOf[Int],
         r.getValue("h_c_d_id").asInstanceOf[Short],
@@ -258,8 +261,8 @@ class ChQuery {
     })
   }
 
-  def newOrderRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "new-order", new ScanQuery(), tSchema).map(r => {
+  def newOrderRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
+    new TRDD[TRecord](scc, "new-order", scanQuery, tSchema).map(r => {
       NewOrder(r.getValue("no_o_id").asInstanceOf[Int],
         r.getValue("no_d_id").asInstanceOf[Short],
         r.getValue("no_w_id").asInstanceOf[Short]
@@ -267,7 +270,7 @@ class ChQuery {
     })
   }
 
-  def orderRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
+  def orderRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "order", scanQuery, tSchema).map(r => {
       Order(r.getValue("o_id").asInstanceOf[Int],
         r.getValue("o_d_id").asInstanceOf[Short],
@@ -281,7 +284,7 @@ class ChQuery {
     })
   }
 
-  def orderLineRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
+  def orderLineRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "order-line", scanQuery, tSchema).map(r => {
       OrderLine(r.getValue("ol_o_id").asInstanceOf[Int],
         r.getValue("ol_d_id").asInstanceOf[Short],
@@ -297,7 +300,7 @@ class ChQuery {
     })
   }
 
-  def itemRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
+  def itemRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "item", scanQuery, tSchema).map(r => {
       Item(r.getValue("i_id").asInstanceOf[Int],
         r.getValue("i_im_id").asInstanceOf[Int],
@@ -308,7 +311,7 @@ class ChQuery {
     })
   }
 
-  def stockRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
+  def stockRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "stock", scanQuery, tSchema).map(r => {
       Stock(r.getValue("s_i_id").asInstanceOf[Int],
         r.getValue("s_w_id").asInstanceOf[Short],
@@ -332,7 +335,7 @@ class ChQuery {
     })
   }
 
-  def regionRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
+  def regionRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "region", scanQuery, tSchema).map(r => {
       Region(r.getValue("r_regionkey").asInstanceOf[Short],
         r.getValue("r_name").asInstanceOf[String],
@@ -341,7 +344,7 @@ class ChQuery {
     })
   }
 
-  def nationRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
+  def nationRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "nation", scanQuery, tSchema).map(r => {
       Nation(r.getValue("n_nationkey").asInstanceOf[Short],
         r.getValue("n_name").asInstanceOf[String],
@@ -350,7 +353,7 @@ class ChQuery {
     })
   }
 
-  def supplierRdd(scc: TSparkContext, scanQuery: ScanQuery, tSchema: TSchema) = {
+  def supplierRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
     new TRDD[TRecord](scc, "supplier", scanQuery, tSchema).map(r => {
       Supplier(r.getValue("su_suppkey").asInstanceOf[Short],
         r.getValue("su_name").asInstanceOf[String],
@@ -370,11 +373,14 @@ object ChQuery {
   /**
    * Execute query reflectively
    */
-  def executeQuery(queryNo: Int, st: String, cm: String, pn: Int, cs: Long, mUrl: String): Unit = {
+  def executeQuery(queryNo: Int, tSparkContext: TSparkContext, sqlContext: SQLContext): Unit = {
     assert(queryNo >= 1 && queryNo <= 22, "Invalid query number")
-    val m = Class.forName(f"ch.ethz.queries.chb.Q${queryNo}%d").newInstance.asInstanceOf[ {def execute(st: String, cm: String, cn: Int, cs: Long, mUrl: String)}]
+    tSparkContext.startTransaction()
+    val m = Class.forName(f"ch.ethz.queries.chb.Q${queryNo}%d").newInstance.asInstanceOf[{
+          def execute(tSparkContext: TSparkContext, sqlContext: SQLContext)}]
     logger.info("[%s] Pre query execution".format(this.getClass.getName))
-    val res = m.execute(st, cm, pn, cs, mUrl)
+    val res = m.execute(tSparkContext, sqlContext)
+    tSparkContext.commitTrx()
     logger.info("[%s] Post query execution".format(this.getClass.getName))
   }
 
@@ -382,40 +388,49 @@ object ChQuery {
     var st = "192.168.0.21:7241"
     var cm = "192.168.0.21:7242"
     var partNum = 4
-    var cs = 5120000L
-    var masterUrl = "local[1]"
-    var qryNum = 6
+    var qryNum = 0
+    var chunkSizeSmall = 0x100000L  // 1MB
+    var chunkSizeBig = 0x100000000L // 4GB
+    var parallelScans =12
 
     // client properties
-    if (args.length >= 4) {
+    if (args.length >= 3 && args.length <= 7) {
       st = args(0)
       cm = args(1)
       partNum = args(2).toInt
-      cs = args(3).toLong
-      if (args.length == 6) {
-        masterUrl = args(4)
-        qryNum = args(5).toInt
-      } else {
-        println("[TELL] Incorrect number of parameters")
-        println("[TELL] <strMng> <commitMng> <partNum> <chunkSz> <masterUrl> <appName>")
-        throw new RuntimeException("Invalid number of arguments")
+      if (args.length > 3) {
+        qryNum = args(3).toInt
       }
+      if (args.length > 4) {
+        chunkSizeSmall = args(4).toLong
+      }
+      if (args.length > 5) {
+        chunkSizeBig = args(5).toLong
+      }
+      if (args.length > 6) {
+        parallelScans = args(6).toInt
+      }
+    } else {
+      println("[TELL] Incorrect number of parameters")
+      println("[TELL] <strMng> <commitMng> <partNum> [<query-num>] [<small-chunk-size>] [<big-chunk-size>] [<num-parallel-scans>]")
+      throw new RuntimeException("Invalid number of arguments")
     }
 
-    TClientFactory.setConf(st, cm, cs)
-    TClientFactory.startTransaction()
-    ChTSchema.init_schema(TClientFactory.mainTrx)
-    TClientFactory.commitTrx()
+    val tSparkContext: TSparkContext = new TSparkContext(st, cm, partNum, chunkSizeSmall, chunkSizeBig, parallelScans)
+    val sqlContext = new org.apache.spark.sql.SQLContext(tSparkContext.sparkContext)
+    tSparkContext.startTransaction()
+    ChTSchema.init_schema(tSparkContext.mainTrx)
+    tSparkContext.commitTrx()
 
-    logger.warn("[%s] Query %d: %s".format(this.getClass.getName,  qryNum, TClientFactory.toString ))
+    logger.warn("[%s] Query %d".format(this.getClass.getName,  qryNum))
     val excludeList = List(16,20,21)
      val includeList = List(1,4,6,7,11,17,18,22)
     if (qryNum > 0) {
-      executeQuery(qryNum, st, cm, partNum, cs, masterUrl)
+      executeQuery(qryNum, tSparkContext, sqlContext)
     } else {
       includeList.map(i => {
         logger.warn("Executing query " + i)
-        executeQuery(i, st, cm, partNum, cs, masterUrl)
+        executeQuery(i, tSparkContext, sqlContext)
       }
       )
     }

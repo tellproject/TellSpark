@@ -1,7 +1,9 @@
 package ch.ethz.queries.chb
 
+import ch.ethz.TScanQuery
 import ch.ethz.queries.ChQuery
 import ch.ethz.tell._
+import org.apache.spark.sql.SQLContext
 
 /**
  * Ch Query1
@@ -16,12 +18,11 @@ class Q1 extends ChQuery {
   /**
    * implemented in children classes and hold the actual query
    */
-  override def execute(st: String, cm: String, cn: Int, cs: Long, mUrl: String): Unit = {
-    val scc = new TSparkContext(mUrl, className, st, cm, cn, cs)
+  override def execute(tSparkContext: TSparkContext, sqlContext: SQLContext): Unit = {
 
-    val sqlContext = new org.apache.spark.sql.SQLContext(scc.sparkContext)
-    import org.apache.spark.sql.functions._
+    import tSparkContext.BufferType._
     import sqlContext.implicits._
+    import org.apache.spark.sql.functions._
 
     val oSchema = ChTSchema.orderLineSch
 
@@ -29,10 +30,10 @@ class Q1 extends ChQuery {
     val dateSelection = new CNFClause
     dateSelection.addPredicate(
       ScanQuery.CmpType.GREATER, oSchema.getField("ol_delivery_d").index, referenceDate2007)
-    val orderLineQuery = new ScanQuery
+    val orderLineQuery = new TScanQuery("order-line", tSparkContext.partNum.value, Big)
     orderLineQuery.addSelection(dateSelection)
 
-    val orderline = orderLineRdd(scc, orderLineQuery, ChTSchema.orderLineSch).toDF()
+    val orderline = orderLineRdd(tSparkContext, orderLineQuery, ChTSchema.orderLineSch).toDF()
     logger.info("[Query %d] %s".format(1, orderline.printSchema))
 
     //ToDo projection push downs
@@ -46,6 +47,5 @@ class Q1 extends ChQuery {
       .sort($"ol_number")
 
     timeCollect(res, 1)
-    scc.sparkContext.stop()
   }
 }

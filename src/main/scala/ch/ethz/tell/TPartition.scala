@@ -1,11 +1,12 @@
 package ch.ethz.tell
 
+import ch.ethz.TScanQuery
 import org.apache.spark.Partition
 
 /**
  * Contains basic information about TellStore partition
  */
-class TPartition[T] (val index: Int, val scanQry: ScanQuery, val tableName: String) extends Partition {
+class TPartition[T] (val index: Int, val scanQry: TScanQuery, val tableName: String) extends Partition {
 
   override def toString = {
     val sb = new StringBuilder
