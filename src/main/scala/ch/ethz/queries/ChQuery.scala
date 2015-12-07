@@ -391,7 +391,7 @@ object ChQuery {
     var qryNum = 0
     var chunkSizeSmall = 0x100000L  // 1MB
     var chunkSizeBig = 0x100000000L // 4GB
-    var parallelScans =12
+    var parallelScans = 6
 
     // client properties
     if (args.length >= 3 && args.length <= 7) {

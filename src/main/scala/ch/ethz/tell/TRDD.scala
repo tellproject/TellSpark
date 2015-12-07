@@ -143,7 +143,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
   def compute(split: Partition, context: TaskContext): Iterator[T] = {
     val theSplit = split.asInstanceOf[TPartition[T]]
-    val scanIt = sparkContext.asInstanceOf[TSparkContext].startScan(theSplit.scanQry)
+    val scanIt = tContext.startScan(theSplit.scanQry)
     logger.info("[TRDD] TellStore scanQuery using transactionId: %s".format(tContext.broadcastTc.value))
     getIterator(scanIt)
   }

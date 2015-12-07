@@ -20,7 +20,7 @@ class Q1 extends ChQuery {
    */
   override def execute(tSparkContext: TSparkContext, sqlContext: SQLContext): Unit = {
 
-    import tSparkContext.BufferType._
+    import BufferType._
     import sqlContext.implicits._
     import org.apache.spark.sql.functions._
 
