@@ -44,8 +44,9 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
     chunkNum = sparkContext.broadcast(paralScans * storageNum.value)
   }
 
-  def initializeClientManager() = {
-    logger.warn("initialize client manager if necessary")
+  def initializeClientManager() = synchronized {
+    logger.warn("initialize client manager if necessary, thread-id:" + Thread.currentThread().getId
+        + ", spark-context-object-hash: " + this.toString)
     if (clientManager == null) {
       logger.warn("before client creation for %s and %s".format(commitMng.value, storageMng.value))
       clientManager = new ClientManager(commitMng.value, storageMng.value)
@@ -53,8 +54,9 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
     }
   }
 
-  def initializeMemoryManagers() = {
-    logger.warn("initialize scan memory manager if necessary")
+  def initializeMemoryManagers() = synchronized {
+    logger.warn("initialize scan memory manager if necessary, thread-id:" + Thread.currentThread().getId
+        + ", spark-context-object-hash: " + this.toString)
     if (scanMemoryManagers == null) {
       logger.warn("before scan memory creation")
       scanMemoryManagers = new Array[ScanMemoryManager](2)
