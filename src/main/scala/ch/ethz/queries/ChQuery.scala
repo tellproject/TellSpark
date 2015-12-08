@@ -174,6 +174,11 @@ class ChQuery {
    */
   def execute(tSparkContext: TSparkContext, sqlContext: SQLContext): Unit = ???
 
+  def logDataFrame(qryName: String, df: DataFrame) = {
+    logger.info("[QUERY %s] Filter at compute level: %s".format(qryName, df.printSchema))
+    logger.info("[QUERY %s] Physical plan: %s".format(qryName, df.explain(true)))
+  }
+
   def timeCollect(df: DataFrame, queryNo: Int): Unit = {
     val t0 = System.nanoTime()
     val cnt = df.count
