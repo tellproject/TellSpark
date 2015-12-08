@@ -25,7 +25,7 @@ class Q1 extends ChQuery {
 
     // dummy rdd
     // TODO feels like a hack, better way to do this?
-    orderLineRdd(tSparkContext, new TScanQuery("",tSparkContext.partNum.value, Big), orderLineSch).count()
+//    orderLineRdd(tSparkContext, new TScanQuery("order-line",tSparkContext.partNum.value, Big), orderLineSch).count()
 
     // prepare date selection
     val dateSelection = new CNFClause
