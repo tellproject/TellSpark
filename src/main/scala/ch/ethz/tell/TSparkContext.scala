@@ -69,10 +69,11 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
   // used mainly to get a new transaction-id
   def startTransaction() = {
     initializeClientManager
-    logger.warn("starting transaction")
+    logger.info("[%s] New client created.".format(this.getClass.getSimpleName))
     mainTrx = Transaction.startTransaction(clientManager)
-    logger.info("[%s] New client created.".format(this.getClass.getName))
-    logger.info("[%s] Starting transaction with trxId %d.".format(this.getClass.getName, mainTrx.getTransactionId))
+    logger.info("[%s] Started transaction with trxId %d.".format(this.getClass.getSimpleName, mainTrx.getTransactionId))
+    if (broadcastTc != null)
+       logger.info("[%s] Previous transaction with trxId %d.".format(this.getClass.getSimpleName, broadcastTc.value))
     broadcastTc = sparkContext.broadcast(mainTrx.getTransactionId)
   }
 
@@ -81,14 +82,13 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
   def getTransaction(trId: Long) = {
     initializeClientManager
     initializeMemoryManagers
-    logger.warn("getting transaction")
-    logger.info("[%s] New client created.".format(this.getClass.getName))
-    logger.info("[%s] Starting transaction with trxId %d.".format(this.getClass.getName, trId))
+    logger.info("[%s] Getting transaction with trxId %d.".format(this.getClass.getSimpleName, trId))
     Transaction.startTransaction(trId, clientManager)
   }
 
   def startScan(tScanQuery: TScanQuery): ScanIterator = {
     val trx = getTransaction(broadcastTc.value)
+    logger.info("[%s] Starting scan with trxId %d.".format(this.getClass.getName, broadcastTc.value))
     trx.scan(scanMemoryManagers(tScanQuery.getScanMemoryManagerIndex()), tScanQuery)
   }
 
@@ -103,3 +103,4 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
 
   def getConf: SparkConf = sparkContext.getConf
 }
+
