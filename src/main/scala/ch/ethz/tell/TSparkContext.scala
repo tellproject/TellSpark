@@ -31,7 +31,7 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
   @transient var scanMemoryManagers: Array[ScanMemoryManager] = null
 
   def this(strMng: String, cmMng: String, pNum: Int,
-           chSzSmall: Long, chSzBig: Long, chPerS: Int) {
+           chSzSmall: Long, chSzBig: Long, paralScans: Int) {
 
     this(new SparkConf())
     //logger.warn("[%s] SPARK_EXECUTOR_MEMORY_STATUS: %d".format(this.getClass.getSimpleName, sparkContext.getExecutorMemoryStatus.toString))
@@ -41,7 +41,7 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
     partNum = sparkContext.broadcast(pNum)
     chSizeSmall = sparkContext.broadcast(chSzSmall)
     chSizeBig= sparkContext.broadcast(chSzBig)
-    chunkNum = sparkContext.broadcast(chPerS * storageNum.value)
+    chunkNum = sparkContext.broadcast(paralScans * storageNum.value)
   }
 
   def initializeClientManager() = {
