@@ -33,19 +33,21 @@ class Q1 extends ChQuery {
     val orderLineQuery = new TScanQuery("order-line", tSparkContext.partNum.value, Big)
     orderLineQuery.addSelection(dateSelection)
 
-    val orderline = orderLineRdd(tSparkContext, orderLineQuery, ChTSchema.orderLineSch).toDF()
-    logger.info("[Query %d] %s".format(1, orderline.printSchema))
+    val orderline = orderLineRdd(tSparkContext, orderLineQuery, ChTSchema.orderLineSch)
+    println(orderline.count)
+    //val orderline = orderLineRdd(tSparkContext, orderLineQuery, ChTSchema.orderLineSch).toDF()
+    //logger.info("[Query %d] %s".format(1, orderline.printSchema))
 
     //ToDo projection push downs
-    val res = orderline
-      .groupBy($"ol_number")
-      .agg(sum($"ol_amount"),
-        sum($"ol_quantity"),
-        avg($"ol_quantity"),
-        avg($"ol_amount"),
-        count($"ol_number"))
-      .sort($"ol_number")
+    //val res = orderline
+    //  .groupBy($"ol_number")
+    //  .agg(sum($"ol_amount"),
+    //    sum($"ol_quantity"),
+    //    avg($"ol_quantity"),
+    //    avg($"ol_amount"),
+    //    count($"ol_number"))
+    //  .sort($"ol_number")
 
-    timeCollect(res, 1)
+    //timeCollect(res, 1)
   }
 }

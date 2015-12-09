@@ -27,8 +27,6 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
   var broadcastTc: Broadcast[Long] = null
 
   @transient var mainTrx : Transaction = null  // used by driver program
-  @transient var clientManager: ClientManager = null
-  @transient var scanMemoryManagers: Array[ScanMemoryManager] = null
 
   def this(strMng: String, cmMng: String, pNum: Int,
            chSzSmall: Long, chSzBig: Long, paralScans: Int) {
@@ -42,37 +40,17 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
     chSizeSmall = sparkContext.broadcast(chSzSmall)
     chSizeBig= sparkContext.broadcast(chSzBig)
     chunkNum = sparkContext.broadcast(paralScans * storageNum.value)
-  }
-
-  def initializeClientManager() = synchronized {
-    logger.warn("initialize client manager if necessary, thread-id:" + Thread.currentThread().getId
-        + ", spark-context-object-hash: " + this.toString)
-    if (clientManager == null) {
-      logger.warn("before client creation for %s and %s".format(commitMng.value, storageMng.value))
-      clientManager = new ClientManager(commitMng.value, storageMng.value)
-      logger.warn("after client creation")
-    }
-  }
-
-  def initializeMemoryManagers() = synchronized {
-    logger.warn("initialize scan memory manager if necessary, thread-id:" + Thread.currentThread().getId
-        + ", spark-context-object-hash: " + this.toString)
-    if (scanMemoryManagers == null) {
-      logger.warn("before scan memory creation")
-      scanMemoryManagers = new Array[ScanMemoryManager](2)
-      import BufferType._
-      scanMemoryManagers(Small) = new ScanMemoryManager(clientManager, chunkNum.value, chSizeSmall.value)
-      scanMemoryManagers(Big) = new ScanMemoryManager(clientManager, chunkNum.value, chSizeBig.value)
-      logger.warn("after scan memory creation")
-    }
+    logger.warn("end of sparkcontext-constructor, thread-id:" + Thread.currentThread().getId
+      + ", spark-context-object-hash: " + this.toString)
   }
 
   // creates a new transaction with no result buffer attached
   // used mainly to get a new transaction-id
   def startTransaction() = {
-    initializeClientManager
     logger.info("[%s] New client created.".format(this.getClass.getSimpleName))
-    mainTrx = Transaction.startTransaction(clientManager)
+    TStorageConnection.getInstance(commitMng.value, storageMng.value,
+        chSizeSmall.value, chSizeBig.value, chunkNum.value)
+    mainTrx = Transaction.startTransaction(TStorageConnection.clientManager)
     logger.info("[%s] Started transaction with trxId %d.".format(this.getClass.getSimpleName, mainTrx.getTransactionId))
     if (broadcastTc != null)
        logger.info("[%s] Previous transaction with trxId %d.".format(this.getClass.getSimpleName, broadcastTc.value))
@@ -82,16 +60,18 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
   // gets a transaction object for the given transaction-id.
   // the given client manager must have memory chunks allocated for buffering results
   def getTransaction(trId: Long) = {
-    initializeClientManager
-    initializeMemoryManagers
+    TStorageConnection.getInstance(commitMng.value, storageMng.value,
+      chSizeSmall.value, chSizeBig.value, chunkNum.value)
     logger.info("[%s] Getting transaction with trxId %d.".format(this.getClass.getSimpleName, trId))
-    Transaction.startTransaction(trId, clientManager)
+    Transaction.startTransaction(trId, TStorageConnection.clientManager)
   }
 
   def startScan(tScanQuery: TScanQuery): ScanIterator = {
+    TStorageConnection.getInstance(commitMng.value, storageMng.value,
+      chSizeSmall.value, chSizeBig.value, chunkNum.value)
     val trx = getTransaction(broadcastTc.value)
     logger.info("[%s] Starting scan with trxId %d.".format(this.getClass.getName, broadcastTc.value))
-    trx.scan(scanMemoryManagers(tScanQuery.getScanMemoryManagerIndex()), tScanQuery)
+    trx.scan(TStorageConnection.scanMemoryManagers(tScanQuery.getScanMemoryManagerIndex()), tScanQuery)
   }
 
   // make sure this is called on Master only!
