@@ -1,6 +1,7 @@
 package ch.ethz.queries
 
 import ch.ethz.TScanQuery
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
 
 import java.util.Calendar
@@ -177,6 +178,13 @@ class ChQuery {
   def logDataFrame(qryName: String, df: DataFrame) = {
     logger.info("[QUERY %s] Filter at compute level: %s".format(qryName, df.printSchema))
     logger.info("[QUERY %s] Physical plan: %s".format(qryName, df.explain(true)))
+  }
+
+  def timeCollect(pRdd: RDD[_], queryNo: Int) : Unit = {
+    val t0 = System.nanoTime()
+    val cnt = pRdd.count
+    val t1 = System.nanoTime()
+    logger.warn("[Query %d] Elapsed time: %d msecs. map:%d".format(queryNo, (t1 - t0) / 1000000, cnt))
   }
 
   def timeCollect(df: DataFrame, queryNo: Int): Unit = {

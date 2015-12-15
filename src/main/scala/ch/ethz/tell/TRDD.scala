@@ -105,6 +105,8 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
           rec.setField(fieldCnt.asInstanceOf[Short], unsafe.getLong(addr + off))
           fieldCnt += 1
           off += 8;
+        case FieldType.BLOB | FieldType.TEXT | FieldType.NOTYPE | FieldType.NULLTYPE =>
+          throw new IllegalArgumentException("%s Type is not a fixed size field.".format(fieldType.toString))
       }
     }
     // variable sized fields

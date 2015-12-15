@@ -32,22 +32,24 @@ class Q1 extends ChQuery {
     dateSelection.addPredicate(ScanQuery.CmpType.GREATER, olSchema.getField("ol_delivery_d").index, referenceDate2007)
     val selectionQuery = new TScanQuery("order-line", tSparkContext.partNum.value, Big)
     selectionQuery.addSelection(dateSelection)
-    val ol = orderLineRdd(tSparkContext, selectionQuery, orderLineSch).toDF()
-    logDataFrame(this.getClass.getSimpleName, ol)
+    val olRdd = orderLineRdd(tSparkContext, selectionQuery, orderLineSch)
+//    logDataFrame(this.getClass.getSimpleName, olRdd)
+//    timeCollect(olRdd, 1)
+    val ol = olRdd.toDF()
     timeCollect(ol, 1)
 
     // empty query
-    val emptyQry = new TScanQuery("order-line", tSparkContext.partNum.value, Big)
-    val ol2 = orderLineRdd(tSparkContext, emptyQry, orderLineSch).toDF
-    ol2.filter($"ol_delivery_d" >= 20071212)
-    logDataFrame(this.getClass.getSimpleName, ol2)
-    timeCollect(ol2, 1)
+//    val emptyQry = new TScanQuery("order-line", tSparkContext.partNum.value, Big)
+//    val ol2 = orderLineRdd(tSparkContext, emptyQry, orderLineSch).toDF
+//    ol2.filter($"ol_delivery_d" >= 20071212)
+//    logDataFrame(this.getClass.getSimpleName, ol2)
+//    timeCollect(ol2, 1)
 
     // correcteness test
-    val valsSel = ol.agg(max($"ol_delivery_d").as("max_date"), min($"ol_delivery_d").as("min_date")).collect()
-    val valsSpark = ol2.agg(max($"ol_delivery_d").as("max_date"), min($"ol_delivery_d").as("min_date")).collect()
-    logger.warn("[QUERY %s] Pushdown. Max->%s \t Min->%s".format(this.getClass.getSimpleName, valsSel(0), valsSel(1)))
-    logger.warn("[QUERY %s] SparkFilter. Max->%s \t Min->%s".format(this.getClass.getSimpleName, valsSpark(0), valsSpark(1)))
+//    val valsSel = ol.agg(max($"ol_delivery_d").as("max_date"), min($"ol_delivery_d").as("min_date")).collect()
+//    val valsSpark = ol2.agg(max($"ol_delivery_d").as("max_date"), min($"ol_delivery_d").as("min_date")).collect()
+//    valsSel.map( p => logger.warn("[QUERY %s] Pushdown.%s".format(this.getClass.getSimpleName, p.toString())))
+//    valsSpark.map( p => logger.warn("[QUERY %s] SparkFilter.%s".format(this.getClass.getSimpleName, p.toString())))
   }
 
 }
