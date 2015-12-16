@@ -48,7 +48,7 @@ class Q22 extends ChQuery {
       phoneSelection.addPredicate(
         ScanQuery.CmpType.LIKE, cPhoneIndex, PredicateType.create(String.valueOf(d)))
     }
-    customerQuery.addSelection(phoneSelection)
+//    customerQuery.addSelection(phoneSelection)
 //
     val fcustomer = customerRdd(tSparkContext, customerQuery, cSchema).toDF()
       .filter($"c_phone".substr(1,1).isin("1","2","3","4","5","6","7"))
@@ -57,9 +57,7 @@ class Q22 extends ChQuery {
 //
     val avg_cbal = fcustomer.filter($"c_balance" > 0).select($"c_balance").agg(avg($"c_balance").as("avg_balance"))
     val res = fcustomer.join(order,
-      $"c_id" !== order("o_c_id")
-        && $"c_w_id" !== order("o_w_id")
-        && $"c_d_id" !== order("o_d_id")
+      ($"c_id" !== order("o_c_id")) && ($"c_w_id" !== order("o_w_id")) && ($"c_d_id" !== order("o_d_id"))
     )
     .join(avg_cbal, $"c_balance" > avg_cbal("avg_balance"))//.filter($"c_balance" > avg_cbal("avg_balance"))
     .select($"c_state".substr(1,1).as("country"), $"c_balance")

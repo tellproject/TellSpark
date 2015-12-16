@@ -37,24 +37,31 @@ class Q21 extends ChQuery {
 
     // prepare nation selection
     val nSchema = ChTSchema.nationSch
-    val nationQuery = new TScanQuery("nation", tSparkContext.partNum.value, Small)
+    val natQry = new TScanQuery("nation", tSparkContext.partNum.value, Small)
     val nNameIndex = nSchema.getField("n_name").index
 //
     val nationSelection = new CNFClause
     nationSelection.addPredicate(
       ScanQuery.CmpType.EQUAL, nNameIndex, new StringType("Germany"))
-    nationQuery.addSelection(nationSelection)
+//    nationQuery.addSelection(nationSelection)
 //
+    val olQry = new TScanQuery("order-line", tSparkContext.partNum.value, Big)
+    val olQry2 = new TScanQuery("order-line", tSparkContext.partNum.value, Big)
     val orderQry = new TScanQuery("order", tSparkContext.partNum.value, Big)
-    val supQry = new TScanQuery("supplier", tSparkContext.partNum.value, Small)
+    val supQry = new TScanQuery("supplier", tSparkContext.partNum.value, Big)
     val stockQry = new TScanQuery("stock", tSparkContext.partNum.value, Big)
-    val oo = orderLineRdd(tSparkContext, orderQry, ChTSchema.orderLineSch)
-    val orderline1 = oo.toDF()
-    val orderline2 = oo.toDF()
+    val oo = orderLineRdd(tSparkContext, olQry, ChTSchema.orderLineSch)
+    val oo2 = orderLineRdd(tSparkContext, olQry2, ChTSchema.orderLineSch)
+
     val supplier = supplierRdd(tSparkContext, supQry, ChTSchema.supplierSch).toDF()
     val stock = stockRdd(tSparkContext, stockQry, ChTSchema.stockSch).toDF()
-    val fnation = nationRdd(tSparkContext, nationQuery, nSchema).toDF()
+    val fnation = nationRdd(tSparkContext, natQry, nSchema).toDF()
       .filter($"n_name" === "Germany")
+
+    val orderline1 = oo.toDF()
+    val orderline2 = orderline1
+//    val orderline2 = oo2.toDF()
+
     val order = orderRdd(tSparkContext, orderQry, ChTSchema.orderSch).toDF()
 //
     val s_n = supplier.join(fnation, $"su_nationkey" === "n_nationkey")
@@ -64,20 +71,20 @@ class Q21 extends ChQuery {
       (orderline1("ol_w_id") !== orderline2("ol_w_id")) &&
       (orderline1("ol_d_id") !== orderline2("ol_d_id")) &&
       (orderline1("ol_delivery_d") > orderline2("ol_delivery_d"))))
-      //ol_w_id = s_w_id and ol_i_id = s_i_id
-    .join(s_s_n,
-        orderline1("ol_w_id") === $"s_w_id" &&
-        orderline1("ol_i_id") === $"s_i_id")
-    .join(order,
-        orderline1("ol_o_id") === $"o_id" &&
-        orderline1("ol_w_id") === $"o_w_id" &&
-        orderline1("ol_d_id") === $"o_d_id" &&
-        orderline1("ol_delivery_d") > $"o_entry_d")
-    .select($"su_name", $"o_id")
-    .groupBy($"su_name")
-      // todo is this the same? count(*) as numwait
-    .agg(count($"o_id").as("numwait"))
-    .orderBy($"numwait".desc, $"su_name")
+//      ol_w_id = s_w_id and ol_i_id = s_i_id
+//    .join(s_s_n,
+//        orderline1("ol_w_id") === $"s_w_id" &&
+//        orderline1("ol_i_id") === $"s_i_id")
+//    .join(order,
+//        orderline1("ol_o_id") === $"o_id" &&
+//        orderline1("ol_w_id") === $"o_w_id" &&
+//        orderline1("ol_d_id") === $"o_d_id" &&
+//        orderline1("ol_delivery_d") > $"o_entry_d")
+//    .select($"su_name", $"o_id")
+//    .groupBy($"su_name")
+//       todo is this the same? count(*) as numwait
+//    .agg(count($"o_id").as("numwait"))
+//    .orderBy($"numwait".desc, $"su_name")
 
     timeCollect(res, 21)
   }
