@@ -27,10 +27,10 @@ object ParamHandler {
         chunkSizeSmall = args(4).toLong
       }
       if (args.length > 5) {
-        chunkSizeMedium = args(6).toLong
+        chunkSizeMedium = args(5).toLong
       }
       if (args.length > 6) {
-        chunkSizeBig = args(5).toLong
+        chunkSizeBig = args(6).toLong
       }
       if (args.length > 7) {
         parallelScans = args(7).toInt
