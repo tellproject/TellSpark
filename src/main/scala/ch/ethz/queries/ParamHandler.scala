@@ -16,7 +16,7 @@ object ParamHandler {
 
   def getParams(args: Array[String]) = {
     // client properties
-    if (args.length >= 3 && args.length <= 7) {
+    if (args.length >= 3 && args.length <= 8) {
       st = args(0)
       cm = args(1)
       partNum = args(2).toInt
