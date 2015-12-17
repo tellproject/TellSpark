@@ -10,33 +10,51 @@ class TRecord (var fieldSchema: TSchema, var values : Array[Any])
     this(fSchema, new Array[Any](valSz))
   }
 
-  //TODO:
-//  def getComplete() = {
-//    (fieldSchema.fields., values)
-//  }
-
+  /**
+    * get tuple (field description and value) by field index
+    */
   def getField(idx : Short) = {
-    (fieldSchema.fields(idx), values(idx))
+    (fieldSchema.getField(idx), values(idx))
   }
 
+  /**
+    * get tuple (field description and value) by name
+    */
   def getField(fieldName : String) = {
-    fieldSchema.strFields(fieldName)
+    val field = fieldSchema.getField(fieldName)
+    (field, values(field.index))
   }
 
+  /**
+    * get only value of a field by field index
+    */
+  def getValue(idx : Short) = {
+    val tuple = getField(idx)
+    tuple._2
+  }
+
+  /**
+    * get only value of a field by name
+    */
+  def getValue(fieldName : String) = {
+    val tuple = getField(fieldName)
+    tuple._2
+  }
+
+  /**
+    * sets the value of a field
+    */
   def setField(idx: Short, value: Any) = {
     values(idx) = value
   }
 
-  def getValue(fieldName : String) = {
-    val idx = fieldSchema.getField(fieldName).index
-    values(idx)
-  }
   override def toString():String = {
     val sb = new StringBuilder
     sb.append("{")
-    fieldSchema.strFields.map(entry => {
-      sb.append(entry._1).append(":")
-      sb.append(values(fieldSchema.getField(entry._1).index))
+    (0 to fieldSchema.getSize()-1).map(entry => {
+      val tuple = getField(entry.asInstanceOf[Short])
+      sb.append(tuple._1.fieldName).append(":")
+      sb.append(tuple._2)
     })
     sb.append("}")
     sb.toString()

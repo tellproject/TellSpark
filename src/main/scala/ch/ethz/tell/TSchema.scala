@@ -11,9 +11,9 @@ class TSchema extends Serializable {
 
   var fixedSizeFields = ArrayBuffer[FieldType]()
   var varSizeFields = ArrayBuffer[FieldType]()
-  var fields = HashMap[Short, Field]()
-  var strFields = HashMap[String, Field]()
-  var headerLength = 0L
+  private var fields = HashMap[Short, Field]()
+  private var strFields = HashMap[String, Field]()
+  private var headerLength = 0L
 
   def this(tellSchema: Schema) {
     this()
@@ -44,6 +44,15 @@ class TSchema extends Serializable {
 
   def getSize() : Short = {
     fields.size.asInstanceOf[Short]
+  }
+
+  def getHeaderLength() : Long = {
+    headerLength
+  }
+
+  def createProjection(fieldIndex: Short) : Projection = {
+    val field = getField(fieldIndex)
+    new Projection(fieldIndex, field.fieldName, field.fieldType, field.nullable)
   }
 
   def printFixedSize():String = {

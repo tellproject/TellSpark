@@ -55,7 +55,7 @@ import ch.ethz.tell._
 //    val amountAggregation = new Aggregation(AggrType.SUM, olAmountIndex, "sum_ol_amount", FieldType.BIGINT)
 //    orderLineQuery.addAggregation(amountAggregation)
 //
-//    val resultSchema = orderLineQuery.getAggregationResultSchema
+//    val resultSchema = orderLineQuery.getResultSchema
 //
 //    // convert an RDDs to a DataFrames
 //    val aggrTrdd = new TRDD[TRecord](scc, "order-line", orderLineQuery, new TSchema(resultSchema)).map(r => {
