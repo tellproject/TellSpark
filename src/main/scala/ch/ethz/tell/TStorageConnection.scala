@@ -23,7 +23,7 @@ object TStorageConnection {
       + ", spark-context-object-hash: " + this.toString)
     if (scanMemoryManagers == null) {
       logger.warn("before scan memory creation")
-      scanMemoryManagers = new Array[ScanMemoryManager](2)
+      scanMemoryManagers = new Array[ScanMemoryManager](3)
       import BufferType._
       scanMemoryManagers(Small) = new ScanMemoryManager(clientManager, chunkNum, chSizeSmall)
       scanMemoryManagers(Big) = new ScanMemoryManager(clientManager, chunkNum, chSizeBig)

@@ -48,9 +48,9 @@ class Q5 extends ChQuery {
 //    regionQuery.addSelection(regionSelection)
 
     val olQry = new TScanQuery("order-line", tSparkContext.partNum.value, Big)
-    val cusQry = new TScanQuery("customer", tSparkContext.partNum.value, Big)
-    val supQry = new TScanQuery("supplier", tSparkContext.partNum.value, Big)
-    val stkQry = new TScanQuery("stock", tSparkContext.partNum.value, Big)
+    val cusQry = new TScanQuery("customer", tSparkContext.partNum.value, Medium)
+    val supQry = new TScanQuery("supplier", tSparkContext.partNum.value, Small)
+    val stkQry = new TScanQuery("stock", tSparkContext.partNum.value, Medium)
     val natQry = new TScanQuery("nation", tSparkContext.partNum.value, Small)
 
     //orderline
