@@ -30,6 +30,7 @@ object MicroQuery {
     var qryNum = 0
     var chunkSizeSmall = 0x100000L  // 1MB
     var chunkSizeBig = 0x100000000L // 4GB
+    var chunkSizeMedium = 0x80000000L // 2GB
     var parallelScans = 6
 
     // client properties
@@ -47,15 +48,18 @@ object MicroQuery {
         chunkSizeBig = args(5).toLong
       }
       if (args.length > 6) {
-        parallelScans = args(6).toInt
+        chunkSizeMedium = args(6).toLong
+      }
+      if (args.length > 7) {
+        parallelScans = args(7).toInt
       }
     } else {
       println("[TELL] Incorrect number of parameters")
-      println("[TELL] <strMng> <commitMng> <partNum> [<query-num>] [<small-chunk-size>] [<big-chunk-size>] [<num-parallel-scans>]")
+      println("[TELL] <strMng> <commitMng> <partNum> [<query-num>] [<small-chunk-size>] [<big-chunk-size>] [<medium-chunk-size] [<num-parallel-scans>]")
       throw new RuntimeException("Invalid number of arguments")
     }
 
-    val tSparkContext: TSparkContext = new TSparkContext(st, cm, partNum, chunkSizeSmall, chunkSizeBig, parallelScans)
+    val tSparkContext: TSparkContext = new TSparkContext(st, cm, partNum, chunkSizeSmall, chunkSizeBig, chunkSizeMedium, parallelScans)
     val sqlContext = new org.apache.spark.sql.SQLContext(tSparkContext.sparkContext)
     tSparkContext.startTransaction()
     ChTSchema.init_schema(tSparkContext.mainTrx)
