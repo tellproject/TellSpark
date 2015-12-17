@@ -24,12 +24,12 @@ class Q2 extends ChQuery {
 
     val rSchema = ChTSchema.regionSch
     val projectionQuery = new TScanQuery("region", tSparkContext.partNum.value, Small)
-    projectionQuery.addProjection(rSchema.createProjection("n_nationkey"))
-    projectionQuery.addProjection(rSchema.createProjection("n_name"))
+    projectionQuery.addProjection(rSchema.createProjection("r_regionkey"))
+    projectionQuery.addProjection(rSchema.createProjection("r_name"))
     val resultSchema = new TSchema(projectionQuery.getResultSchema)
     val olRdd = new TRDD[TRecord](tSparkContext, projectionQuery, resultSchema).map(r => {
-      println(r.getValue("n_nationkey").asInstanceOf[Short])
-      println(r.getValue("n_name").asInstanceOf[String])
+      println(r.getValue("r_regionkey").asInstanceOf[Short])
+      println(r.getValue("r_name").asInstanceOf[String])
     })
 //    logDataFrame(this.getClass.getSimpleName, olRdd)
     timeCollect(olRdd, 1)
