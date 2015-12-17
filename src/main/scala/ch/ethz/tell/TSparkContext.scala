@@ -23,13 +23,14 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
   var partNum: Broadcast[Int] = null
   var chSizeSmall: Broadcast[Long] = null
   var chSizeBig: Broadcast[Long] = null
+  var chSizeMedium: Broadcast[Long] = null
   var chunkNum: Broadcast[Int] = null
   var broadcastTc: Broadcast[Long] = null
 
   @transient var mainTrx : Transaction = null  // used by driver program
 
   def this(strMng: String, cmMng: String, pNum: Int,
-           chSzSmall: Long, chSzBig: Long, paralScans: Int) {
+           chSzSmall: Long, chSzBig: Long, chSzMedium:Long, paralScans: Int) {
 
     this(new SparkConf())
     //logger.warn("[%s] SPARK_EXECUTOR_MEMORY_STATUS: %d".format(this.getClass.getSimpleName, sparkContext.getExecutorMemoryStatus.toString))
@@ -38,7 +39,8 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
     commitMng = sparkContext.broadcast(cmMng)
     partNum = sparkContext.broadcast(pNum)
     chSizeSmall = sparkContext.broadcast(chSzSmall)
-    chSizeBig= sparkContext.broadcast(chSzBig)
+    chSizeBig = sparkContext.broadcast(chSzBig)
+    chSizeMedium = sparkContext.broadcast(chSzMedium)
     chunkNum = sparkContext.broadcast(paralScans * storageNum.value)
     logger.warn("end of sparkcontext-constructor, thread-id:" + Thread.currentThread().getId
       + ", spark-context-object-hash: " + this.toString)
@@ -49,7 +51,7 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
   def startTransaction() = {
     logger.info("[%s] New client created.".format(this.getClass.getSimpleName))
     TStorageConnection.getInstance(commitMng.value, storageMng.value,
-        chSizeSmall.value, chSizeBig.value, chunkNum.value)
+        chSizeSmall.value, chSizeBig.value, chSizeMedium.value, chunkNum.value)
     mainTrx = Transaction.startTransaction(TStorageConnection.clientManager)
     logger.info("[%s] Started transaction with trxId %d.".format(this.getClass.getSimpleName, mainTrx.getTransactionId))
     if (broadcastTc != null)
@@ -61,14 +63,14 @@ class TSparkContext (@transient val conf: SparkConf) extends Serializable{
   // the given client manager must have memory chunks allocated for buffering results
   def getTransaction(trId: Long) = {
     TStorageConnection.getInstance(commitMng.value, storageMng.value,
-      chSizeSmall.value, chSizeBig.value, chunkNum.value)
+      chSizeSmall.value, chSizeBig.value, chSizeMedium.value, chunkNum.value)
     logger.info("[%s] Getting transaction with trxId %d.".format(this.getClass.getSimpleName, trId))
     Transaction.startTransaction(trId, TStorageConnection.clientManager)
   }
 
   def startScan(tScanQuery: TScanQuery): ScanIterator = {
     TStorageConnection.getInstance(commitMng.value, storageMng.value,
-      chSizeSmall.value, chSizeBig.value, chunkNum.value)
+      chSizeSmall.value, chSizeBig.value, chSizeMedium.value, chunkNum.value)
     val trx = getTransaction(broadcastTc.value)
     logger.info("[%s] Starting scan with trxId %d.".format(this.getClass.getName, broadcastTc.value))
     trx.scan(TStorageConnection.scanMemoryManagers(tScanQuery.getScanMemoryManagerIndex()), tScanQuery)
