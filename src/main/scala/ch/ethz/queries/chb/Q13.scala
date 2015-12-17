@@ -24,6 +24,7 @@ class Q13 extends ChQuery {
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
     import BufferType._
+
     // prepare date selection
     val oSchema = ChTSchema.orderSch
     val ordQry = new TScanQuery("order", tSparkContext.partNum.value, Big)
