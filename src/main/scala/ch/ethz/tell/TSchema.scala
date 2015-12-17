@@ -52,7 +52,12 @@ class TSchema extends Serializable {
 
   def createProjection(fieldIndex: Short) : Projection = {
     val field = getField(fieldIndex)
-    new Projection(fieldIndex, field.fieldName, field.fieldType, field.nullable)
+    new Projection(field.index, field.fieldName, field.fieldType, field.nullable)
+  }
+
+  def createProjection(fieldName: String) : Projection = {
+    val field = getField(fieldName)
+    new Projection(field.index, field.fieldName, field.fieldType, field.nullable)
   }
 
   def printFixedSize():String = {
