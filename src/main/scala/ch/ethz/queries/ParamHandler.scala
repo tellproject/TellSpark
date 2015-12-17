@@ -27,17 +27,17 @@ object ParamHandler {
         chunkSizeSmall = args(4).toLong
       }
       if (args.length > 5) {
-        chunkSizeBig = args(5).toLong
+        chunkSizeMedium = args(6).toLong
       }
       if (args.length > 6) {
-        chunkSizeMedium = args(6).toLong
+        chunkSizeBig = args(5).toLong
       }
       if (args.length > 7) {
         parallelScans = args(7).toInt
       }
     } else {
       println("[TELL] Incorrect number of parameters")
-      println("[TELL] <strMng> <commitMng> <partNum> [<query-num>] [<small-chunk-size>] [<big-chunk-size>] [<medium-chunk-size] [<num-parallel-scans>]")
+      println("[TELL] <strMng> <commitMng> <partNum> [<query-num>] [<small-chunk-size>] [<medium-chunk-size] [<big-chunk-size>] [<num-parallel-scans>]")
       throw new RuntimeException("Invalid number of arguments")
     }
   }
