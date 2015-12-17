@@ -201,7 +201,7 @@ class ChQuery {
   }
 
   def warehouseRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "warehouse", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       Warehouse(r.getValue("w_id").asInstanceOf[Int],
         r.getValue("w_name").asInstanceOf[String],
         r.getValue("w_street_1").asInstanceOf[String],
@@ -216,7 +216,7 @@ class ChQuery {
   }
 
   def districtRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "district", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       District(r.getValue("d_id").asInstanceOf[Short],
         r.getValue("d_w_id").asInstanceOf[Short],
         r.getValue("d_name").asInstanceOf[String],
@@ -233,7 +233,7 @@ class ChQuery {
   }
 
   def customerRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "customer", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       Customer(r.getValue("c_id").asInstanceOf[Int],
         r.getValue("c_d_id").asInstanceOf[Short],
         r.getValue("c_w_id").asInstanceOf[Short],
@@ -261,7 +261,7 @@ class ChQuery {
   }
 
   def historyRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "history", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       History(r.getValue("h_c_id").asInstanceOf[Int],
         r.getValue("h_c_d_id").asInstanceOf[Short],
         r.getValue("h_c_w_id").asInstanceOf[Short],
@@ -275,7 +275,7 @@ class ChQuery {
   }
 
   def newOrderRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "new-order", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       NewOrder(r.getValue("no_o_id").asInstanceOf[Int],
         r.getValue("no_d_id").asInstanceOf[Short],
         r.getValue("no_w_id").asInstanceOf[Short]
@@ -284,7 +284,7 @@ class ChQuery {
   }
 
   def orderRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "order", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       Order(r.getValue("o_id").asInstanceOf[Int],
         r.getValue("o_d_id").asInstanceOf[Short],
         r.getValue("o_w_id").asInstanceOf[Short],
@@ -298,7 +298,7 @@ class ChQuery {
   }
 
   def orderLineRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "order-line", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       OrderLine(r.getValue("ol_o_id").asInstanceOf[Int],
         r.getValue("ol_d_id").asInstanceOf[Short],
         r.getValue("ol_w_id").asInstanceOf[Short],
@@ -314,7 +314,7 @@ class ChQuery {
   }
 
   def itemRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "item", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       Item(r.getValue("i_id").asInstanceOf[Int],
         r.getValue("i_im_id").asInstanceOf[Int],
         r.getValue("i_name").asInstanceOf[String],
@@ -325,7 +325,7 @@ class ChQuery {
   }
 
   def stockRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "stock", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       Stock(r.getValue("s_i_id").asInstanceOf[Int],
         r.getValue("s_w_id").asInstanceOf[Short],
         r.getValue("s_quantity").asInstanceOf[Int],
@@ -349,7 +349,7 @@ class ChQuery {
   }
 
   def regionRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "region", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       Region(r.getValue("r_regionkey").asInstanceOf[Short],
         r.getValue("r_name").asInstanceOf[String],
         r.getValue("r_comment").asInstanceOf[String]
@@ -358,7 +358,7 @@ class ChQuery {
   }
 
   def nationRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "nation", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       Nation(r.getValue("n_nationkey").asInstanceOf[Short],
         r.getValue("n_name").asInstanceOf[String],
         r.getValue("n_regionkey").asInstanceOf[Short],
@@ -367,7 +367,7 @@ class ChQuery {
   }
 
   def supplierRdd(scc: TSparkContext, scanQuery: TScanQuery, tSchema: TSchema) = {
-    new TRDD[TRecord](scc, "supplier", scanQuery, tSchema).map(r => {
+    new TRDD[TRecord](scc, scanQuery, tSchema).map(r => {
       Supplier(r.getValue("su_suppkey").asInstanceOf[Short],
         r.getValue("su_name").asInstanceOf[String],
         r.getValue("su_address").asInstanceOf[String],

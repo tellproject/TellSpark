@@ -20,16 +20,15 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
   // Tell schema
   var tSchema: TSchema = null
   // Tell table
-  var tTable: String = ""
+//  var tTable: String = ""
   // Tell query
   var tQuery: TScanQuery = null
   // Tell context
   var tContext: TSparkContext = null
 
-  def this(@transient scc: TSparkContext, tbl: String, qry: TScanQuery, sch: TSchema) = {
+  def this(@transient scc: TSparkContext, qry: TScanQuery, sch: TSchema) = {
     this(scc.sparkContext, Nil)
     tSchema = sch
-    tTable = tbl
     tQuery = qry
     tContext = scc
   }
@@ -159,7 +158,7 @@ class TRDD [T: ClassTag]( @transient var sc: SparkContext,
 
     (0 to partNum-1).map(pos => {
       val scn = new TScanQuery(pos, tQuery)
-      array(pos) = new TPartition(pos, scn, tTable)
+      array(pos) = new TPartition(pos, scn)
       logger.info("[TRDD] Partition used: %s".format(array(pos).toString))
     })
     array
