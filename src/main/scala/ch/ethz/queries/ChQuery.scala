@@ -1,6 +1,7 @@
 package ch.ethz.queries
 
 import ch.ethz.TScanQuery
+import ch.ethz.tell.BufferType._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
 
@@ -377,6 +378,10 @@ class ChQuery {
         r.getValue("su_comment").asInstanceOf[String])
     })
   }
+
+  def getOrderQry(tSparkContext: TSparkContext) : TScanQuery = {
+    new TScanQuery("order", tSparkContext.partNum.value, Big)
+  }
 }
 
 object ChQuery {
@@ -402,7 +407,7 @@ object ChQuery {
     ParamHandler.getParams(args)
 
     val tSparkContext: TSparkContext = new TSparkContext(ParamHandler.st, ParamHandler.cm, ParamHandler.partNum,
-      ParamHandler.chunkSizeSmall, ParamHandler.chunkSizeBig, ParamHandler.chunkSizeMedium, ParamHandler.parallelScans)
+      ParamHandler.chunkSizeSmall, ParamHandler.chunkSizeBig, ParamHandler.parallelScans)
 
     val sqlContext = new org.apache.spark.sql.SQLContext(tSparkContext.sparkContext)
     tSparkContext.startTransaction()

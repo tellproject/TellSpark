@@ -27,7 +27,7 @@ class Q13 extends ChQuery {
 
     // prepare date selection
     val oSchema = ChTSchema.orderSch
-    val ordQry = new TScanQuery("order", tSparkContext.partNum.value, Big)
+    val ordQry = getOrderQry(tSparkContext)
     val oCarrierIndex = oSchema.getField("o_carrier_id").index
 
     val carrierSelection = new CNFClause
