@@ -11,12 +11,12 @@ object ParamHandler {
   var qryNum = 0
   var chunkSizeSmall = 0x100000L  // 1MB
   var chunkSizeBig = 0x100000000L // 4GB
-  var chunkSizeMedium = 0x80000000L // 2GB
+//  var chunkSizeMedium = 0x80000000L // 2GB
   var parallelScans = 6
 
   def getParams(args: Array[String]) = {
     // client properties
-    if (args.length >= 3 && args.length <= 8) {
+    if (args.length >= 3 && args.length <= 7) {
       st = args(0)
       cm = args(1)
       partNum = args(2).toInt
@@ -27,17 +27,14 @@ object ParamHandler {
         chunkSizeSmall = args(4).toLong
       }
       if (args.length > 5) {
-        chunkSizeMedium = args(5).toLong
+        chunkSizeBig = args(5).toLong
       }
       if (args.length > 6) {
-        chunkSizeBig = args(6).toLong
-      }
-      if (args.length > 7) {
-        parallelScans = args(7).toInt
+        parallelScans = args(6).toInt
       }
     } else {
       println("[TELL] Incorrect number of parameters")
-      println("[TELL] <strMng> <commitMng> <partNum> [<query-num>] [<small-chunk-size>] [<medium-chunk-size] [<big-chunk-size>] [<num-parallel-scans>]")
+      println("[TELL] <strMng> <commitMng> <partNum> [<query-num>] [<small-chunk-size>] [<big-chunk-size>] [<num-parallel-scans>]")
       throw new RuntimeException("Invalid number of arguments")
     }
   }

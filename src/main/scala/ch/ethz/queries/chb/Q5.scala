@@ -2,7 +2,6 @@ package ch.ethz.queries.chb
 
 import ch.ethz.TScanQuery
 import ch.ethz.queries.ChQuery
-import ch.ethz.tell.PredicateType.StringType
 import ch.ethz.tell._
 import org.apache.spark.sql.SQLContext
 
@@ -48,9 +47,9 @@ class Q5 extends ChQuery {
 //    regionQuery.addSelection(regionSelection)
 
     val olQry = new TScanQuery("order-line", tSparkContext.partNum.value, Big)
-    val cusQry = new TScanQuery("customer", tSparkContext.partNum.value, Medium)
+    val cusQry = new TScanQuery("customer", tSparkContext.partNum.value, Big)
     val supQry = new TScanQuery("supplier", tSparkContext.partNum.value, Small)
-    val stkQry = new TScanQuery("stock", tSparkContext.partNum.value, Medium)
+    val stkQry = new TScanQuery("stock", tSparkContext.partNum.value, Big)
     val natQry = new TScanQuery("nation", tSparkContext.partNum.value, Small)
 
     //orderline

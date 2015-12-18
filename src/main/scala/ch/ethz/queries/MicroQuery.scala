@@ -28,7 +28,7 @@ object MicroQuery {
     ParamHandler.getParams(args)
 
     val tSparkContext: TSparkContext = new TSparkContext(ParamHandler.st, ParamHandler.cm, ParamHandler.partNum,
-      ParamHandler.chunkSizeSmall, ParamHandler.chunkSizeBig, ParamHandler.chunkSizeMedium, ParamHandler.parallelScans)
+      ParamHandler.chunkSizeSmall, ParamHandler.chunkSizeBig, ParamHandler.parallelScans)
     val sqlContext = new org.apache.spark.sql.SQLContext(tSparkContext.sparkContext)
     tSparkContext.startTransaction()
     ChTSchema.init_schema(tSparkContext.mainTrx)
