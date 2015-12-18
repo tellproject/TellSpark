@@ -18,23 +18,22 @@ object TStorageConnection {
     }
   }
 
-  private def initializeMemoryManagers(chSizeSmall: Long, chSizeBig: Long, chSizeMedium: Long, chunkNum: Int) = synchronized {
+  private def initializeMemoryManagers(chSizeSmall: Long, chSizeBig: Long, chunkNum: Int) = synchronized {
     logger.warn("initialize scan memory manager if necessary, thread-id:" + Thread.currentThread().getId
       + ", spark-context-object-hash: " + this.toString)
     if (scanMemoryManagers == null) {
       logger.warn("before scan memory creation")
-      scanMemoryManagers = new Array[ScanMemoryManager](3)
+      scanMemoryManagers = new Array[ScanMemoryManager](2)
       import BufferType._
       scanMemoryManagers(Small) = new ScanMemoryManager(clientManager, chunkNum, chSizeSmall)
       scanMemoryManagers(Big) = new ScanMemoryManager(clientManager, chunkNum, chSizeBig)
-      scanMemoryManagers(Medium) = new ScanMemoryManager(clientManager, chunkNum, chSizeMedium)
       logger.warn("after scan memory creation")
     }
   }
 
-  def getInstance(commitMng: String, storageMng: String, chSizeSmall: Long, chSizeBig: Long, chSizeMedium: Long, chunkNum: Int): Unit = {
+  def getInstance(commitMng: String, storageMng: String, chSizeSmall: Long, chSizeBig: Long,  chunkNum: Int): Unit = {
     initializeClientManager(commitMng, storageMng)
-    initializeMemoryManagers(chSizeSmall, chSizeBig, chSizeMedium, chunkNum)
+    initializeMemoryManagers(chSizeSmall, chSizeBig, chunkNum)
     // return a reference to "this" object
   }
 
