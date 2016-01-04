@@ -21,9 +21,8 @@ unmanagedBase := baseDirectory.value / "lib"
 unmanagedJars in Compile := (baseDirectory.value ** "*.jar").classpath
 
 libraryDependencies ++= Seq(
-  "org.scalatest" % "scalatest_2.10" % "3.0.0-SNAP4",
-  "org.apache.spark" % "spark-core_2.10" % "1.5.0", //exclude("org.slf4j", "slf4j-api")
-  "org.apache.spark" %% "spark-hive" % "1.5.0"
+  "org.apache.spark" % "spark-core_2.10" % "1.5.2",
+  "org.apache.spark" % "spark-sql_2.10" % "1.5.2"
 )
 
 assemblyMergeStrategy in assembly := {
