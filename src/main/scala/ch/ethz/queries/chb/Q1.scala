@@ -1,9 +1,8 @@
 package ch.ethz.queries.chb
 
-import ch.ethz.TScanQuery
 import ch.ethz.queries.ChQuery
-import ch.ethz.tell._
-import org.apache.spark.sql.SQLContext
+import ch.ethz.tell.TellContext
+import org.apache.spark.sql.DataFrame
 
 /**
  * Ch Query1
@@ -15,39 +14,23 @@ import org.apache.spark.sql.SQLContext
  */
 class Q1 extends ChQuery {
 
-  /**
-   * implemented in children classes and hold the actual query
-   */
-  override def execute(tSparkContext: TSparkContext, sqlContext: SQLContext): Unit = {
-
-    import BufferType._
-    import sqlContext.implicits._
+  override def executeQuery(context: TellContext): DataFrame = {
     import org.apache.spark.sql.functions._
 
-    val oSchema = ChTSchema.orderLineSch
+    val orderline = context.read.format("tell").options(Map(
+      "table" -> "order-line",
+      "numPartitions" -> "8"
+    )).load()
 
-    // prepare date selection
-    val dateSelection = new CNFClause
-    dateSelection.addPredicate(
-      ScanQuery.CmpType.GREATER, oSchema.getField("ol_delivery_d").index, referenceDate2007)
-    val orderLineQuery = new TScanQuery("order-line", tSparkContext.partNum.value, Big)
-    orderLineQuery.addSelection(dateSelection)
-
-    //val orderline = orderLineRdd(tSparkContext, orderLineQuery, ChTSchema.orderLineSch)
-    //println(orderline.count)
-    val orderline = orderLineRdd(tSparkContext, orderLineQuery, ChTSchema.orderLineSch).toDF()
-    logger.info("[Query %d] %s".format(1, orderline.printSchema))
-
-    //ToDo projection push downs
-    val res = orderline
-      .groupBy($"ol_number")
-      .agg(sum($"ol_amount"),
-        sum($"ol_quantity"),
-        avg($"ol_quantity"),
-        avg($"ol_amount"),
-        count($"ol_number"))
-      .sort($"ol_number")
-
-    timeCollect(res, 1)
+    orderline
+      .filter(orderline("ol_delivery_d") > referenceDate2007)
+      .groupBy("ol_number")
+      .agg(
+        sum("ol_quantity").as("sum_qty"),
+        sum("ol_amount").as("sum_amount"),
+        avg("ol_quantity").as("avg_qty"),
+        avg("ol_amount").as("avg_amount"),
+        count("ol_number").as("count_order")
+      ).sort("ol_number")
   }
 }
