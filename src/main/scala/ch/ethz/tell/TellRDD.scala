@@ -52,7 +52,7 @@ class TellRDD(
   def compileFilter (filter:Filter, clause:CNFClause, srcSchema:Schema): Unit = {
     filter match {
       case And(left, right) => throw new RuntimeException("AND should never appear within a filter as each" +
-        "conjunct is supposed to appear in its proper filter! --> check API of interfaces.scala:PrunedFilteredScan")
+        " conjunct is supposed to appear in its proper filter! --> check API of interfaces.scala:PrunedFilteredScan")
       case Or(left, right) =>
         compileFilter(left, clause, srcSchema)
         compileFilter(right, clause, srcSchema)
