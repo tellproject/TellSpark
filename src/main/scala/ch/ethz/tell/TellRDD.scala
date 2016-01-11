@@ -56,6 +56,8 @@ class TellRDD(
       val connection = context.connection
       val transaction = connection.startTransaction(transactionId)
 
+      val srcSchema = transaction.schemaForTable(table)
+
       val scanQuery = {
         val numPartitions = {
           if (partitions.length > 1) {
@@ -98,7 +100,15 @@ class TellRDD(
         query
       }
 
-      val schema = scanQuery.getResultSchema
+      var schema:Schema = null
+      try {
+        schema = scanQuery.getResultSchema
+      } catch {
+        case e : RuntimeException => {
+          // if there is no result schema (because there is no projection or aggregation), then use the source schema
+          schema = srcSchema
+        }
+      }
 
       val headerLength = schema.getHeaderLength
 
