@@ -72,6 +72,8 @@ class TellRDD(
         clause.addPredicate(CmpType.PREFIX_LIKE, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
       case StringEndsWith(attr, value) =>
         clause.addPredicate(CmpType.POSTFIX_LIKE, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+      case StringContains(attr, value) =>
+        // we cannot push down "contains" because it is not supported in TellStore
     }
   }
 
