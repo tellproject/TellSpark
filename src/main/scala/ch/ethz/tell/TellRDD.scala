@@ -51,8 +51,6 @@ class TellRDD(
   // compiles a (possibly nested) filter
   def compileFilter (filter:Filter, clause:CNFClause, srcSchema:Schema): Unit = {
     filter match {
-      case And(left, right) => throw new RuntimeException("AND should never appear within a filter as each" +
-        " conjunct is supposed to appear in its proper filter! --> check API of interfaces.scala:PrunedFilteredScan")
       case Or(left, right) =>
         compileFilter(left, clause, srcSchema)
         compileFilter(right, clause, srcSchema)
@@ -73,9 +71,11 @@ class TellRDD(
       case StringEndsWith(attr, value) =>
         clause.addPredicate(CmpType.POSTFIX_LIKE, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
       case _ =>
-        // we cannot push down other predicates, e.g. "contains" because it is not supported in TellStore
-        // however, this is not a problem because push-downs are just an optimization and predicates are re-evaluated
+        // We cannot push down other predicates, e.g. "contains" or "and" nested into an "or" because this is
+        // not supported in TellStore.
+        // However, this is not a problem because push-downs are just an optimization and predicates are re-evaluated
         // anyway later again.
+        logWarning("filter " + filter + " cannot be pushed down. It is currently not supported in Tell.")
     }
   }
 
