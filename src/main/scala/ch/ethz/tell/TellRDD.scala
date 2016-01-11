@@ -48,6 +48,33 @@ class TellRDD(
 
   override def getPartitions: Array[Partition] = partitions
 
+  // compiles a (possibly nested) filter
+  def compileFilter (filter:Filter, clause:CNFClause, srcSchema:Schema): Unit = {
+    filter match {
+      case And(left, right) => throw new RuntimeException("AND should never appear within a filter as each" +
+        "conjunct is supposed to appear in its proper filter! --> check API of interfaces.scala:PrunedFilteredScan")
+      case Or(left, right) =>
+        compileFilter(left, clause, srcSchema)
+        compileFilter(right, clause, srcSchema)
+      case EqualTo(attr, value) =>
+        clause.addPredicate(CmpType.EQUAL, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+      case LessThan(attr, value) =>
+        clause.addPredicate(CmpType.LESS, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+      case GreaterThan(attr, value) =>
+        clause.addPredicate(CmpType.GREATER, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+      case LessThanOrEqual(attr, value) =>
+        clause.addPredicate(CmpType.LESS_EQUAL, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+      case GreaterThanOrEqual(attr, value) =>
+        clause.addPredicate(CmpType.GREATER_EQUAL, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+      case IsNull(attr) => clause.addPredicate(CmpType.IS_NULL, srcSchema.idOf(attr), null)
+      case IsNotNull(attr) => clause.addPredicate(CmpType.IS_NOT_NULL, srcSchema.idOf(attr), null)
+      case StringStartsWith(attr, value) =>
+        clause.addPredicate(CmpType.PREFIX_LIKE, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+      case StringEndsWith(attr, value) =>
+        clause.addPredicate(CmpType.POSTFIX_LIKE, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+    }
+  }
+
   override def compute(split: Partition, task: TaskContext): Iterator[InternalRow] = {
     new Iterator[InternalRow] {
       logInfo(s"Iterating through a TellRDD split [transaction = ${transactionId}, table = ${table}, " +
@@ -75,24 +102,7 @@ class TellRDD(
         }
         for (filter <- filters) {
           val clause = new CNFClause
-          filter match {
-            case EqualTo(attr, value) =>
-              clause.addPredicate(CmpType.EQUAL, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
-            case LessThan(attr, value) =>
-              clause.addPredicate(CmpType.LESS, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
-            case GreaterThan(attr, value) =>
-              clause.addPredicate(CmpType.GREATER, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
-            case LessThanOrEqual(attr, value) =>
-              clause.addPredicate(CmpType.LESS_EQUAL, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
-            case GreaterThanOrEqual(attr, value) =>
-              clause.addPredicate(CmpType.GREATER_EQUAL, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
-            case IsNull(attr) => clause.addPredicate(CmpType.IS_NULL, srcSchema.idOf(attr), null)
-            case IsNotNull(attr) => clause.addPredicate(CmpType.IS_NOT_NULL, srcSchema.idOf(attr), null)
-            case StringStartsWith(attr, value) =>
-              clause.addPredicate(CmpType.PREFIX_LIKE, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
-            case StringEndsWith(attr, value) =>
-              clause.addPredicate(CmpType.POSTFIX_LIKE, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
-          }
+          compileFilter(filter, clause, srcSchema)
           if (clause.numPredicates() > 0) {
             query.addSelection(clause)
           }
