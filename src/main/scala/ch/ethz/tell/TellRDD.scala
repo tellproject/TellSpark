@@ -106,7 +106,7 @@ class TellRDD(
         }
         for (filter <- filters) {
           val clause = new CNFClause
-          compileFilter(filter, clause, srcSchema)
+//          compileFilter(filter, clause, srcSchema)
           if (clause.numPredicates() > 0) {
             query.addSelection(clause)
           }
