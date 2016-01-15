@@ -17,7 +17,7 @@ class DefaultSource extends RelationProvider with DataSourceRegister {
   override def createRelation(sqlContext: SQLContext, parameters: Map[String, String]): BaseRelation = {
     val table = parameters.getOrElse("table", sys.error("Option 'table' not specified"))
 
-    val useSmallMemory = parameters.getOrElse("useSmallMemory", "false").toBoolean
+    val useSmallMemory = false //parameters.getOrElse("useSmallMemory", "false").toBoolean
 
     val numPartitions = parameters.getOrElse("numPartitions", sys.error("Option 'numPartitions' not specified")).toInt
     if (numPartitions < 1) {

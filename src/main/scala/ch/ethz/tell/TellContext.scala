@@ -19,7 +19,7 @@ object TellConnection extends Logging {
           clientManagerInstance = new ClientManager(commitManager, storageManager)
 
           logInfo(s"Initializing small memory manager [count = ${chunkCount} size = ${chunkSizeSmall}]")
-          memoryManagerSmallInstance = new ScanMemoryManager(clientManagerInstance, chunkCount, chunkSizeSmall)
+          //memoryManagerSmallInstance = new ScanMemoryManager(clientManagerInstance, chunkCount, chunkSizeSmall)
 
           logInfo(s"Initializing big memory manager [count = ${chunkCount} size = ${chunkSizeBig}]")
           memoryManagerBigInstance = new ScanMemoryManager(clientManagerInstance, chunkCount, chunkSizeBig)
@@ -38,7 +38,7 @@ class TellConnection(commitManager: String,
 
   val clientManager = TellConnection.clientManagerInstance
 
-  val memoryManagerSmall = TellConnection.memoryManagerSmallInstance
+  //val memoryManagerSmall = TellConnection.memoryManagerSmallInstance
 
   val memoryManagerBig = TellConnection.memoryManagerBigInstance
 

@@ -106,7 +106,7 @@ class TellRDD(
         }
         for (filter <- filters) {
           val clause = new CNFClause
-//          compileFilter(filter, clause, srcSchema)
+          compileFilter(filter, clause, srcSchema)
           if (clause.numPredicates() > 0) {
             query.addSelection(clause)
           }
@@ -147,11 +147,7 @@ class TellRDD(
 
       val iter: ScanIterator = {
         val scanMemoryManager = {
-          if (useSmallMemory) {
-            connection.memoryManagerSmall
-          } else {
-            connection.memoryManagerBig
-          }
+          connection.memoryManagerBig
         }
         transaction.scan(scanMemoryManager, scanQuery)
       }
