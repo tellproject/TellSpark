@@ -63,6 +63,10 @@ class TellContext(sc: SparkContext) extends SQLContext(sc) with Logging {
 
   val commitManager = tellConf.get("spark.sql.tell.commitmanager")
   val storageManager = tellConf.get("spark.sql.tell.storagemanager")
+  val partitionShift = {
+    val storageCount = storageManager.split(";").length
+    Math.log(storageCount).toInt
+  }
   val chunkCount = tellConf.getInt("spark.sql.tell.chunkCount", 8)
   val chunkSizeSmall = tellConf.getLong("spark.sql.tell.chunkSizeSmall", 4L * 1024L)
   val chunkSizeBig = tellConf.getLong("spark.sql.tell.chunkSizeBig", 4L * 1024L * 1024L)

@@ -97,9 +97,8 @@ class TellRDD(
             0
           }
         }
-        val srcSchema = transaction.schemaForTable(table)
 
-        val query = new ScanQuery(table, split.index, numPartitions)
+        val query = new ScanQuery(table, context.partitionShift, split.index, numPartitions)
         for (name <- requiredColumns) {
           val field = srcSchema.getFieldByName(name)
           query.addProjection(field.index, field.fieldName, field.fieldType, field.notNull)
