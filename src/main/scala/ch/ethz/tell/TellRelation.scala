@@ -55,8 +55,6 @@ case class TellRelation(
   @transient
   val context = sqlContext.asInstanceOf[TellContext]
 
-  override val needConversion: Boolean = false
-
   override val schema: StructType = {
     val transaction = context.transaction
     val srcSchema = transaction.schemaForTable(table)
@@ -70,6 +68,12 @@ case class TellRelation(
       i = i + 1
     }
     StructType(fields)
+  }
+
+  override val needConversion: Boolean = false
+
+  override def unhandledFilters(filters: Array[Filter]): Array[Filter] = {
+    filters.filterNot(f => TellRDD.validFilter(f))
   }
 
   override def buildScan(requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {

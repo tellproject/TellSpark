@@ -31,6 +31,29 @@ object TellRDD extends Logging {
     case data: String => PredicateType.create(data)
     case _ => null
   }
+
+  def validFilter(filter: Filter): Boolean = {
+    filter match {
+      case Or(left, right) => validFilter(left) && validFilter(right)
+      case EqualTo(_, _) => true
+      case LessThan(_, _) => true
+      case GreaterThan(_, _) => true
+      case LessThanOrEqual(_, _) => true
+      case GreaterThanOrEqual(_, _) => true
+      case IsNull(_) => true
+      case IsNotNull(_) => true
+      case StringStartsWith(_, _) => true
+      case StringEndsWith(_, _) => true
+      case Not(child) => child match {
+        case EqualTo(_, _) => true
+        case StringStartsWith(_, _) => true
+        case StringEndsWith(_, _) => true
+        case _ => false
+      }
+      case In(_, _) => true
+      case _ => false
+    }
+  }
 }
 
 /**
@@ -49,7 +72,7 @@ class TellRDD(
   override def getPartitions: Array[Partition] = partitions
 
   // compiles a (possibly nested) filter
-  def compileFilter (filter:Filter, clause:CNFClause, srcSchema:Schema): Unit = {
+  def compileFilter(filter: Filter, clause: CNFClause, srcSchema: Schema): Unit = {
     filter match {
       case Or(left, right) =>
         compileFilter(left, clause, srcSchema)
@@ -70,6 +93,22 @@ class TellRDD(
         clause.addPredicate(CmpType.PREFIX_LIKE, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
       case StringEndsWith(attr, value) =>
         clause.addPredicate(CmpType.POSTFIX_LIKE, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+      case Not(child) => child match {
+        case EqualTo(attr, value) =>
+          clause.addPredicate(CmpType.NOT_EQUAL, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+        case StringStartsWith(attr, value) =>
+          clause.addPredicate(CmpType.PREFIX_NOT_LIKE, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+        case StringEndsWith(attr, value) =>
+          clause.addPredicate(CmpType.POSTFIX_NOT_LIKE, srcSchema.idOf(attr), TellRDD.getPredicateType(value))
+        case _ =>
+          logWarning("filter NOT " + child + " cannot be pushed down. It is currently not supported in Tell.")
+      }
+      case In(attr, values) => {
+        val id = srcSchema.idOf(attr)
+        for (value <- values) {
+          clause.addPredicate(CmpType.EQUAL, id, TellRDD.getPredicateType(value))
+        }
+      }
       case _ =>
         // We cannot push down other predicates, e.g. "contains" or "and" nested into an "or" because this is
         // not supported in TellStore.
