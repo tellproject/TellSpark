@@ -22,8 +22,8 @@ unmanagedBase := baseDirectory.value / "lib"
 unmanagedJars in Compile := (baseDirectory.value ** "*.jar").classpath
 
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-core" % "1.5.2",
-  "org.apache.spark" %% "spark-sql" % "1.5.2"
+  "org.apache.spark" %% "spark-core" % "1.6.0",
+  "org.apache.spark" %% "spark-sql" % "1.6.0"
 )
 
 assemblyMergeStrategy in assembly := {
