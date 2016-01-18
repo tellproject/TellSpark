@@ -138,9 +138,12 @@ class TellRDD(
         }
 
         val query = new ScanQuery(table, context.partitionShift, numPartitions, split.index)
-        for (name <- requiredColumns) {
-          val field = srcSchema.getFieldByName(name)
-          query.addProjection(field.index, field.fieldName, field.fieldType, field.notNull)
+
+        if (requiredColumns.length != srcSchema.fieldCount) {
+          for (name <- requiredColumns) {
+            val field = srcSchema.getFieldByName(name)
+            query.addProjection(field.index, field.fieldName, field.fieldType, field.notNull)
+          }
         }
         for (filter <- filters) {
           val clause = new CNFClause
